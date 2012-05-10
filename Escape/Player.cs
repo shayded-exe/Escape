@@ -14,8 +14,6 @@ namespace Escape
 		private static int healthBar = 0;
 		private static List<int> inventory = new List<int>();
 		
-		private readonly static string[] Commands = new string[] {"help", "?", "exit", "quit", "move", "go", "examine", "take", "pickup", "drop", "place", "use", "items", "inventory", "inv", "attack"};
-		private readonly static string[] BattleCommands = new string[] {"attack", "flee", "escape", "use", "items", "inventory", "inv"};
 		private static string[] Attacks = new string[] {/*TODO: Add attacks*/};
 		#endregion
 		
@@ -42,69 +40,69 @@ namespace Escape
 			switch(Program.GameState)
 			{
 				case Program.GameStates.Playing:
-					if (IsValidInput(Commands, verb, true))
+					switch(verb)
 					{
-						switch(verb)
-						{
-							case "help":
-							case "?":
-								WriteCommands();
-								break;
-							case "exit":
-							case "quit":
-								Program.GameState = Program.GameStates.Quit;
-								break;
-							case "move":
-							case "go":
-								MoveTo(noun);
-								break;
-							case "examine":
-								Examine(noun);
-								break;
-							case "take":
-							case "pickup":
-								Pickup(noun);
-								break;
-							case "drop":
-							case "place":
-								Place(noun);
-								break;
-							case "use":
-								Use(noun);
-								break;
-							case "items":
-							case "inventory":
-							case "inv":
-								DisplayInventory();
-								break;
-							case "attack":
-								//attack command
-								break;
-						}
+						case "help":
+						case "?":
+							WriteCommands();
+							break;
+						case "exit":
+						case "quit":
+							Program.GameState = Program.GameStates.Quit;
+							break;
+						case "move":
+						case "go":
+							MoveTo(noun);
+							break;
+						case "examine":
+							Examine(noun);
+							break;
+						case "take":
+						case "pickup":
+							Pickup(noun);
+							break;
+						case "drop":
+						case "place":
+							Place(noun);
+							break;
+						case "use":
+							Use(noun);
+							break;
+						case "items":
+						case "inventory":
+						case "inv":
+							DisplayInventory();
+							break;
+						case "attack":
+							//attack command
+							break;
+						default:
+							InputNotValid();
+							break;							
 					}
 					break;
 					
 				case Program.GameStates.Battle:
-					if(IsValidInput(BattleCommands, verb, true))
+					switch(verb)
 					{
-						switch(verb)
-						{
-							case "attack":
-								//attack command
-								break;
-							case "flee":
-							case "escape":
-								//flee command
-								break;
-							case "use":
-								//use command
-								break;
-							case "items":
-							case "inventory":
-							case "inv":
-								//items command
-								break;
-						}
+						case "attack":
+							//attack command
+							break;
+						case "flee":
+						case "escape":
+							//flee command
+							break;
+						case "use":
+							//use command
+							break;
+						case "items":
+						case "inventory":
+						case "inv":
+							//items command
+							break;
+						default:
+							InputNotValid();
+							break;
 					}
 					break;
 			}
@@ -115,18 +113,19 @@ namespace Escape
 		private static void WriteCommands()
 		{
 			Text.WriteColor("`g`Available Commands:`w`");
-			Text.WriteColor("help/? - Displays this list.");
-			Text.WriteColor("exit/quit - Exits the game.");
-			Text.WriteColor("move/go <`c`location`w`> - Moves you to the specified location.");
-			Text.WriteColor("examine <`c`item`w`> - Shows info about the specified item.");
-			Text.WriteColor("take/pickuip <`c`item`w`> - Puts the specified item in your inventory.");
-			Text.WriteColor("drop/place <`c`item`w`> - Drops the specified item from your inventory and places it in the world.");
-			Text.WriteColor("items/inventory/inv - Displays your current inventory.");
-			Text.WriteColor("use <`c`item`w`> - Uses the specified item.");
+			Text.WriteColor("help/? - Display this list.");
+			Text.WriteColor("exit/quit - Exit the game.");
+			Text.WriteColor("move/go <`c`location`w`> - Move to the specified location.");
+			Text.WriteColor("examine <`c`item`w`> - Show info about the specified item.");
+			Text.WriteColor("take/pickuip <`c`item`w`> - Put the specified item in your inventory.");
+			Text.WriteColor("drop/place <`c`item`w`> - Drop the specified item from your inventory and place it in the world.");
+			Text.WriteColor("items/inventory/inv - Display your current inventory.");
+			Text.WriteColor("use <`c`item`w`> - Use the specified item.");
 			Text.BlankLines();
 			
 			Text.WriteColor("`r`Not Implemented Commands:`w`");
-			Text.WriteColor("attack <`c`enemy`w`> - Attacks the specified enemy.");
+			Text.WriteColor("attack <`c`enemy`w`> - Attack the specified enemy.");
+			Text.WriteColor("talk <`c`person`w`> - Talk to the specified person.");
 			Text.BlankLines();
 		}
 		
@@ -246,9 +245,7 @@ namespace Escape
 			for (int i = 0; i < inventory.Count; i++)
 			{
 				string name = World.Items[inventory[i]].Name;
-				Text.WriteColor("|`w`" + name, false);
-				Text.BlankSpaces(15 - name.Length);
-				Text.WriteColor("`m`|");
+				Text.WriteColor("|`w`" + name + Text.BlankSpaces(15 - name.Length, true) + "`m`|");
 			}
 			
 			Text.WriteColor("\\---------------/`w`");
@@ -257,20 +254,9 @@ namespace Escape
 		#endregion
 		
 		#region Helper Methods
-		private static bool IsValidInput(string[] type, string aString, bool notify)
+		private static void InputNotValid()
 		{
-			for (int i = 0; i < type.Length; i++)
-			{
-				if (type[i] == aString)
-					return true;
-			}
-			
-			if(notify)
-			{
-				Program.SetError("That isn't a valid command!");
-			}
-			
-			return false;
+			Program.SetError("That isn't a valid command!");
 		}
 		
 		private static bool ItemIsInInventory(int itemId)

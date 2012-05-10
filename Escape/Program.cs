@@ -20,10 +20,14 @@ namespace Escape
 		private static List<string> notifications = new List<string>();
 		#endregion
 		
+		#region Main
 		public static void Main(string[] args)
 		{
 			Console.WindowWidth = Width;
 			Console.WindowHeight = Height;
+
+			Console.BufferWidth = Width;
+			Console.BufferHeight = Height;
 
 			World.Initialize();
 			
@@ -34,47 +38,23 @@ namespace Escape
 					switch (GameState)
 					{
 						case GameStates.Start:
-							Text.WriteLine("Hello adventurer! What is your name?");
-							Player.Name = Text.SetPrompt("> ");
-							Text.Clear();
-							GameState = GameStates.Playing;
+							StartState();
 							break;
 							
 						case GameStates.Playing:
-							if (isNotification)
-							{
-								DisplayNotification();
-							}
-							
-							World.LocationDescription();
-							World.LocationExits();
-							World.LocationItems();
-							
-							string temp = Text.SetPrompt("[" + World.Map[Player.Location].Name + "] > ");
-							Text.Clear();
-							Player.Do(temp);
+							PlayingState();
 							break;
 						
 						case GameStates.Battle:
+							BattleState();
 							break;
 							
 						case GameStates.Quit:
-							Console.Clear();
-							Text.WriteLine("Are you sure you want to quit? (y/n)");
-							
-							ConsoleKeyInfo quitKey = Console.ReadKey();
-							if (quitKey.KeyChar == 'y')
-							{
-								run = false;
-							}
-							else
-							{
-								Text.Clear();
-								GameState = GameStates.Playing;
-							}
+							QuitState();
 							break;
 							
 						case GameStates.GameOver:
+							GameOverState();
 							break;
 					}
 				}
@@ -84,6 +64,60 @@ namespace Escape
 				}
 			}
 		}
+		#endregion
+		
+		#region GameState Methods
+		private static void StartState()
+		{
+			Text.WriteLine("Hello adventurer! What is your name?");
+			Player.Name = Text.SetPrompt("> ");
+			Text.Clear();
+			GameState = GameStates.Playing;
+		}
+		
+		private static void PlayingState()
+		{
+			if (isNotification)
+			{
+				DisplayNotification();
+			}
+			
+			World.LocationDescription();
+			World.LocationExits();
+			World.LocationItems();
+			
+			string temp = Text.SetPrompt("[" + World.Map[Player.Location].Name + "] > ");
+			Text.Clear();
+			Player.Do(temp);
+		}
+		
+		private static void BattleState()
+		{
+			//TODO: stuff here
+		}
+		
+		private static void QuitState()
+		{
+			Console.Clear();
+			Text.WriteLine("Are you sure you want to quit? (y/n)");
+			
+			ConsoleKeyInfo quitKey = Console.ReadKey();
+			if (quitKey.KeyChar == 'y')
+			{
+				run = false;
+			}
+			else
+			{
+				Text.Clear();
+				GameState = GameStates.Playing;
+			}
+		}
+		
+		private static void GameOverState()
+		{
+		
+		}
+		#endregion
 		
 		#region Notification Handling
 		private static void DisplayNotification()

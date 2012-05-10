@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Escape
 {
 	static class Text
 	{
+		#region Declarations
+		
+		#endregion
+		
 		#region Public Methods
 		public static string SetPrompt(string aString)
 		{
@@ -13,17 +18,25 @@ namespace Escape
 		}
 		
 		public static void Write(string aString)
-		{
+		{			
 			Console.Write(aString);
 		}
 		
-		public static void WriteLine(string aString)
+		public static void WriteLine(string aString, bool keepIndent = true)
 		{
+			int curX = Console.CursorLeft;
+			
 			Console.WriteLine(aString);
+			
+			if (keepIndent)
+			{
+				Console.CursorLeft = curX;
+			}
 		}
 	    
-		public static void WriteColor(string aString, bool newLine = true)
+		public static void WriteColor(string aString, bool newLine = true, bool keepIndent = true)
 		{
+			int curX = Console.CursorLeft;
 			string[] segments = aString.Split('`');
 			for (int i = 0; i < segments.Length; i++)
 			{
@@ -91,37 +104,69 @@ namespace Escape
 			}
 			if (newLine)
 			{
-				Text.WriteLine("");
+				Text.WriteLine("", false);
+				
+				if (keepIndent)
+				{
+					Console.CursorLeft = curX;
+				}
 			}
 		}
 		
-		public static void WriteAt(string aString, int x, int y)
+		public static void WriteAt(string aString, int x, int y, bool fromOrigin = false, bool color = false)
 		{
 		    int origX = Console.CursorLeft;
 		  	int origY = Console.CursorTop;
+		  	
+		  	if (fromOrigin)
+		  	{
+		  		Console.SetCursorPosition(0 + x, 0 + y);
+		  	}
+		  	else
+		  	{
+		    	Console.SetCursorPosition(origX + x, origY + y);
+		  	}
 		    
-		    Console.SetCursorPosition(origX + x, origY + y);
-		    Text.Write(aString);
+		    if (color)
+		    {
+		    	Text.WriteColor(aString, false);
+		    }
+		    else
+		    {
+		    	Text.Write(aString);
+		    }
 		    
 		    Console.SetCursorPosition(origX, origY);
 	    }
 	    
 		public static void BlankLines(int num = 1)
-		{
+		{		
 			string temp = "";
+			
 			for (int i = 0; i < num; i++)
 			{
 				temp += "\n";
 			}
+			
 			Text.Write(temp);
 		}
 		
-		public static void BlankSpaces(int num = 1)
+		public static string BlankSpaces(int num = 1, bool returnOnly = true)
 		{
+			string temp = "";
+			
 			for (int i = 0; i < num; i++)
 			{
-				Text.Write(" ");
+				temp += " ";
 			}
+			
+			if (returnOnly)
+			{
+				return temp;
+			}
+			
+			Text.Write(temp);
+			return temp;
 		}
 		
 		public static void Clear()

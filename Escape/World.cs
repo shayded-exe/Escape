@@ -8,6 +8,11 @@ namespace Escape
 		#region Declarations
 		public static List<Location> Map = new List<Location>();
 		public static List<Item> Items = new List<Item>();
+		
+		private static int locationDescriptionX;
+		private static int locationDescriptionY;
+		private static int locationItemsX;
+		private static int locationItemsY;
 		#endregion
 		
 		#region Initialization
@@ -25,7 +30,7 @@ namespace Escape
 				"Room 1",
 				"This is a room.",
 				new List<int>() {1},
-				new List<int>() {0}));
+				new List<int>() {0, 2}));
 				
 			Map.Add(new Location(
 				"Room 2",
@@ -54,6 +59,10 @@ namespace Escape
 			Items.Add(new Item(
 				"Shiny Stone",
 				"Its a stone, and its shiny, what more could you ask for?"));
+				
+			Items.Add(new Item(
+				"Rock",
+				"It doesn't do anything, however, it is said that the mystical game designer used this for testing."));
 		}
 		#endregion
 		
@@ -90,6 +99,9 @@ namespace Escape
 		{
 			if (Map[Player.Location].Exits.Count <= 0)
 				return;
+				
+			locationDescriptionX = Console.CursorLeft + 17;
+			locationDescriptionY = Console.CursorTop;
 			
 			Text.WriteColor("`c`/---------------\\");
 			Text.WriteColor("|`w`Available Exits`c`|");
@@ -98,9 +110,7 @@ namespace Escape
 			for (int i = 0; i < Map[Player.Location].Exits.Count; i++)
 			{
 				string name = Map[Map[Player.Location].Exits[i]].Name;
-				Text.WriteColor("|`w`" + name, false);
-				Text.BlankSpaces(15 - name.Length);
-				Text.WriteColor("`c`|");
+				Text.WriteColor("|`w`" + name + Text.BlankSpaces(15 - name.Length, true) + "`c`|");
 			}
 			
 			Text.WriteColor("\\---------------/`w`");
@@ -112,6 +122,11 @@ namespace Escape
 			if (Map[Player.Location].Items.Count <= 0)
 				return;
 				
+			locationItemsX = Console.CursorLeft + 17;
+			locationItemsY = Console.CursorTop;
+			
+			Console.SetCursorPosition(locationDescriptionX + 2, locationDescriptionY);
+			
 			Text.WriteColor("`g`/---------------\\");
 			Text.WriteColor("|`w`     Items     `g`|");
 			Text.WriteLine(">---------------<");
@@ -119,13 +134,13 @@ namespace Escape
 			for (int i = 0; i < Map[Player.Location].Items.Count; i++)
 			{
 				string name = Items[Map[Player.Location].Items[i]].Name;
-				Text.WriteColor("|`w`" + name, false);
-				Text.BlankSpaces(15 - name.Length);
-				Text.WriteColor("`g`|");
+				Text.WriteColor("|`w`" + name + Text.BlankSpaces(15 - name.Length, true) + "`g`|");
 			}
 			
 			Text.WriteColor("\\---------------/`w`");
 			Text.BlankLines();
+			
+			Console.CursorLeft = 0;
 		}
 		#endregion
 		
