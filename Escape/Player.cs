@@ -9,11 +9,13 @@ namespace Escape
 		public static string Name;
 		public static int Location = 0;
 		
-		private static int baseHealth = 100;
-		private static int health = baseHealth;
-		private static int healthBar = 0;
-		private static List<int> inventory = new List<int>();
+		public static int MaxHealth = 100;
+		public static int Health = MaxHealth;
+
+		public static int MaxMagic = 100;
+		public static int Magic = MaxMagic;
 		
+		private static List<int> inventory = new List<int>();
 		private static string[] Attacks = new string[] {/*TODO: Add attacks*/};
 		#endregion
 		
@@ -227,6 +229,14 @@ namespace Escape
 				{
 					World.Items[itemId].Use();
 				}
+				else
+				{
+					Program.SetError("You aren't holding that item!");
+				}
+			}
+			else
+			{
+				Program.SetError("That isn't a valid item!");
 			}
 		}
 		

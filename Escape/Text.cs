@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Escape
 {
@@ -167,6 +169,65 @@ namespace Escape
 			
 			Text.Write(temp);
 			return temp;
+		}
+		
+		public static List<string> Limit(string aString, int limit)
+		{
+			string[] words = aString.Split(' ');
+			List<string> newSentence = new List<string>();
+			string line = "";
+			
+			foreach (string word in words)
+			{
+				string newWord = Regex.Replace(word, @"`.`", "");
+				string newLine = Regex.Replace(line, @"`.`", "");
+			    if ((newLine + newWord).Length > limit)
+			    {
+			        newSentence.Add(line);
+			        line = "";
+			    }
+			
+			    line += string.Format("{0} ", word);
+			}
+			
+			if (line.Length > 0)
+			{
+				newSentence.Add(line);
+			}
+			
+			return newSentence;
+		}
+		
+		public static string ToBar(int num, int maxNum, int length)
+		{
+			string barString = ("");
+			int barNum = 0;
+			
+			for (int i = num; i > 0; i -= maxNum / length)
+			{
+				if (i < maxNum / length)
+				{
+					barString += ("+");
+					
+					if (i < maxNum / (length * 2))
+					{
+						barString += ("\b-");
+					}
+					
+					barNum++;
+					break;
+				}
+				
+				barString += ("=");
+				barNum++;
+			}
+			
+			for (int i = barNum; i < length; i++)
+			{
+				barString += (" ");
+			}
+			
+			return barString;
 		}
 		
 		public static void Clear()

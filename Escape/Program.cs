@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Escape
 {
 	class Program
 	{
 		#region Declarations
-		private static int Width = 100;
+		private static int Width = 73;
 		private static int Height = 30;
 		
 		public enum GameStates { Start, Playing, Battle, Quit, GameOver };
@@ -82,9 +83,7 @@ namespace Escape
 				DisplayNotification();
 			}
 			
-			World.LocationDescription();
-			World.LocationExits();
-			World.LocationItems();
+			World.LocationHUD();
 			
 			string temp = Text.SetPrompt("[" + World.Map[Player.Location].Name + "] > ");
 			Text.Clear();
@@ -122,12 +121,22 @@ namespace Escape
 		#region Notification Handling
 		private static void DisplayNotification()
 		{
+			Console.CursorTop = Console.WindowHeight - 1;
+			Text.WriteColor("`g`/-----------------------------------------------------------------------\\", false);
+			
 			foreach (string notification in notifications)
-			{
-				Text.WriteColor("`g`Alert: `w`" + notification);
+			{	
+				List<string> notificationLines = Text.Limit(string.Format("`g`Alert: `w`" + notification), Console.WindowWidth - 4);
+								
+				foreach (string line in notificationLines)
+				{
+					Text.WriteColor("| `w`" + line + Text.BlankSpaces(Console.WindowWidth - Regex.Replace(line, @"`.`", "").Length - 4, true) + "`g` |", false);
+				}
 			}
 			
-			Text.BlankLines(2);
+			Text.Write("\\-----------------------------------------------------------------------/");
+			
+			Console.SetCursorPosition(0, 0);
 			UnsetNotification();
 		}
 		
@@ -147,12 +156,22 @@ namespace Escape
 		#region Error Handling
 		private static void DisplayError()
 		{
+			Console.CursorTop = Console.WindowHeight - 1;
+			Text.WriteColor("`r`/-----------------------------------------------------------------------\\", false);
+			
 			foreach (string error in errors)
-			{
-				Text.WriteColor("`r`Error: `w`" + error);
+			{	
+				List<string> errorLines = Text.Limit(string.Format("`r`Error: `w`" + error), Console.WindowWidth - 4);
+								
+				foreach (string line in errorLines)
+				{					
+					Text.WriteColor("| `w`" + line + Text.BlankSpaces(Console.WindowWidth - Regex.Replace(line, @"`.`", "").Length - 4, true) + "`r` |", false);
+				}
 			}
 			
-			Text.BlankLines(2);
+			Text.Write("\\-----------------------------------------------------------------------/");
+			
+			Console.SetCursorPosition(0, 0);
 			UnsetError();
 		}
 		

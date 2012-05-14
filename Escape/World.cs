@@ -8,11 +8,6 @@ namespace Escape
 		#region Declarations
 		public static List<Location> Map = new List<Location>();
 		public static List<Item> Items = new List<Item>();
-		
-		private static int locationDescriptionX;
-		private static int locationDescriptionY;
-		private static int locationItemsX;
-		private static int locationItemsY;
 		#endregion
 		
 		#region Initialization
@@ -88,59 +83,66 @@ namespace Escape
 			
 			return -1;
 		}
-		
-		public static void LocationDescription()
+
+		public static void LocationHUD()
 		{
-			Text.WriteLine(Map[Player.Location].Description);
-			Text.BlankLines();
-		}
-		
-		public static void LocationExits()
-		{
-			if (Map[Player.Location].Exits.Count <= 0)
-				return;
-				
-			locationDescriptionX = Console.CursorLeft + 17;
-			locationDescriptionY = Console.CursorTop;
+			Text.WriteColor("`c`/-----------------------------------------------------------------------\\", false);
 			
-			Text.WriteColor("`c`/---------------\\");
-			Text.WriteColor("|`w`Available Exits`c`|");
-			Text.WriteLine(">---------------<");
+			List<string> locationDesctiption = Text.Limit(Map[Player.Location].Description, Console.WindowWidth - 4);
 			
-			for (int i = 0; i < Map[Player.Location].Exits.Count; i++)
+			foreach (string line in locationDesctiption)
+			{
+				Text.WriteColor("| `w`" + line + Text.BlankSpaces((Console.WindowWidth - line.Length - 4), true) + "`c` |", false);
+			}
+			
+			Text.WriteColor(">-----------------v-----------------v-----------------v-----------------<", false);
+			Text.WriteColor("|      `w`Exits`c`      |      `w`Items`c`      |      `w`Stats`c`      |    `w`More Crap`c`    |", false);
+			Text.WriteColor(">-----------------#-----------------#-----------------#-----------------<`w`", false);
+			
+			int currentY = Console.CursorTop;
+			int i;
+			int longestList = 0;
+			
+			for (i = 0; i < Map[Player.Location].Exits.Count; i++)
 			{
 				string name = Map[Map[Player.Location].Exits[i]].Name;
-				Text.WriteColor("|`w`" + name + Text.BlankSpaces(15 - name.Length, true) + "`c`|");
+				Text.WriteColor("  " + name + Text.BlankSpaces(16 - name.Length, true));
 			}
 			
-			Text.WriteColor("\\---------------/`w`");
-			Text.BlankLines();
-		}
-		
-		public static void LocationItems()
-		{
-			if (Map[Player.Location].Items.Count <= 0)
-				return;
-				
-			locationItemsX = Console.CursorLeft + 17;
-			locationItemsY = Console.CursorTop;
+			longestList = (i > longestList) ? i : longestList;
 			
-			Console.SetCursorPosition(locationDescriptionX + 2, locationDescriptionY);
+			Console.SetCursorPosition(18, currentY);
 			
-			Text.WriteColor("`g`/---------------\\");
-			Text.WriteColor("|`w`     Items     `g`|");
-			Text.WriteLine(">---------------<");
-			
-			for (int i = 0; i < Map[Player.Location].Items.Count; i++)
+			for (i = 0; i < Map[Player.Location].Items.Count; i++)
 			{
 				string name = Items[Map[Player.Location].Items[i]].Name;
-				Text.WriteColor("|`w`" + name + Text.BlankSpaces(15 - name.Length, true) + "`g`|");
+				Text.WriteColor("  " + name + Text.BlankSpaces(16 - name.Length, true));
 			}
 			
-			Text.WriteColor("\\---------------/`w`");
-			Text.BlankLines();
+			longestList = (i > longestList) ? i : longestList;
 			
-			Console.CursorLeft = 0;
+			Console.SetCursorPosition(37, currentY);
+			
+			Text.WriteColor(" HP [`r`" + Text.ToBar(Player.Health, Player.MaxHealth, 10) + "`w`]");
+			Text.WriteColor(" MP [`g`" + Text.ToBar(Player.Magic, Player.MaxMagic, 10) + "`w`]");
+			
+			longestList = (2 > longestList) ? 2 : longestList;
+			
+			Console.SetCursorPosition(0, currentY);
+			
+			for (i = 0; i < longestList; i++)
+			{
+				for (int j = 0; j < 4; j++)
+				{
+					Text.WriteColor("`c`|", false);
+					Console.CursorLeft += 17;
+				}
+				
+				Text.Write("|");
+				Console.CursorLeft = 0;
+			}
+			
+			Text.WriteColor("\\-----------------^-----------------^-----------------^-----------------/`w`");
 		}
 		#endregion
 		
