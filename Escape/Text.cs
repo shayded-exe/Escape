@@ -198,16 +198,16 @@ namespace Escape
 			return newSentence;
 		}
 		
-		public static string ToBar(int num, int maxNum, int length)
+		public static string ToBar(int num, decimal maxNum, int length)
 		{
 			string barString = ("");
 			int barNum = 0;
 			
-			for (int i = num; i > 0; i -= maxNum / length)
+			for (decimal i = num; i > 0; i -= maxNum / length)
 			{
 				if (i < maxNum / length)
 				{
-					barString += ("+");
+					barString += ("=");
 					
 					if (i < maxNum / (length * 2))
 					{
@@ -218,7 +218,7 @@ namespace Escape
 					break;
 				}
 				
-				barString += ("=");
+				barString += ("≡");
 				barNum++;
 			}
 			

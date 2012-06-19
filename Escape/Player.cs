@@ -15,8 +15,7 @@ namespace Escape
 		public static int MaxMagic = 100;
 		public static int Magic = MaxMagic;
 		
-		private static List<int> inventory = new List<int>();
-		private static string[] Attacks = new string[] {/*TODO: Add attacks*/};
+		public static List<int> Inventory = new List<int>();
 		#endregion
 		
 		#region Public Methods
@@ -78,6 +77,15 @@ namespace Escape
 						case "attack":
 							//attack command
 							break;
+						case "hurt":
+							Player.Health -= Convert.ToInt32(noun);
+							break;
+						case "save":
+							Program.Save();
+							break;
+						case "load":
+							Program.Load();
+							break;
 						default:
 							InputNotValid();
 							break;							
@@ -109,6 +117,14 @@ namespace Escape
 					break;
 			}
 		}
+		
+		public static void RemoveItemFromInventory(int itemId)
+		{
+			if (ItemIsInInventory(itemId))
+			{
+				Inventory.Remove(itemId);
+			}
+		}
 		#endregion
 		
 		#region Command Methods
@@ -123,11 +139,7 @@ namespace Escape
 			Text.WriteColor("drop/place <`c`item`w`> - Drop the specified item from your inventory and place it in the world.");
 			Text.WriteColor("items/inventory/inv - Display your current inventory.");
 			Text.WriteColor("use <`c`item`w`> - Use the specified item.");
-			Text.BlankLines();
-			
-			Text.WriteColor("`r`Not Implemented Commands:`w`");
-			Text.WriteColor("attack <`c`enemy`w`> - Attack the specified enemy.");
-			Text.WriteColor("talk <`c`person`w`> - Talk to the specified person.");
+			Text.WriteColor("save/load - saves/loads the game respectively.");
 			Text.BlankLines();
 		}
 		
@@ -140,6 +152,12 @@ namespace Escape
 				if (World.Map[Location].ContainsExit(locationId))
 				{
 					Location = locationId;
+					
+					World.Map[Location].CalculateRandomBattle();
+				}
+				else if (Player.Location == locationId)
+				{
+					Program.SetError("You are already there!");
 				}
 				else
 				{
@@ -182,7 +200,7 @@ namespace Escape
 				if (World.Map[Location].ContainsItem(itemId))
 				{
 					World.Map[Location].Items.Remove(itemId);
-					inventory.Add(itemId);
+					Inventory.Add(itemId);
 					Program.SetNotification("You put the " + World.Items[itemId].Name + " in your bag!");
 				}
 				else
@@ -204,7 +222,7 @@ namespace Escape
 				
 				if (ItemIsInInventory(itemId))
 				{
-					inventory.Remove(itemId);
+					Inventory.Remove(itemId);
 					World.Map[Location].Items.Add(itemId);
 					Program.SetNotification("You placed the " + World.Items[itemId].Name + " in the room!");
 				}
@@ -242,23 +260,23 @@ namespace Escape
 		
 		private static void DisplayInventory()
 		{
-			if (inventory.Count <= 0)
+			if (Inventory.Count <= 0)
 			{
 				Program.SetNotification("You aren't carrying anything!");
 				return;
 			}
 				
-			Text.WriteColor("`m`/---------------\\");
-			Text.WriteColor("|`w`   Inventory   `m`|");
-			Text.WriteLine(">---------------<");
+			Text.WriteColor("`m`/-----------------\\");
+			Text.WriteColor("|`w`    Inventory    `m`|");
+			Text.WriteLine(">-----------------<");
 			
-			for (int i = 0; i < inventory.Count; i++)
+			for (int i = 0; i < Inventory.Count; i++)
 			{
-				string name = World.Items[inventory[i]].Name;
-				Text.WriteColor("|`w`" + name + Text.BlankSpaces(15 - name.Length, true) + "`m`|");
+				string name = World.Items[Inventory[i]].Name;
+				Text.WriteColor("|`w` " + name + Text.BlankSpaces(16 - name.Length, true) + "`m`|");
 			}
 			
-			Text.WriteColor("\\---------------/`w`");
+			Text.WriteColor("\\-----------------/`w`");
 			Text.BlankLines();
 		}
 		#endregion
@@ -271,20 +289,10 @@ namespace Escape
 		
 		private static bool ItemIsInInventory(int itemId)
 		{
-			if (inventory.Contains(itemId))
+			if (Inventory.Contains(itemId))
 				return true;
 			else
 				return false;
-		}
-		#endregion
-		
-		#region Public Methods
-		public static void RemoveItemFromInventory(int itemId)
-		{
-			if (ItemIsInInventory(itemId))
-			{
-				inventory.Remove(itemId);
-			}
 		}
 		#endregion
 	}

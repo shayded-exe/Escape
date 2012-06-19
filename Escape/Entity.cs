@@ -2,6 +2,7 @@
 
 namespace Escape
 {
+	[Serializable]
 	abstract class Entity
 	{
 		#region Declarations

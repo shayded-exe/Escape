@@ -1,14 +1,21 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace Escape
 {
 	class Program
 	{
 		#region Declarations
-		private static int Width = 73;
-		private static int Height = 30;
+		private const int Width = 73;
+		private const int Height = 30;
+		
+		private const string saveFile = "save.dat";
 		
 		public enum GameStates { Start, Playing, Battle, Quit, GameOver };
 		public static GameStates GameState = GameStates.Start;
@@ -19,6 +26,8 @@ namespace Escape
 		
 		private static bool isNotification = false;
 		private static List<string> notifications = new List<string>();
+		
+		public static Random Rand = new Random();
 		#endregion
 		
 		#region Main
@@ -36,6 +45,11 @@ namespace Escape
 			{
 				if (!isError)
 				{
+					if (Player.Health <= 0)
+					{
+						GameState = GameStates.GameOver;
+					}
+					
 					switch (GameState)
 					{
 						case GameStates.Start:
@@ -92,15 +106,23 @@ namespace Escape
 		
 		private static void BattleState()
 		{
-			//TODO: stuff here
+			if (isNotification)
+			{
+				DisplayNotification();
+			}
+			
+			BattleCore.BattleHUD();
 		}
 		
 		private static void QuitState()
 		{
 			Console.Clear();
-			Text.WriteLine("Are you sure you want to quit? (y/n)");
+			Text.WriteColor("`r`/-----------------------------------------------------------------------\\", false);
+			Text.WriteColor("|`w`                 Are you sure you want to quit? (y/n)                  `r`|", false);
+			Text.WriteColor("\\-----------------------------------------------------------------------/`w`", false);
 			
 			ConsoleKeyInfo quitKey = Console.ReadKey();
+			
 			if (quitKey.KeyChar == 'y')
 			{
 				run = false;
@@ -114,7 +136,23 @@ namespace Escape
 		
 		private static void GameOverState()
 		{
-		
+			Console.Clear();
+			Text.WriteColor("`r`/-----------------------------------------------------------------------\\", false);
+			Text.WriteColor("|`w`                              Game Over!                               `r`|", false);
+			Text.WriteColor("|`w`                           Try again? (y/n)                            `r`|", false);
+			Text.WriteColor("\\-----------------------------------------------------------------------/`w`", false);
+			
+			ConsoleKeyInfo quitKey = Console.ReadKey();
+			
+			if (quitKey.KeyChar == 'y')
+			{
+				Process.Start(Assembly.GetExecutingAssembly().Location);
+				run = false;
+			}
+			else
+			{
+				run = false;
+			}
 		}
 		#endregion
 		
@@ -185,6 +223,59 @@ namespace Escape
 		{
 			errors.Clear();
 			isError = false;
+		}
+		#endregion
+		
+		#region Save and Load
+		public static void Save()
+		{
+			SaveGame saveGame = new SaveGame();
+			
+			try
+			{
+				using (Stream stream = File.Open(saveFile, FileMode.Create))
+				{
+					BinaryFormatter bin = new BinaryFormatter();
+					bin.Serialize(stream, saveGame);
+				}
+				
+				Program.SetNotification("Save Successful!");
+			}
+			catch (AccessViolationException)
+			{
+				Program.SetError("Save Failed! File access denied.");
+			}
+			catch (Exception)
+			{
+				Program.SetError("Save Failed! An unspecified error occurred.");
+			}
+		}
+		
+		public static void Load()
+		{
+			try
+			{
+				using (Stream stream = File.Open(saveFile, FileMode.Open))
+				{
+					BinaryFormatter bin = new BinaryFormatter();
+					SaveGame saveGame = (SaveGame)bin.Deserialize(stream);
+					saveGame.Load();
+				}
+				
+				Program.SetNotification("Load Successful!");
+			}
+			catch (FileNotFoundException)
+			{
+				Program.SetError("No savegame exists!");
+			}
+			catch (AccessViolationException)
+			{
+				Program.SetError("Load failed! File access denied.");
+			}
+			catch (Exception)
+			{
+				Program.SetError("Load failed! An unspecified error occurred.");
+			}
 		}
 		#endregion
 	}

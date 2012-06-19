@@ -8,6 +8,7 @@ namespace Escape
 		#region Declarations
 		public static List<Location> Map = new List<Location>();
 		public static List<Item> Items = new List<Item>();
+		public static List<Enemy> Enemies = new List<Enemy>();
 		#endregion
 		
 		#region Initialization
@@ -15,6 +16,7 @@ namespace Escape
 		{
 			GenerateWorld();
 			GenerateItems();
+			GenerateEnemies();
 		}
 		#endregion
 		
@@ -31,12 +33,17 @@ namespace Escape
 				"Room 2",
 				"This is another room.",
 				new List<int>() {0, 2},
-				new List<int>() {1}));
+				new List<int>() {1},
+				new List<int>() {0},
+				50));
 				
 			Map.Add(new Location(
 				"Room 3",
 				"This is yet another room.",
-				new List<int>() {1}));
+				new List<int>() {1},
+				new List<int>(),
+				new List<int>() {0, 1},
+				75));
 			
 			Map.Add(new Location(
 				"Secret Room",
@@ -46,18 +53,34 @@ namespace Escape
 		
 		private static void GenerateItems()
 		{
-			Items.Add(new Item(
+			Items.Add(new Key(
 				"Brass Key",
 				"Just your generic key thats in almost every game.",
+				2, 3,
 				true));
 				
-			Items.Add(new Item(
+			Items.Add(new ShinyStone(
 				"Shiny Stone",
 				"Its a stone, and its shiny, what more could you ask for?"));
 				
-			Items.Add(new Item(
+			Items.Add(new Rock(
 				"Rock",
 				"It doesn't do anything, however, it is said that the mystical game designer used this for testing."));
+		}
+		
+		private static void GenerateEnemies()
+		{
+			Enemies.Add(new Rat(
+				"Rat",
+				"Its just a pwesious wittle wat that will KILL YOU!",
+				new List<int>() {10, 3, 5},
+				new List<int>() {0, 1}));
+				
+			Enemies.Add(new Hawk(
+				"Hawk",
+				"It flies around looking for prey to feed on.",
+				new List<int>() {15, 5, 0},
+				new List<int>() {2, 3}));
 		}
 		#endregion
 		
@@ -96,7 +119,7 @@ namespace Escape
 			}
 			
 			Text.WriteColor(">-----------------v-----------------v-----------------v-----------------<", false);
-			Text.WriteColor("|      `w`Exits`c`      |      `w`Items`c`      |      `w`Stats`c`      |    `w`More Crap`c`    |", false);
+			Text.WriteColor("|      `w`Exits`c`      |      `w`Items`c`      |     `w`People`c`      |      `w`Stats`c`      |", false);
 			Text.WriteColor(">-----------------#-----------------#-----------------#-----------------<`w`", false);
 			
 			int currentY = Console.CursorTop;
@@ -106,7 +129,7 @@ namespace Escape
 			for (i = 0; i < Map[Player.Location].Exits.Count; i++)
 			{
 				string name = Map[Map[Player.Location].Exits[i]].Name;
-				Text.WriteColor("  " + name + Text.BlankSpaces(16 - name.Length, true));
+				Text.WriteColor("  " + name);
 			}
 			
 			longestList = (i > longestList) ? i : longestList;
@@ -116,18 +139,28 @@ namespace Escape
 			for (i = 0; i < Map[Player.Location].Items.Count; i++)
 			{
 				string name = Items[Map[Player.Location].Items[i]].Name;
-				Text.WriteColor("  " + name + Text.BlankSpaces(16 - name.Length, true));
+				Text.WriteColor("  " + name);
 			}
 			
 			longestList = (i > longestList) ? i : longestList;
 			
-			Console.SetCursorPosition(37, currentY);
+			Console.SetCursorPosition(36, currentY);
 			
-			Text.WriteColor(" HP [`r`" + Text.ToBar(Player.Health, Player.MaxHealth, 10) + "`w`]");
-			Text.WriteColor(" MP [`g`" + Text.ToBar(Player.Magic, Player.MaxMagic, 10) + "`w`]");
+			for (i = 0; i < Map[Player.Location].Enemies.Count; i++)
+			{
+				string name = Enemies[Map[Player.Location].Enemies[i]].Name;
+				Text.WriteColor("  " + name);
+			}
+			
+			longestList = (i > longestList) ? i : longestList;
+			
+			Console.SetCursorPosition(54, currentY);
+			
+			Text.WriteColor("  HP [`r`" + Text.ToBar(Player.Health, Player.MaxHealth, 10) + "`w`]");
+			Text.WriteColor("  MP [`g`" + Text.ToBar(Player.Magic, Player.MaxMagic, 10) + "`w`]");
 			
 			longestList = (2 > longestList) ? 2 : longestList;
-			
+						
 			Console.SetCursorPosition(0, currentY);
 			
 			for (i = 0; i < longestList; i++)
