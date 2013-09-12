@@ -9,18 +9,21 @@ namespace Escape
 		public int Health;
 		public int Power;
 		public int Magic;
+		public List<string> Attacks;
 		#endregion
 		
 		#region Constructor
 		public Enemy(
 			string Name,
 			string Description,
-			List<int> Stats)
+			List<int> Stats,
+			List<string> Attacks)
 		:base(Name, Description)
 		{
 			this.Health = Stats[0];
 			this.Power = Stats[1];
 			this.Magic = Stats[2];
+			this.Attacks = Attacks;
 		}
 		#endregion
 
@@ -35,8 +38,9 @@ namespace Escape
 		public Rat(
 			string Name,
 			string Description,
-			List<int> Stats)
-		:base(Name, Description, Stats)
+			List<int> Stats,
+			List<string> Attacks)
+		:base(Name, Description, Stats, Attacks)
 		{	
 		}
 
@@ -53,8 +57,9 @@ namespace Escape
 		public Hawk(
 			string Name,
 			string Description,
-			List<int> Stats)
-		:base(Name, Description, Stats)
+			List<int> Stats,
+			List<string> Attacks)
+		:base(Name, Description, Stats, Attacks)
 		{
 		}
 

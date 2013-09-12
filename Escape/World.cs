@@ -73,12 +73,14 @@ namespace Escape
 			Enemies.Add(new Rat(
 				"Rat",
 				"Its just a pwesious wittle wat that will KILL YOU!",
-				new List<int>() {10, 3, 5}));
-				
+				new List<int>() { 10, 3, 5 },
+				new List<string>() { }));
+
 			Enemies.Add(new Hawk(
 				"Hawk",
 				"It flies around looking for prey to feed on.",
-				new List<int>() {15, 5, 0}));
+				new List<int>() { 15, 5, 0 },
+				new List<string>() { }));
 		}
 		#endregion
 		

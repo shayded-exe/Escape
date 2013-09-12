@@ -47,6 +47,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attack.cs" />
     <Compile Include="BattleCore.cs" />
     <Compile Include="Enemy.cs" />
     <Compile Include="Entity.cs" />
