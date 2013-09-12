@@ -55,7 +55,7 @@ namespace Escape
 		{
 			Items.Add(new Key(
 				"Brass Key",
-				"Just your generic key thats in almost every game.",
+				"Just your generic key that's in almost every game.",
 				2, 3,
 				true));
 				
@@ -73,14 +73,12 @@ namespace Escape
 			Enemies.Add(new Rat(
 				"Rat",
 				"Its just a pwesious wittle wat that will KILL YOU!",
-				new List<int>() {10, 3, 5},
-				new List<int>() {0, 1}));
+				new List<int>() {10, 3, 5}));
 				
 			Enemies.Add(new Hawk(
 				"Hawk",
 				"It flies around looking for prey to feed on.",
-				new List<int>() {15, 5, 0},
-				new List<int>() {2, 3}));
+				new List<int>() {15, 5, 0}));
 		}
 		#endregion
 		

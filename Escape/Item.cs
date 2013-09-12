@@ -29,7 +29,7 @@ namespace Escape
 		#endregion
 	}
 
-	#region BrassKey
+	#region Key
 	class Key : Item
 	{
 		private int targetLocation;
@@ -83,7 +83,7 @@ namespace Escape
 			}
 			else
 			{
-				Program.SetNotification("The shiny orb glowed shiny colors!");
+				Program.SetNotification("The shiny stone glowed shiny colors!");
 			}
 		}
 	}
