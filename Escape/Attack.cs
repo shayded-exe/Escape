@@ -10,7 +10,11 @@ namespace Escape
 		#region Declarations
 		public int ID;
 		public string Name;
+		public int Power;
+		public int Cost;
+		public AttackTypes Type;
 
+		public enum AttackTypes { Physical, Magic, Self };
 		#endregion
 	}
 }
