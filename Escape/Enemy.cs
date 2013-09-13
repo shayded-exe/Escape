@@ -14,11 +14,12 @@ namespace Escape
 		
 		#region Constructor
 		public Enemy(
+			int ID,
 			string Name,
 			string Description,
 			List<int> Stats,
 			List<string> Attacks)
-		:base(Name, Description)
+		:base(ID, Name, Description)
 		{
 			this.Health = Stats[0];
 			this.Power = Stats[1];
@@ -36,11 +37,12 @@ namespace Escape
 	class Rat : Enemy
 	{
 		public Rat(
+			int ID,
 			string Name,
 			string Description,
 			List<int> Stats,
 			List<string> Attacks)
-		:base(Name, Description, Stats, Attacks)
+		:base(ID, Name, Description, Stats, Attacks)
 		{	
 		}
 
@@ -55,11 +57,12 @@ namespace Escape
 	class Hawk : Enemy
 	{
 		public Hawk(
+			int ID,
 			string Name,
 			string Description,
 			List<int> Stats,
 			List<string> Attacks)
-		:base(Name, Description, Stats, Attacks)
+		:base(ID, Name, Description, Stats, Attacks)
 		{
 		}
 

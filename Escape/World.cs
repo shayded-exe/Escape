@@ -9,6 +9,7 @@ namespace Escape
 		public static List<Location> Map = new List<Location>();
 		public static List<Item> Items = new List<Item>();
 		public static List<Enemy> Enemies = new List<Enemy>();
+		public static List<Attack> Attacks = new List<Attack>();
 		#endregion
 		
 		#region Initialization
@@ -54,16 +55,19 @@ namespace Escape
 		private static void GenerateItems()
 		{
 			Items.Add(new Key(
+				1,
 				"Brass Key",
 				"Just your generic key that's in almost every game.",
 				2, 3,
 				true));
 				
 			Items.Add(new ShinyStone(
+				2,
 				"Shiny Stone",
 				"Its a stone, and its shiny, what more could you ask for?"));
 				
 			Items.Add(new Rock(
+				3,
 				"Rock",
 				"It doesn't do anything, however, it is said that the mystical game designer used this for testing."));
 		}
@@ -71,12 +75,14 @@ namespace Escape
 		private static void GenerateEnemies()
 		{
 			Enemies.Add(new Rat(
+				1,
 				"Rat",
 				"Its just a pwesious wittle wat that will KILL YOU!",
 				new List<int>() { 10, 3, 5 },
 				new List<string>() { }));
 
 			Enemies.Add(new Hawk(
+				2,
 				"Hawk",
 				"It flies around looking for prey to feed on.",
 				new List<int>() { 15, 5, 0 },

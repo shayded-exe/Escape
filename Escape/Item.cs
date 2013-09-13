@@ -10,10 +10,11 @@ namespace Escape
 		
 		#region Constructor
 		public Item(
+			int ID,
 			string Name,
 			string Description,
 			bool uses = false)
-		:base(Name, Description)
+		:base(ID, Name, Description)
 		{
 			this.uses = uses;
 		}
@@ -36,12 +37,13 @@ namespace Escape
 		private int newLocation;
 
 		public Key(
+			int ID,
 			string Name,
 			string Description,
 			int targetLocation,
 			int newLocation,
 			bool uses = false)
-		:base(Name, Description, uses)
+		:base(ID, Name, Description, uses)
 		{
 			this.targetLocation = targetLocation;
 			this.newLocation = newLocation;
@@ -67,10 +69,11 @@ namespace Escape
 	class ShinyStone : Item
 	{
 		public ShinyStone(
+			int ID,
 			string Name,
 			string Description,
 			bool uses = false)
-		: base(Name, Description, uses)
+		: base(ID, Name, Description, uses)
 		{
 		}
 
@@ -93,10 +96,11 @@ namespace Escape
 	class Rock : Item
 	{
 		public Rock(
+			int ID,
 			string Name,
 			string Description,
 			bool uses = false)
-		:base(Name, Description, uses)
+		:base(ID, Name, Description, uses)
 		{
 		}
 
