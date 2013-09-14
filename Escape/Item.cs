@@ -32,14 +32,14 @@ namespace Escape
 	#region Key
 	class Key : Item
 	{
-		private string targetLocation;
-		private string newLocation;
+		private int targetLocation;
+		private int newLocation;
 
 		public Key(
 			string Name,
 			string Description,
-			string targetLocation,
-			string newLocation,
+			int targetLocation,
+			int newLocation,
 			bool uses = false)
 		:base(Name, Description, uses)
 		{
@@ -52,7 +52,7 @@ namespace Escape
 			if (Player.Location == targetLocation)
 			{
 				Program.SetNotification("The " + this.Name + " opened the lock!");
-				World.Map[World.GetLocationIdByName(targetLocation)].Exits.Add(newLocation);
+				World.Map[targetLocation].Exits.Add(newLocation);
 			}
 			else
 			{
@@ -76,7 +76,7 @@ namespace Escape
 
 		public override void Use()
 		{
-			if (Player.Location == "Room 3")
+			if (Player.Location == 3)
 			{
 				Player.Health += Math.Min(Player.MaxHealth / 10, Player.MaxHealth - Player.Health);
 				Program.SetNotification("The magical stone restored your health by 10%!");

@@ -99,7 +99,7 @@ namespace Escape
 			
 			World.LocationHUD();
 			
-			string temp = Text.SetPrompt("[" + Player.Location + "] > ");
+			string temp = Text.SetPrompt("[" + World.Map[Player.Location].Name + "] > ");
 			Text.Clear();
 			Player.Do(temp);
 		}
