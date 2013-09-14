@@ -7,7 +7,7 @@ namespace Escape
 	{
 		#region Declarations
 		public static string Name;
-		public static int Location = 0;
+		public static string Location = "Room 1";
 		
 		public static int MaxHealth = 100;
 		public static int Health = MaxHealth;
@@ -15,7 +15,7 @@ namespace Escape
 		public static int MaxMagic = 100;
 		public static int Magic = MaxMagic;
 		
-		public static List<int> Inventory = new List<int>();
+		public static List<string> Inventory = new List<string>();
 		#endregion
 		
 		#region Public Methods
@@ -118,11 +118,11 @@ namespace Escape
 			}
 		}
 		
-		public static void RemoveItemFromInventory(int itemId)
+		public static void RemoveItemFromInventory(string aItem)
 		{
-			if (ItemIsInInventory(itemId))
+			if (ItemIsInInventory(aItem))
 			{
-				Inventory.Remove(itemId);
+				Inventory.Remove(aItem);
 			}
 		}
 		#endregion
@@ -147,15 +147,15 @@ namespace Escape
 		{
 			if (World.IsLocation(locationName))
 			{
-				int locationId = World.GetLocationIdByName(locationName);
-				
-				if (World.Map[Location].ContainsExit(locationId))
+				locationName = World.Map[World.GetLocationIdByName(locationName)].Name;
+
+				if (World.Map[World.GetLocationIdByName(Location)].ContainsExit(locationName))
 				{
-					Location = locationId;
+					Location = locationName;
 					
-					World.Map[Location].CalculateRandomBattle();
+					World.Map[World.GetLocationIdByName(Location)].CalculateRandomBattle();
 				}
-				else if (Player.Location == locationId)
+				else if (Player.Location == locationName)
 				{
 					Program.SetError("You are already there!");
 				}
@@ -172,13 +172,13 @@ namespace Escape
 		
 		private static void Examine(string itemName)
 		{
-			int itemId = World.GetItemIdByName(itemName);
-			
 			if (World.IsItem(itemName))
-			{				
-				if (World.Map[Location].ContainsItem(itemId) || ItemIsInInventory(itemId))
+			{
+				itemName = World.Items[World.GetItemIdByName(itemName)].Name;
+
+				if (World.Map[World.GetLocationIdByName(Location)].ContainsItem(itemName) || ItemIsInInventory(itemName))
 				{
-					World.ItemDescription(itemId);
+					World.ItemDescription(itemName);
 				}
 				else
 				{
@@ -195,13 +195,13 @@ namespace Escape
 		{
 			if (World.IsItem(itemName))
 			{
-				int itemId = World.GetItemIdByName(itemName);
-				
-				if (World.Map[Location].ContainsItem(itemId))
+				itemName = World.Items[World.GetItemIdByName(itemName)].Name;
+
+				if (World.Map[World.GetLocationIdByName(Location)].ContainsItem(itemName))
 				{
-					World.Map[Location].Items.Remove(itemId);
-					Inventory.Add(itemId);
-					Program.SetNotification("You put the " + World.Items[itemId].Name + " in your bag!");
+					World.Map[World.GetLocationIdByName(Location)].Items.Remove(itemName);
+					Inventory.Add(itemName);
+					Program.SetNotification("You put the " + itemName + " in your bag!");
 				}
 				else
 				{
@@ -218,13 +218,13 @@ namespace Escape
 		{
 			if (World.IsItem(itemName))
 			{
-				int itemId = World.GetItemIdByName(itemName);
-				
-				if (ItemIsInInventory(itemId))
+				itemName = World.Items[World.GetItemIdByName(itemName)].Name;
+
+				if (ItemIsInInventory(itemName))
 				{
-					Inventory.Remove(itemId);
-					World.Map[Location].Items.Add(itemId);
-					Program.SetNotification("You placed the " + World.Items[itemId].Name + " in the room!");
+					Inventory.Remove(itemName);
+					World.Map[World.GetLocationIdByName(Location)].Items.Add(itemName);
+					Program.SetNotification("You placed the " + itemName + " in the room!");
 				}
 				else
 				{
@@ -241,11 +241,11 @@ namespace Escape
 		{
 			if (World.IsItem(itemName))
 			{
-				int itemId = World.GetItemIdByName(itemName);
-				
-				if (ItemIsInInventory(itemId))
+				itemName = World.Items[World.GetItemIdByName(itemName)].Name;
+
+				if (ItemIsInInventory(itemName))
 				{
-					World.Items[itemId].Use();
+					World.Items[World.GetItemIdByName(itemName)].Use();
 				}
 				else
 				{
@@ -272,7 +272,7 @@ namespace Escape
 			
 			for (int i = 0; i < Inventory.Count; i++)
 			{
-				string name = World.Items[Inventory[i]].Name;
+				string name = Inventory[i];
 				Text.WriteColor("|`w` " + name + Text.BlankSpaces(16 - name.Length, true) + "`m`|");
 			}
 			
@@ -287,9 +287,9 @@ namespace Escape
 			Program.SetError("That isn't a valid command!");
 		}
 		
-		private static bool ItemIsInInventory(int itemId)
+		private static bool ItemIsInInventory(string aItem)
 		{
-			if (Inventory.Contains(itemId))
+			if (Inventory.Contains(aItem))
 				return true;
 			else
 				return false;

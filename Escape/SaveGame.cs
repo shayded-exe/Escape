@@ -8,7 +8,7 @@ namespace Escape
 	{
 		#region Declarations
 		public string Player_Name = Player.Name;
-		public int Player_Location = Player.Location;
+		public string Player_Location = Player.Location;
 		
 		public int Player_MaxHealth = Player.MaxHealth;
 		public int Player_Health = Player.Health;
@@ -16,7 +16,7 @@ namespace Escape
 		public int Player_MaxMagic = Player.MaxMagic;
 		public int Player_Magic = Player.Magic;
 		
-		public List<int> Player_Inventory = Player.Inventory;
+		public List<string> Player_Inventory = Player.Inventory;
 		
 		public List<Location> World_Map = World.Map;
 		#endregion

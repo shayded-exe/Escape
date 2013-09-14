@@ -6,9 +6,9 @@ namespace Escape
 	static class World
 	{
 		#region Declarations
-		public static List<Location> Map = new List<Location>();
 		public static List<Item> Items = new List<Item>();
 		public static List<Enemy> Enemies = new List<Enemy>();
+		public static List<Location> Map = new List<Location>();
 		#endregion
 		
 		#region Initialization
@@ -17,46 +17,49 @@ namespace Escape
 			GenerateWorld();
 			GenerateItems();
 			GenerateEnemies();
+			GenerateAttacks();
 		}
 		#endregion
 		
-		#region World Generation Methods
+		#region Generate World
 		private static void GenerateWorld()
 		{
 			Map.Add(new Location(
 				"Room 1",
 				"This is a room.",
-				new List<int>() {1},
-				new List<int>() {0, 2}));
+				new List<string>() { "Room 2" },
+				new List<string>() { "Brass Key", "Rock" }));
 				
 			Map.Add(new Location(
 				"Room 2",
 				"This is another room.",
-				new List<int>() {0, 2},
-				new List<int>() {1},
-				new List<int>() {0},
+				new List<string>() { "Room 1", "Room 3" },
+				new List<string>() { "Shiny Stone" },
+				new List<string>() { "Rat" },
 				50));
 				
 			Map.Add(new Location(
 				"Room 3",
 				"This is yet another room.",
-				new List<int>() {1},
-				new List<int>(),
-				new List<int>() {0, 1},
+				new List<string>() { "Room 2" },
+				new List<string>(),
+				new List<string>() { "Rat", "Hawk" },
 				75));
 			
 			Map.Add(new Location(
 				"Secret Room",
 				"This is a very awesome secret room.",
-				new List<int>() {2}));
+				new List<string>() { "Room 3" }));
 		}
-		
+		#endregion
+
+		#region Generate Items
 		private static void GenerateItems()
 		{
 			Items.Add(new Key(
 				"Brass Key",
 				"Just your generic key that's in almost every game.",
-				2, 3,
+				"Room 3", "Secret Room",
 				true));
 				
 			Items.Add(new ShinyStone(
@@ -67,7 +70,9 @@ namespace Escape
 				"Rock",
 				"It doesn't do anything, however, it is said that the mystical game designer used this for testing."));
 		}
-		
+		#endregion
+
+		#region Generate Enemies
 		private static void GenerateEnemies()
 		{
 			Enemies.Add(new Rat(
@@ -83,7 +88,14 @@ namespace Escape
 				new List<string>() { }));
 		}
 		#endregion
-		
+
+		#region Generate Attacks
+		private static void GenerateAttacks()
+		{
+
+		}
+		#endregion
+
 		#region Public Location Methods
 		public static bool IsLocation(string locationName)
 		{
@@ -107,11 +119,16 @@ namespace Escape
 			return -1;
 		}
 
+		public static void SetExits(string room, List<string> exits)
+		{
+			Map[GetLocationIdByName(room)].SetExits(exits);
+		}
+
 		public static void LocationHUD()
 		{
 			Text.WriteColor("`c`/-----------------------------------------------------------------------\\", false);
 			
-			List<string> locationDesctiption = Text.Limit(Map[Player.Location].Description, Console.WindowWidth - 4);
+			List<string> locationDesctiption = Text.Limit(Map[GetLocationIdByName(Player.Location)].Description, Console.WindowWidth - 4);
 			
 			foreach (string line in locationDesctiption)
 			{
@@ -126,9 +143,9 @@ namespace Escape
 			int i;
 			int longestList = 0;
 			
-			for (i = 0; i < Map[Player.Location].Exits.Count; i++)
+			for (i = 0; i < Map[GetLocationIdByName(Player.Location)].Exits.Count; i++)
 			{
-				string name = Map[Map[Player.Location].Exits[i]].Name;
+				string name = Map[GetLocationIdByName(Player.Location)].Exits[i];
 				Text.WriteColor("  " + name);
 			}
 			
@@ -136,9 +153,9 @@ namespace Escape
 			
 			Console.SetCursorPosition(18, currentY);
 			
-			for (i = 0; i < Map[Player.Location].Items.Count; i++)
+			for (i = 0; i < Map[GetLocationIdByName(Player.Location)].Items.Count; i++)
 			{
-				string name = Items[Map[Player.Location].Items[i]].Name;
+				string name = Map[GetLocationIdByName(Player.Location)].Items[i];
 				Text.WriteColor("  " + name);
 			}
 			
@@ -146,9 +163,9 @@ namespace Escape
 			
 			Console.SetCursorPosition(36, currentY);
 			
-			for (i = 0; i < Map[Player.Location].Enemies.Count; i++)
+			for (i = 0; i < Map[GetLocationIdByName(Player.Location)].Enemies.Count; i++)
 			{
-				string name = Enemies[Map[Player.Location].Enemies[i]].Name;
+				string name = Map[GetLocationIdByName(Player.Location)].Enemies[i];
 				Text.WriteColor("  " + name);
 			}
 			
@@ -202,10 +219,23 @@ namespace Escape
 			return -1;
 		}
 		
-		public static void ItemDescription(int itemId)
+		public static void ItemDescription(string aItem)
 		{
-			Text.WriteLine(Items[itemId].Description);
+			Text.WriteLine(Items[GetItemIdByName(aItem)].Description);
 			Text.BlankLines();
+		}
+		#endregion
+
+		#region Public Enemy Methods
+		public static int GetEnemyIdByName(string enemyName)
+		{
+			for (int i = 0; i < Items.Count; i++)
+			{
+				if (Enemies[i].Name.ToLower() == enemyName.ToLower())
+					return i;
+			}
+
+			return -1;
 		}
 		#endregion
 	}

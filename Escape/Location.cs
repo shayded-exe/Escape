@@ -7,9 +7,9 @@ namespace Escape
 	class Location : Entity
 	{
 		#region Declarations
-		public List<int> Exits;
-		public List<int> Items;
-		public List<int> Enemies;
+		public List<string> Exits;
+		public List<string> Items;
+		public List<string> Enemies;
 		private int BattleChance;
 		#endregion
 		
@@ -17,9 +17,33 @@ namespace Escape
 		public Location(
 			string Name,
 			string Description,
-			List<int> Exits,
-			List<int> Items,
-			List<int> Enemies,
+			List<string> Exits)
+			: base(Name, Description)
+		{
+			this.Exits = Exits;
+			this.Items = new List<string>();
+			this.Enemies = new List<string>();
+		}
+
+		public Location(
+			string Name,
+			string Description,
+			List<string> Exits,
+			List<string> Items)
+			:base(Name, Description)
+		{
+			this.Exits = Exits;
+			this.Items = Items;
+			this.Enemies = new List<string>();
+			this.BattleChance = 0;
+		}
+
+		public Location(
+			string Name,
+			string Description,
+			List<string> Exits,
+			List<string> Items,
+			List<string> Enemies,
 			int BattleChance)
 		:base(Name, Description)
 		{
@@ -28,35 +52,20 @@ namespace Escape
 			this.Enemies = Enemies;
 			this.BattleChance = BattleChance;
 		}
-		
-		public Location(
-			string Name,
-			string Description,
-			List<int> Exits,
-			List<int> Items)
-		:base(Name, Description)
-		{
-			this.Exits = Exits;
-			this.Items = Items;
-			this.Enemies = new List<int>();
-			this.BattleChance = 0;
-		}
-		
-		public Location(
-			string Name,
-			string Description,
-			List<int> Exits)
-		:base(Name, Description)
-		{
-			this.Exits = Exits;
-			this.Items = new List<int>();
-			this.Enemies = new List<int>();
-			this.BattleChance = 0;
-		}
 		#endregion
 		
 		#region Public Methods
-		public bool ContainsExit(int aExit)
+		public void SetExits(List<string> exits)
+		{
+			this.Exits = exits;
+		}
+
+		public void AddExit(List<string> exits)
+		{
+			this.Exits.AddRange(exits);
+		}
+
+		public bool ContainsExit(string aExit)
 		{
 			if (Exits.Contains(aExit))
 				return true;
@@ -64,7 +73,7 @@ namespace Escape
 				return false;
 		}
 		
-		public bool ContainsItem(int aItem)
+		public bool ContainsItem(string aItem)
 		{
 			if (Items.Contains(aItem))
 				return true;
@@ -72,7 +81,7 @@ namespace Escape
 				return false;
 		}
 		
-		public bool ContainsEnemy(int aEnemy)
+		public bool ContainsEnemy(string aEnemy)
 		{
 			if (Enemies.Contains(aEnemy))
 				return true;
@@ -86,6 +95,38 @@ namespace Escape
 				return true;
 			else
 				return false;
+		}
+
+		private List<int> ConvertNameToID(List<String> input, string listType)
+		{
+			List<int> result = new List<int>();
+
+			switch (listType)
+			{
+				case "location":
+					for (int i = 0; i < input.Count; i++)
+					{
+						result.Add(World.GetLocationIdByName(input[i]));
+					}
+					break;
+				case "item":
+					for (int i = 0; i < input.Count; i++)
+					{
+						result.Add(World.GetItemIdByName(input[i]));
+					}
+					break;
+				case "enemy":
+					for (int i = 0; i < input.Count; i++)
+					{
+						result.Add(World.GetEnemyIdByName(input[i]));
+					}
+					break;
+				default:
+					result.Add(1);
+					break;
+			}
+
+			return result;
 		}
 		#endregion
 	}
