@@ -7,6 +7,10 @@ namespace Escape
 	class Location : Entity
 	{
 		#region Declarations
+		private List<string> TempExits;
+		private List<string> TempItems;
+		private List<string> TempEnemies;
+
 		public List<int> Exits;
 		public List<int> Items;
 		public List<int> Enemies;
@@ -17,40 +21,40 @@ namespace Escape
 		public Location(
 			string Name,
 			string Description,
-			List<int> Exits,
-			List<int> Items,
-			List<int> Enemies,
+			List<string> Exits,
+			List<string> Items,
+			List<string> Enemies,
 			int BattleChance)
 		:base(Name, Description)
 		{
-			this.Exits = Exits;
-			this.Items = Items;
-			this.Enemies = Enemies;
+			this.TempExits = Exits;
+			this.TempItems = Items;
+			this.TempEnemies = Enemies;
 			this.BattleChance = BattleChance;
 		}
 		
 		public Location(
 			string Name,
 			string Description,
-			List<int> Exits,
-			List<int> Items)
+			List<string> Exits,
+			List<string> Items)
 		:base(Name, Description)
 		{
-			this.Exits = Exits;
-			this.Items = Items;
-			this.Enemies = new List<int>();
+			this.TempExits = Exits;
+			this.TempItems = Items;
+			this.TempEnemies = new List<string>();
 			this.BattleChance = 0;
 		}
 		
 		public Location(
 			string Name,
 			string Description,
-			List<int> Exits)
+			List<string> Exits)
 		:base(Name, Description)
 		{
-			this.Exits = Exits;
-			this.Items = new List<int>();
-			this.Enemies = new List<int>();
+			this.TempExits = Exits;
+			this.TempItems = new List<string>();
+			this.TempEnemies = new List<string>();
 			this.BattleChance = 0;
 		}
 		#endregion
@@ -86,6 +90,36 @@ namespace Escape
 				return true;
 			else
 				return false;
+		}
+
+		public void ConvertAttributeListsToIDs()
+		{
+			List<int> ExitsResult = new List<int>();
+
+			for (int i = 0; i < TempExits.Count; i++)
+			{
+				ExitsResult.Add(World.GetLocationIDByName(TempExits[i]));
+			}
+			
+			this.Exits = ExitsResult;
+
+			List<int> ItemsResult = new List<int>();
+
+			for (int i = 0; i < TempItems.Count; i++)
+			{
+				ItemsResult.Add(World.GetItemIDByName(TempItems[i]));
+			}
+
+			this.Items = ItemsResult;
+
+			List<int> EnemiesResult = new List<int>();
+
+			for (int i = 0; i < TempEnemies.Count; i++)
+			{
+				EnemiesResult.Add(World.GetEnemyIDByName(TempEnemies[i]));
+			}
+
+			this.Enemies = EnemiesResult;
 		}
 		#endregion
 	}

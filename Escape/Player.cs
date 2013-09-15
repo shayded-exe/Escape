@@ -147,7 +147,7 @@ namespace Escape
 		{
 			if (World.IsLocation(locationName))
 			{
-				int locationId = World.GetLocationIdByName(locationName);
+				int locationId = World.GetLocationIDByName(locationName);
 				
 				if (World.Map[Location].ContainsExit(locationId))
 				{
@@ -172,7 +172,7 @@ namespace Escape
 		
 		private static void Examine(string itemName)
 		{
-			int itemId = World.GetItemIdByName(itemName);
+			int itemId = World.GetItemIDByName(itemName);
 			
 			if (World.IsItem(itemName))
 			{				
@@ -195,7 +195,7 @@ namespace Escape
 		{
 			if (World.IsItem(itemName))
 			{
-				int itemId = World.GetItemIdByName(itemName);
+				int itemId = World.GetItemIDByName(itemName);
 				
 				if (World.Map[Location].ContainsItem(itemId))
 				{
@@ -218,7 +218,7 @@ namespace Escape
 		{
 			if (World.IsItem(itemName))
 			{
-				int itemId = World.GetItemIdByName(itemName);
+				int itemId = World.GetItemIDByName(itemName);
 				
 				if (ItemIsInInventory(itemId))
 				{
@@ -241,7 +241,7 @@ namespace Escape
 		{
 			if (World.IsItem(itemName))
 			{
-				int itemId = World.GetItemIdByName(itemName);
+				int itemId = World.GetItemIDByName(itemName);
 				
 				if (ItemIsInInventory(itemId))
 				{

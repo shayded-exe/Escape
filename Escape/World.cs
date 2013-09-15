@@ -9,6 +9,7 @@ namespace Escape
 		public static List<Location> Map = new List<Location>();
 		public static List<Item> Items = new List<Item>();
 		public static List<Enemy> Enemies = new List<Enemy>();
+		public static List<Attack> Attacks = new List<Attack>();
 		#endregion
 		
 		#region Initialization
@@ -17,6 +18,7 @@ namespace Escape
 			GenerateWorld();
 			GenerateItems();
 			GenerateEnemies();
+			ConvertAttributeListsToIDs();
 		}
 		#endregion
 		
@@ -26,29 +28,29 @@ namespace Escape
 			Map.Add(new Location(
 				"Room 1",
 				"This is a room.",
-				new List<int>() {1},
-				new List<int>() {0, 2}));
+				new List<string>() { "room 2" },
+				new List<string>() { "brass key", "rock" }));
 				
 			Map.Add(new Location(
 				"Room 2",
 				"This is another room.",
-				new List<int>() {0, 2},
-				new List<int>() {1},
-				new List<int>() {0},
+				new List<string>() { "room 1", "room 3" },
+				new List<string>() { "shiny stone" },
+				new List<string>() { "rat" },
 				50));
 				
 			Map.Add(new Location(
 				"Room 3",
 				"This is yet another room.",
-				new List<int>() {1},
-				new List<int>(),
-				new List<int>() {0, 1},
+				new List<string>() { "room 2" },
+				new List<string>(),
+				new List<string>() { "rat", "hawk" },
 				75));
 			
 			Map.Add(new Location(
 				"Secret Room",
 				"This is a very awesome secret room.",
-				new List<int>() {2}));
+				new List<string>() { "room 3" }));
 		}
 		
 		private static void GenerateItems()
@@ -56,7 +58,7 @@ namespace Escape
 			Items.Add(new Key(
 				"Brass Key",
 				"Just your generic key that's in almost every game.",
-				2, 3,
+				"room 3", "secret room",
 				true));
 				
 			Items.Add(new ShinyStone(
@@ -82,8 +84,21 @@ namespace Escape
 				new List<int>() { 15, 5, 0 },
 				new List<string>() { }));
 		}
+
+		private static void ConvertAttributeListsToIDs()
+		{
+			for (int i = 0; i < Map.Count; i++)
+			{
+				Map[i].ConvertAttributeListsToIDs();
+			}
+
+			for (int i = 0; i < Enemies.Count; i++)
+			{
+				Enemies[i].ConvertAttributeListsToIDs();
+			}
+		}
 		#endregion
-		
+
 		#region Public Location Methods
 		public static bool IsLocation(string locationName)
 		{
@@ -96,7 +111,7 @@ namespace Escape
 			return false;
 		}
 		
-		public static int GetLocationIdByName(string locationName)
+		public static int GetLocationIDByName(string locationName)
 		{
 			for (int i = 0; i < Map.Count; i++)
 			{
@@ -191,7 +206,7 @@ namespace Escape
 			return false;
 		}
 		
-		public static int GetItemIdByName(string itemName)
+		public static int GetItemIDByName(string itemName)
 		{
 			for (int i = 0; i < Items.Count; i++)
 			{
@@ -206,6 +221,32 @@ namespace Escape
 		{
 			Text.WriteLine(Items[itemId].Description);
 			Text.BlankLines();
+		}
+		#endregion
+
+		#region Public Enemy Methods
+		public static int GetEnemyIDByName(string enemyName)
+		{
+			for (int i = 0; i < Enemies.Count; i++)
+			{
+				if (Enemies[i].Name.ToLower() == enemyName.ToLower())
+					return i;
+			}
+
+			return -1;
+		}
+		#endregion
+
+		#region Public Attack Methods
+		public static int GetAttackIDByName(string attackName)
+		{
+			for (int i = 0; i < Attacks.Count; i++)
+			{
+				if (Attacks[i].Name.ToLower() == attackName.ToLower())
+					return i;
+			}
+
+			return -1;
 		}
 		#endregion
 	}

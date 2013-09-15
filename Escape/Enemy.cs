@@ -9,7 +9,8 @@ namespace Escape
 		public int Health;
 		public int Power;
 		public int Magic;
-		public List<string> Attacks;
+		public List<string> TempAttacks;
+		public List<int> Attacks;
 		#endregion
 		
 		#region Constructor
@@ -23,12 +24,24 @@ namespace Escape
 			this.Health = Stats[0];
 			this.Power = Stats[1];
 			this.Magic = Stats[2];
-			this.Attacks = Attacks;
+			this.TempAttacks = Attacks;
 		}
 		#endregion
 
 		#region Public Methods
 		public virtual void Attack() { }
+
+		public void ConvertAttributeListsToIDs()
+		{
+			List<int> AttacksResult = new List<int>();
+
+			for (int i = 0; i < TempAttacks.Count; i++)
+			{
+				AttacksResult.Add(World.GetAttackIDByName(TempAttacks[i]));
+			}
+
+			this.Attacks = AttacksResult;
+		}
 		#endregion
 	}
 
