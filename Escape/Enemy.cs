@@ -29,7 +29,13 @@ namespace Escape
 		#endregion
 
 		#region Public Methods
-		public virtual void Attack() { }
+		public virtual void Attack() 
+		{
+			Random rand = new Random();
+			int attackToUse = rand.Next(0, this.Attacks.Count);
+
+			World.Attacks[attackToUse].Use();
+		}
 
 		public void ConvertAttributeListsToIDs()
 		{

@@ -12,8 +12,8 @@ namespace Escape
 	class Program
 	{
 		#region Declarations
-		private const int Width = 73;
-		private const int Height = 30;
+		private const int width = 73;
+		private const int height = 30;
 		
 		private const string saveFile = "save.dat";
 		
@@ -33,11 +33,11 @@ namespace Escape
 		#region Main
 		public static void Main(string[] args)
 		{
-			Console.WindowWidth = Width;
-			Console.WindowHeight = Height;
+			Console.WindowWidth = width;
+			Console.WindowHeight = height;
 
-			Console.BufferWidth = Width;
-			Console.BufferHeight = Height;
+			Console.BufferWidth = width;
+			Console.BufferHeight = height;
 
 			World.Initialize();
 			

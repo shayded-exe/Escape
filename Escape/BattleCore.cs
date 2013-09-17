@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace Escape
 {
-	class BattleCore
+	static class BattleCore
 	{
 		#region Declarations
 		#endregion
 
 		#region Start Battle Method
-		public static void StartBattle(Enemy enemy)
+		public static void StartBattle(int enemy)
 		{
 
 		}			

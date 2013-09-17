@@ -76,13 +76,26 @@ namespace Escape
 				"Rat",
 				"Its just a pwesious wittle wat that will KILL YOU!",
 				new List<int>() { 10, 3, 5 },
-				new List<string>() { }));
+				new List<string>() { "scratch" }));
 
 			Enemies.Add(new Hawk(
 				"Hawk",
 				"It flies around looking for prey to feed on.",
 				new List<int>() { 15, 5, 0 },
-				new List<string>() { }));
+				new List<string>() { "scratch" }));
+		}
+
+		private static void GenerateAttacks()
+		{
+			Attacks.Add(new Attack(
+				"Flail",
+				"Flail your arms like a fish out of water and hope something happens",
+				5, 0, Attack.AttackTypes.Physical));
+
+			Attacks.Add(new Attack(
+				"Scratch",
+				"The Attacker digs it's claws into the skin of it's prey. Not really as painful as it sounds.",
+				10, 5, Attack.AttackTypes.Physical));
 		}
 
 		private static void ConvertAttributeListsToIDs()
