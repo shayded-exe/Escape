@@ -75,13 +75,13 @@ namespace Escape
 			Enemies.Add(new Rat(
 				"Rat",
 				"Its just a pwesious wittle wat that will KILL YOU!",
-				new List<int>() { 10, 3, 5 },
+				new List<int>() { 10, 5, 5, 5 },
 				new List<string>() { "scratch" }));
 
 			Enemies.Add(new Hawk(
 				"Hawk",
 				"It flies around looking for prey to feed on.",
-				new List<int>() { 15, 5, 0 },
+				new List<int>() { 15, 0, 10, 0 },
 				new List<string>() { "scratch" }));
 		}
 
@@ -90,12 +90,14 @@ namespace Escape
 			Attacks.Add(new Attack(
 				"Flail",
 				"Flail your arms like a fish out of water and hope something happens",
-				5, 70, 0, Attack.AttackTypes.Physical));
+				new List<int>() { 5, 70, 0 },
+				Attack.AttackTypes.Physical));
 
 			Attacks.Add(new Attack(
 				"Scratch",
 				"The Attacker digs it's claws into the skin of it's prey. Not really as painful as it sounds.",
-				10, 70, 5, Attack.AttackTypes.Physical));
+				new List<int>() { 10, 70, 5 },
+				Attack.AttackTypes.Physical));
 		}
 
 		private static void ConvertAttributeListsToIDs()

@@ -14,6 +14,9 @@ namespace Escape
 
 		public static int MaxMagic = 100;
 		public static int Magic = MaxMagic;
+
+		public static int Power = 10;
+		public static int Defense = 10;
 		
 		public static List<int> Inventory = new List<int>();
 		#endregion

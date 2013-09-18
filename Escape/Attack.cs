@@ -15,22 +15,20 @@ namespace Escape
 
 		public enum AttackTypes { Physical, Magic, Self };
 
-		private bool isLucky;
+		private int lucky = 0;
 		#endregion
 
 		#region Constructor
 		public Attack(
 			string Name,
 			string Description,
-			int Power,
-			int Accuracy,
-			int Cost,
+			List<int> Stats,
 			AttackTypes Type)
 		:base(Name, Description)
 		{
-			this.Power = Power;
-			this.Accuracy = Accuracy;
-			this.Cost = Cost;
+			this.Power = Stats[0];
+			this.Accuracy = Stats[1];
+			this.Cost = Stats[2];
 			this.Type = Type;
 		}
 		#endregion
@@ -43,22 +41,22 @@ namespace Escape
 		#endregion
 
 		#region Helper Methods
-		private bool checkLucky()
+		private void CheckLucky()
 		{
 			Random rand = new Random();
 			int random = rand.Next(0, 100);
 
-			double modifiedLuckyRate = BattleCore.BaseLuckyRate * ((100 - BattleCore.CurrentEnemy.Health) * 0.0125);
+			double modifiedLuckyRate = BattleCore.BaseLuckyRate * ((100 - BattleCore.AttackerHealth) * 0.0125);
 
 			if (random < modifiedLuckyRate)
-				return true;
-
-			return false;
+				lucky = 1;
+			else
+				lucky = 0;
 		}
 
-		private bool checkAccuracy()
+		private bool CheckAccuracy()
 		{
-			if (isLucky)
+			if (lucky == 1)
 				return true;
 
 			Random rand = new Random();
@@ -66,15 +64,23 @@ namespace Escape
 
 			double modifiedAccuracy = this.Accuracy;
 
-			if (BattleCore.CurrentEnemy.Health < 50)
+			if (BattleCore.AttackerHealth < 50)
 			{
-				modifiedAccuracy = this.Accuracy * (BattleCore.CurrentEnemy.Health * 0.02);
+				modifiedAccuracy = this.Accuracy * (BattleCore.AttackerHealth * 0.02);
 			}
 
 			if (random < modifiedAccuracy)
 				return true;
 
 			return false;
+		}
+
+		private int CalculateDamage()
+		{
+			double modifier = lucky * 0.5;
+			double damage = ((BattleCore.AttackerPower / BattleCore.DefenderDefense) * this.Power) * modifier;
+
+			return (int)damage;
 		}
 		#endregion
 	}

@@ -7,8 +7,9 @@ namespace Escape
 	{
 		#region Declarations
 		public int Health;
-		public int Power;
 		public int Magic;
+		public int Power;
+		public int Defense;
 		public List<string> TempAttacks;
 		public List<int> Attacks;
 		#endregion
@@ -22,8 +23,9 @@ namespace Escape
 		:base(Name, Description)
 		{
 			this.Health = Stats[0];
-			this.Power = Stats[1];
-			this.Magic = Stats[2];
+			this.Magic = Stats[1];
+			this.Power = Stats[2];
+			this.Defense = Stats[3];
 			this.TempAttacks = Attacks;
 		}
 		#endregion
