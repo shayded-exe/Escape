@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 namespace Escape
 {
@@ -93,7 +95,7 @@ namespace Escape
 		#region Start Battle Method
 		public static void StartBattle(int enemy)
 		{
-			CurrentEnemy = World.Enemies[enemy];
+			CurrentEnemy = CloneEnemy(World.Enemies[enemy]);
 		}			
 		#endregion
 		
@@ -102,6 +104,20 @@ namespace Escape
 		{
 			Text.WriteColor("`c`/-----------------------------------------------------------------------\\", false);
 			
+		}
+		#endregion
+
+		#region Helper Methods
+		private static T CloneEnemy<T>(T obj)
+		{
+			using (var ms = new MemoryStream())
+			{
+				var formatter = new BinaryFormatter();
+				formatter.Serialize(ms, obj);
+				ms.Position = 0;
+
+				return (T) formatter.Deserialize(ms);
+			}
 		}
 		#endregion
 	}

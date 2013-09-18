@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Escape
 {
+	[Serializable]
 	abstract class Enemy : Entity
 	{
 		#region Declarations
@@ -54,6 +55,7 @@ namespace Escape
 	}
 
 	#region Rat
+	[Serializable]
 	class Rat : Enemy
 	{
 		public Rat(
@@ -73,6 +75,7 @@ namespace Escape
 	#endregion
 
 	#region Hawk
+	[Serializable]
 	class Hawk : Enemy
 	{
 		public Hawk(
