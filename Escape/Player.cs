@@ -78,7 +78,7 @@ namespace Escape
 							DisplayInventory();
 							break;
 						case "attack":
-							//attack command
+							Attack(noun);
 							break;
 						case "hurt":
 							Player.Health -= Convert.ToInt32(noun);
@@ -142,6 +142,7 @@ namespace Escape
 			Text.WriteColor("drop/place <`c`item`w`> - Drop the specified item from your inventory and place it in the world.");
 			Text.WriteColor("items/inventory/inv - Display your current inventory.");
 			Text.WriteColor("use <`c`item`w`> - Use the specified item.");
+			Text.WriteColor("attack <`c`enemy`w`> - Attack the specified enemy.");
 			Text.WriteColor("save/load - saves/loads the game respectively.");
 			Text.BlankLines();
 		}
@@ -258,6 +259,27 @@ namespace Escape
 			else
 			{
 				Program.SetError("That isn't a valid item!");
+			}
+		}
+
+		private static void Attack(string enemyName)
+		{
+			if (World.IsEnemy(enemyName))
+			{
+				int enemyId = World.GetEnemyIDByName(enemyName);
+
+				if (World.Map[Location].ContainsEnemy(enemyId))
+				{
+					BattleCore.StartBattle(enemyId);
+				}
+				else
+				{
+					Program.SetError("That enemy isn't able to take your call at the moment, please leave a message!..... **BEEP**");
+				}
+			}
+			else
+			{
+				Program.SetError("That isn't a valid enemy!");
 			}
 		}
 		

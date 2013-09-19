@@ -250,6 +250,17 @@ namespace Escape
 
 			return -1;
 		}
+
+		public static bool IsEnemy(string enemyName)
+		{
+			for (int i = 0; i < Enemies.Count; i++)
+			{
+				if (Enemies[i].Name.ToLower() == enemyName.ToLower())
+					return true;
+			}
+
+			return false;
+		}
 		#endregion
 
 		#region Public Attack Methods
