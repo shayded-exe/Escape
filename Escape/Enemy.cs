@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Escape
 {
 	[Serializable]
-	abstract class Enemy : Entity
+	class Enemy : Entity
 	{
 		#region Declarations
 		public int Health;
@@ -53,44 +53,4 @@ namespace Escape
 		}
 		#endregion
 	}
-
-	#region Rat
-	[Serializable]
-	class Rat : Enemy
-	{
-		public Rat(
-			string Name,
-			string Description,
-			List<int> Stats,
-			List<string> Attacks)
-		:base(Name, Description, Stats, Attacks)
-		{	
-		}
-
-		public override void Attack()
-		{
-			
-		}
-	}
-	#endregion
-
-	#region Hawk
-	[Serializable]
-	class Hawk : Enemy
-	{
-		public Hawk(
-			string Name,
-			string Description,
-			List<int> Stats,
-			List<string> Attacks)
-		:base(Name, Description, Stats, Attacks)
-		{
-		}
-
-		public override void Attack()
-		{
-			
-		}
-	}
-	#endregion
 }
