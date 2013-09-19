@@ -17,6 +17,10 @@ namespace Escape
 
 		public static int Power = 10;
 		public static int Defense = 10;
+
+		public static int Level = 1;
+		public static int Exp = 0;
+		public static int NextLevel = 10;
 		
 		public static List<int> Inventory = new List<int>();
 		#endregion
@@ -83,6 +87,9 @@ namespace Escape
 						case "hurt":
 							Player.Health -= Convert.ToInt32(noun);
 							break;
+						case "exp":
+							AddExp(Convert.ToInt32(noun));
+							break;
 						case "save":
 							Program.Save();
 							break;
@@ -126,6 +133,28 @@ namespace Escape
 			if (ItemIsInInventory(itemId))
 			{
 				Inventory.Remove(itemId);
+			}
+		}
+
+		public static void AddExp(int expAmount)
+		{
+			Player.Exp += expAmount;
+
+			while (Player.Exp >= NextLevel)
+			{
+				Player.Level++;
+				Player.Exp -= NextLevel;
+				GenerateNextLevel();
+			}
+		}
+
+		public static void GenerateNextLevel()
+		{
+			NextLevel = (int)Math.Pow(Level, 3);
+
+			if (Player.Level < 5)
+			{
+				NextLevel += 10;
 			}
 		}
 		#endregion

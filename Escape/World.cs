@@ -205,7 +205,9 @@ namespace Escape
 				Console.CursorLeft = 0;
 			}
 			
-			Text.WriteColor("\\-----------------^-----------------^-----------------^-----------------/`w`");
+			Text.WriteColor("\\-----------------^-----------------^-----------------^-----------------/`w`", false);
+			Text.WriteColor(" `c`\\`w`Exp [`g`" + Text.ToBar(Player.Exp, Player.NextLevel, 30) + "`w`] Lvl." + Player.Level + "`c`/`w`" + Player.Exp + "/" 
+			+ Player.NextLevel + "`c`/`w`");
 		}
 		#endregion
 		

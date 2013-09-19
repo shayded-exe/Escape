@@ -97,6 +97,7 @@ namespace Escape
 		{
 			Program.GameState = Program.GameStates.Battle;
 
+			CurrentTurn = "player";
 			CurrentEnemy = CloneEnemy(World.Enemies[enemy]);
 		}
 		#endregion
