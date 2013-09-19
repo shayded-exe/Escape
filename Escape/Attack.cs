@@ -14,8 +14,6 @@ namespace Escape
 		public AttackTypes Type;
 
 		public enum AttackTypes { Physical, Magic, Self };
-
-		private int lucky = 0;
 		#endregion
 
 		#region Constructor
@@ -36,12 +34,17 @@ namespace Escape
 		#region Public Methods
 		public virtual void Use() 
 		{
-			
+			int lucky = CheckLucky();
+			bool willHit = CheckAccuracy(lucky);
+			int damage = CheckDamage(lucky);
+
+			BattleCore.DefenderHealth -= damage;
+			BattleCore.AttackerMagic -= this.Cost;
 		}
 		#endregion
 
 		#region Helper Methods
-		private void CheckLucky()
+		private int CheckLucky()
 		{
 			Random rand = new Random();
 			int random = rand.Next(0, 100);
@@ -49,15 +52,17 @@ namespace Escape
 			double modifiedLuckyRate = BattleCore.BaseLuckyRate * ((100 - BattleCore.AttackerHealth) * 0.0125);
 
 			if (random < modifiedLuckyRate)
-				lucky = 1;
+				return 1;
 			else
-				lucky = 0;
+				return 0;
 		}
 
-		private bool CheckAccuracy()
+		private bool CheckAccuracy(int lucky)
 		{
 			if (lucky == 1)
+			{
 				return true;
+			}
 
 			Random rand = new Random();
 			int random = rand.Next(0, 100);
@@ -71,11 +76,12 @@ namespace Escape
 
 			if (random < modifiedAccuracy)
 				return true;
-
-			return false;
+			else
+				return false;
+				
 		}
 
-		private int CalculateDamage()
+		private int CheckDamage(int lucky)
 		{
 			double modifier = lucky * 0.5;
 			double damage = ((BattleCore.AttackerPower / BattleCore.DefenderDefense) * this.Power) * modifier;

@@ -95,8 +95,10 @@ namespace Escape
 		#region Start Battle Method
 		public static void StartBattle(int enemy)
 		{
+			Program.GameState = Program.GameStates.Battle;
+
 			CurrentEnemy = CloneEnemy(World.Enemies[enemy]);
-		}			
+		}
 		#endregion
 		
 		#region Public Methods
