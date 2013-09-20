@@ -205,9 +205,34 @@ namespace Escape
 				Console.CursorLeft = 0;
 			}
 			
-			Text.WriteColor("\\-----------------^-----------------^-----------------^-----------------/`w`", false);
-			Text.WriteColor(" `c`\\`w`Exp [`g`" + Text.ToBar(Player.Exp, Player.NextLevel, 30) + "`w`] Lvl." + Player.Level + "`c`/`w`" + Player.Exp + "/" 
-			+ Player.NextLevel + "`c`/`w`");
+			Text.WriteColor("\\-----------------^-----------------+-----------------^-----------------/`w`", false);
+			Text.WriteColor(" `c`\\`w` Lvl.", false);
+
+			if (Player.Level < 10)
+			{
+				Text.Write(" ");
+			}
+
+			Text.WriteColor(Player.Level + " [`g`" + Text.ToBar(Player.Exp, Player.NextLevel, 23) + "`w`] `c`|`w` " 
+			+ Player.Exp + "/" + Player.NextLevel + "`c` /", false);
+
+			int expLength = Console.CursorLeft;
+
+			Text.WriteLine("", false);
+
+			Text.WriteColor("  \\---------------------------------^", false);
+
+			while (Console.CursorLeft < expLength - 2)
+			{
+				Text.WriteColor("-", false);
+			}
+
+			Text.WriteColor("/`w`", false);
+
+			Text.WriteAt("`c`v`w`", expLength, Console.CursorTop - 2, true, true);
+
+			Text.WriteLine("", false);
+			Text.WriteLine("", false);
 		}
 		#endregion
 		
