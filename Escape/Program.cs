@@ -112,6 +112,7 @@ namespace Escape
 			}
 			
 			BattleCore.BattleHUD();
+			BattleCore.NextTurn();
 		}
 		
 		private static void QuitState()
@@ -121,9 +122,9 @@ namespace Escape
 			Text.WriteColor("|`w`                 Are you sure you want to quit? (y/n)                  `r`|", false);
 			Text.WriteColor("\\-----------------------------------------------------------------------/`w`", false);
 			
-			ConsoleKeyInfo quitKey = Console.ReadKey();
+			char quitKey = Text.SetKeyPrompt();
 			
-			if (quitKey.KeyChar == 'y')
+			if (quitKey == 'y')
 			{
 				run = false;
 			}

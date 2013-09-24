@@ -18,7 +18,10 @@ namespace Escape
 			GenerateWorld();
 			GenerateItems();
 			GenerateEnemies();
+			GenerateAttacks();
 			ConvertAttributeListsToIDs();
+
+			Player.Attacks.Add(GetAttackIDByName("flail"));
 		}
 		#endregion
 		
@@ -63,11 +66,13 @@ namespace Escape
 				
 			Items.Add(new ShinyStone(
 				"Shiny Stone",
-				"Its a stone, and its shiny, what more could you ask for?"));
+				"Its a stone, and its shiny, what more could you ask for?",
+				true, true));
 				
 			Items.Add(new Rock(
 				"Rock",
-				"It doesn't do anything, however, it is said that the mystical game designer used this for testing."));
+				"It doesn't do anything, however, it is said that the mystical game designer used this for testing.",
+				false, true));
 		}
 		
 		private static void GenerateEnemies()
@@ -141,7 +146,7 @@ namespace Escape
 		{
 			Text.WriteColor("`c`/-----------------------------------------------------------------------\\", false);
 			
-			List<string> locationDesctiption = Text.Limit(Map[Player.Location].Description, Console.WindowWidth - 4);
+			List<string> locationDesctiption = Text.Limit(Map[Player.Location].Name + " - " + Map[Player.Location].Description, Console.WindowWidth - 4);
 			
 			foreach (string line in locationDesctiption)
 			{
@@ -153,36 +158,41 @@ namespace Escape
 			Text.WriteColor(">-----------------#-----------------#-----------------#-----------------<`w`", false);
 			
 			int currentY = Console.CursorTop;
-			int i;
+			int i = 0;
 			int longestList = 0;
 			
-			for (i = 0; i < Map[Player.Location].Exits.Count; i++)
+			foreach (int exit in Map[Player.Location].Exits)
 			{
-				string name = Map[Map[Player.Location].Exits[i]].Name;
+				string name = Map[exit].Name;
 				Text.WriteColor("  " + name);
+				i++;
 			}
 			
 			longestList = (i > longestList) ? i : longestList;
+			i = 0;
 			
 			Console.SetCursorPosition(18, currentY);
 			
-			for (i = 0; i < Map[Player.Location].Items.Count; i++)
+			foreach (int item in Map[Player.Location].Items)
 			{
-				string name = Items[Map[Player.Location].Items[i]].Name;
+				string name = Items[item].Name;
 				Text.WriteColor("  " + name);
+				i++;
 			}
 			
 			longestList = (i > longestList) ? i : longestList;
+			i = 0;
 			
 			Console.SetCursorPosition(36, currentY);
 			
-			for (i = 0; i < Map[Player.Location].Enemies.Count; i++)
+			foreach (int enemy in Map[Player.Location].Enemies)
 			{
-				string name = Enemies[Map[Player.Location].Enemies[i]].Name;
+				string name = Enemies[enemy].Name;
 				Text.WriteColor("  " + name);
 			}
 			
 			longestList = (i > longestList) ? i : longestList;
+			i = 0;
 			
 			Console.SetCursorPosition(54, currentY);
 			
@@ -237,28 +247,28 @@ namespace Escape
 		#endregion
 		
 		#region Public Item Methods
+		public static int GetItemIDByName(string itemName)
+		{
+			foreach (Item item in Items)
+			{
+				if (item.Name.ToLower() == itemName.ToLower())
+					return Items.IndexOf(item);
+			}
+
+			return -1;
+		}
+
 		public static bool IsItem(string itemName)
 		{
-			for (int i = 0; i < Items.Count; i++)
+			foreach (Item item in Items)
 			{
-				if (Items[i].Name.ToLower() == itemName.ToLower())
+				if (item.Name.ToLower() == itemName.ToLower())
 					return true;
 			}
 			
 			return false;
 		}
-		
-		public static int GetItemIDByName(string itemName)
-		{
-			for (int i = 0; i < Items.Count; i++)
-			{
-				if (Items[i].Name.ToLower() == itemName.ToLower())
-					return i;
-			}
-			
-			return -1;
-		}
-		
+
 		public static void ItemDescription(int itemId)
 		{
 			Text.WriteLine(Items[itemId].Description);
@@ -269,10 +279,10 @@ namespace Escape
 		#region Public Enemy Methods
 		public static int GetEnemyIDByName(string enemyName)
 		{
-			for (int i = 0; i < Enemies.Count; i++)
+			foreach (Enemy enemy in Enemies)
 			{
-				if (Enemies[i].Name.ToLower() == enemyName.ToLower())
-					return i;
+				if (enemy.Name.ToLower() == enemyName.ToLower())
+					return Enemies.IndexOf(enemy);
 			}
 
 			return -1;
@@ -280,9 +290,9 @@ namespace Escape
 
 		public static bool IsEnemy(string enemyName)
 		{
-			for (int i = 0; i < Enemies.Count; i++)
+			foreach (Enemy enemy in Enemies)
 			{
-				if (Enemies[i].Name.ToLower() == enemyName.ToLower())
+				if (enemy.Name.ToLower() == enemyName.ToLower())
 					return true;
 			}
 
@@ -293,13 +303,24 @@ namespace Escape
 		#region Public Attack Methods
 		public static int GetAttackIDByName(string attackName)
 		{
-			for (int i = 0; i < Attacks.Count; i++)
+			foreach (Attack attack in Attacks)
 			{
-				if (Attacks[i].Name.ToLower() == attackName.ToLower())
-					return i;
+				if (attack.Name.ToLower() == attackName.ToLower())
+					return Attacks.IndexOf(attack);
 			}
 
 			return -1;
+		}
+
+		public static bool IsAttack(string attackName)
+		{
+			foreach (Attack attack in Attacks)
+			{
+				if (attack.Name.ToLower() == attackName.ToLower())
+					return true;
+			}
+
+			return false;
 		}
 		#endregion
 	}

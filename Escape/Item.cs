@@ -6,16 +6,19 @@ namespace Escape
 	{
 		#region Declarations
 		private bool uses;
+		public bool CanUseInBattle;
 		#endregion
 		
 		#region Constructor
 		public Item(
 			string Name,
 			string Description,
-			bool uses = false)
+			bool uses,
+			bool CanUseInBattle = false)
 		:base(Name, Description)
 		{
 			this.uses = uses;
+			this.CanUseInBattle = CanUseInBattle;
 		}
 		#endregion
 		
@@ -40,7 +43,7 @@ namespace Escape
 			string Description,
 			string targetLocation,
 			string newLocation,
-			bool uses = false)
+			bool uses)
 		:base(Name, Description, uses)
 		{
 			this.targetLocation = targetLocation;
@@ -69,8 +72,9 @@ namespace Escape
 		public ShinyStone(
 			string Name,
 			string Description,
-			bool uses = false)
-		: base(Name, Description, uses)
+			bool uses,
+			bool CanUseInBattle)
+		: base(Name, Description, uses, CanUseInBattle)
 		{
 		}
 
@@ -95,8 +99,9 @@ namespace Escape
 		public Rock(
 			string Name,
 			string Description,
-			bool uses = false)
-		:base(Name, Description, uses)
+			bool uses,
+			bool CanUseInBattle)
+		:base(Name, Description, uses, CanUseInBattle)
 		{
 		}
 

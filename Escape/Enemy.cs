@@ -8,7 +8,11 @@ namespace Escape
 	{
 		#region Declarations
 		public int Health;
+		public int MaxHealth;
+
 		public int Magic;
+		public int MaxMagic;
+
 		public int Power;
 		public int Defense;
 		public List<string> TempAttacks;
@@ -24,7 +28,11 @@ namespace Escape
 		:base(Name, Description)
 		{
 			this.Health = Stats[0];
+			this.MaxHealth = Health;
+
 			this.Magic = Stats[1];
+			this.MaxMagic = Magic;
+
 			this.Power = Stats[2];
 			this.Defense = Stats[3];
 			this.TempAttacks = Attacks;
@@ -37,7 +45,7 @@ namespace Escape
 			Random rand = new Random();
 			int attackToUse = rand.Next(0, this.Attacks.Count);
 
-			World.Attacks[attackToUse].Use();
+			World.Attacks[Attacks[attackToUse]].Use();
 		}
 
 		public void ConvertAttributeListsToIDs()

@@ -23,6 +23,7 @@ namespace Escape
 		public static int NextLevel = 10;
 		
 		public static List<int> Inventory = new List<int>();
+		public static List<int> Attacks = new List<int>();
 		#endregion
 		
 		#region Public Methods
@@ -134,6 +135,21 @@ namespace Escape
 			{
 				Inventory.Remove(itemId);
 			}
+		}
+
+		public static List<int> ItemsUsableInBattle()
+		{
+			List<int> result = new List<int>();
+
+			foreach (int item in Inventory)
+			{
+				if (World.Items[item].CanUseInBattle)
+				{
+					result.Add(item);
+				}
+			}
+
+			return result;
 		}
 
 		public static void AddExp(int expAmount)
@@ -300,6 +316,7 @@ namespace Escape
 				if (World.Map[Location].ContainsEnemy(enemyId))
 				{
 					BattleCore.StartBattle(enemyId);
+					Program.SetNotification("You attacked the " + World.Enemies[enemyId].Name + ". Prepare for battle!");
 				}
 				else
 				{

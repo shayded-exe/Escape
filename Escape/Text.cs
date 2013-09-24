@@ -18,6 +18,13 @@ namespace Escape
 			
 			return Console.ReadLine();
 		}
+
+		public static char SetKeyPrompt(string aString = "")
+		{
+			Text.Write(string.Format(aString));
+
+			return Console.ReadKey().KeyChar;
+		}
 		
 		public static void Write(string aString)
 		{			
