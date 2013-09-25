@@ -31,7 +31,7 @@ namespace Escape
 		#endregion
 		
 		#region Main
-		public static void Main(string[] args)
+		public static void Main()
 		{
 			Console.WindowWidth = width;
 			Console.WindowHeight = height;

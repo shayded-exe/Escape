@@ -34,8 +34,14 @@ namespace Escape
 		#region Public Methods
 		public virtual void Use() 
 		{
+			if (!CheckMagic())
+				return;
+
 			int lucky = CheckLucky();
-			bool willHit = CheckAccuracy(lucky);
+			
+			if (!CheckAccuracy(lucky))
+				return;
+
 			int damage = CheckDamage(lucky);
 
 			BattleCore.DefenderHealth -= damage;
@@ -52,14 +58,17 @@ namespace Escape
 			double modifiedLuckyRate = BattleCore.BaseLuckyRate * ((100 - BattleCore.AttackerHealth) * 0.0125);
 
 			if (random < modifiedLuckyRate)
-				return 1;
+			{
+				Program.SetNotification("Lucky Hit!");
+				return 2;
+			}
 			else
-				return 0;
+				return 1;
 		}
 
 		private bool CheckAccuracy(int lucky)
 		{
-			if (lucky == 1)
+			if (lucky == 2)
 			{
 				return true;
 			}
@@ -69,7 +78,7 @@ namespace Escape
 
 			double modifiedAccuracy = this.Accuracy;
 
-			if (BattleCore.AttackerHealth < 50)
+			if ((BattleCore.AttackerHealth / BattleCore.AttackerMaxHealth) < 0.5)
 			{
 				modifiedAccuracy = this.Accuracy * (BattleCore.AttackerHealth * 0.02);
 			}
@@ -77,14 +86,40 @@ namespace Escape
 			if (random < modifiedAccuracy)
 				return true;
 			else
+			{
+				Program.SetError("The attack missed!");
 				return false;
+			}
 				
+		}
+
+		private bool CheckMagic()
+		{
+			if (BattleCore.AttackerMagic >= this.Cost)
+				return true;
+			else
+			{
+				Program.SetError("Not enough magic to attack!");
+				return false;
+			}
 		}
 
 		private int CheckDamage(int lucky)
 		{
-			double modifier = lucky * 0.5;
-			double damage = ((BattleCore.AttackerPower / BattleCore.DefenderDefense) * this.Power) * modifier;
+			Random random = new Random();
+			double modifier = lucky * 0.6;
+			double variation = (random.Next(85, 115) / 100d);
+			
+			double damage = ((BattleCore.AttackerPower * this.Power) / Math.Max(BattleCore.DefenderDefense, 1)) * modifier * variation;
+
+			if (BattleCore.CurrentTurn == "player")
+			{
+				Program.SetNotification("You did " + (int)damage + " damage!");
+			}
+			else
+			{
+				Program.SetNotification("The enemy did " + (int)damage + " damage");
+			}
 
 			return (int)damage;
 		}

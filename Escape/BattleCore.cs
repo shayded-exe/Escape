@@ -33,6 +33,17 @@ namespace Escape
 			}
 		}
 
+		public static int AttackerMaxHealth
+		{
+			get
+			{
+				if (CurrentTurn == "player")
+					return Player.MaxHealth;
+				else
+					return CurrentEnemy.MaxHealth;
+			}
+		}
+
 		public static int DefenderHealth
 		{
 			get
@@ -48,6 +59,17 @@ namespace Escape
 					CurrentEnemy.Health = value;
 				else
 					Player.Health = value;
+			}
+		}
+
+		public static int DefenderMaxHealth
+		{
+			get
+			{
+				if (CurrentTurn == "player")
+					return CurrentEnemy.MaxHealth;
+				else
+					return Player.MaxHealth;
 			}
 		}
 

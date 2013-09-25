@@ -80,13 +80,13 @@ namespace Escape
 			Enemies.Add(new Enemy(
 				"Rat",
 				"Its just a pwesious wittle wat that will KILL YOU!",
-				new List<int>() { 10, 5, 5, 5 },
+				new List<int>() { 10, 5, 10, 5 },
 				new List<string>() { "scratch" }));
 
 			Enemies.Add(new Enemy(
 				"Hawk",
 				"It flies around looking for prey to feed on.",
-				new List<int>() { 15, 0, 10, 0 },
+				new List<int>() { 15, 0, 15, 0 },
 				new List<string>() { "scratch" }));
 		}
 
@@ -101,7 +101,7 @@ namespace Escape
 			Attacks.Add(new Attack(
 				"Scratch",
 				"The Attacker digs it's claws into the skin of it's prey. Not really as painful as it sounds.",
-				new List<int>() { 10, 70, 5 },
+				new List<int>() { 10, 70, 1 },
 				Attack.AttackTypes.Physical));
 		}
 
