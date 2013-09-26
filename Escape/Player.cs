@@ -75,6 +75,7 @@ namespace Escape
 							Place(noun);
 							break;
 						case "use":
+						case "item":
 							Use(noun);
 							break;
 						case "items":
@@ -106,14 +107,20 @@ namespace Escape
 				case Program.GameStates.Battle:
 					switch(verb)
 					{
+						case "help":
+						case "?":
+							WriteBattleCommands();
+							break;
 						case "attack":
-							//attack command
+							AttackInBattle(noun);
 							break;
 						case "flee":
 						case "escape":
+						case "run":
 							//flee command
 							break;
 						case "use":
+						case "item":
 							//use command
 							break;
 						case "items":
@@ -163,16 +170,6 @@ namespace Escape
 				GenerateNextLevel();
 			}
 		}
-
-		public static void GenerateNextLevel()
-		{
-			NextLevel = (int)Math.Pow(Level, 3);
-
-			if (Player.Level < 5)
-			{
-				NextLevel += 10;
-			}
-		}
 		#endregion
 		
 		#region Command Methods
@@ -186,7 +183,7 @@ namespace Escape
 			Text.WriteColor("take/pickuip <`c`item`w`> - Put the specified item in your inventory.");
 			Text.WriteColor("drop/place <`c`item`w`> - Drop the specified item from your inventory and place it in the world.");
 			Text.WriteColor("items/inventory/inv - Display your current inventory.");
-			Text.WriteColor("use <`c`item`w`> - Use the specified item.");
+			Text.WriteColor("use/item <`c`item`w`> - Use the specified item.");
 			Text.WriteColor("attack <`c`enemy`w`> - Attack the specified enemy.");
 			Text.WriteColor("save/load - saves/loads the game respectively.");
 			Text.BlankLines();
@@ -351,7 +348,36 @@ namespace Escape
 			Text.BlankLines();
 		}
 		#endregion
-		
+
+		#region Battle Command Methods
+		private static void WriteBattleCommands()
+		{
+			Text.WriteColor("`g`Available Battle Commands:`w`");
+			Text.WriteColor("help/? - Display this list.");
+		}
+
+		private static void AttackInBattle(string attackName)
+		{
+			if (World.IsAttack(attackName))
+			{
+				int attackID = World.GetAttackIDByName(attackName);
+
+				if (AttackIsInInventory(attackID))
+				{
+					World.Attacks[attackID].Use();
+				}
+				else
+				{
+					Program.SetError("You don't know that attack!");
+				}
+			}
+			else
+			{
+				Program.SetError("That isn't a valid attack!");
+			}
+		}
+		#endregion
+
 		#region Helper Methods
 		private static void InputNotValid()
 		{
@@ -364,6 +390,24 @@ namespace Escape
 				return true;
 			else
 				return false;
+		}
+
+		private static bool AttackIsInInventory(int attackId)
+		{
+			if (Attacks.Contains(attackId))
+				return true;
+			else
+				return false;
+		}
+
+		private static void GenerateNextLevel()
+		{
+			NextLevel = (int)Math.Pow(Level, 3);
+
+			if (Player.Level < 5)
+			{
+				NextLevel += 10;
+			}
 		}
 		#endregion
 	}
