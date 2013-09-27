@@ -28,10 +28,7 @@ namespace Escape
 		
 		#region Public Methods
 		public static void Do(string aString)
-		{
-			if(aString == "")
-				return;
-			
+		{		
 			string verb = "";
 			string noun = "";
 			
@@ -129,6 +126,7 @@ namespace Escape
 							//items command
 							break;
 						default:
+							BattleCore.CurrentTurn = "enemy";
 							InputNotValid();
 							break;
 					}
