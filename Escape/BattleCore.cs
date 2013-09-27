@@ -114,7 +114,7 @@ namespace Escape
 		}
 		#endregion
 
-		#region Start Battle Method
+		#region Battle Methods
 		public static void StartBattle(int enemy)
 		{
 			Program.GameState = Program.GameStates.Battle;

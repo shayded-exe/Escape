@@ -34,8 +34,22 @@ namespace Escape
 		#region Public Methods
 		public virtual void Use() 
 		{
+			if (BattleCore.CurrentTurn == "player")
+			{
+				Program.SetNotification("You used " + this.Name + "!");
+			}
+			else
+			{
+				Program.SetNotification("The enemy used " + this.Name + "!");
+			}
+
 			if (!CheckMagic())
+			{
+				World.Attacks[World.GetAttackIDByName("flail")].Use();
 				return;
+			}
+
+			BattleCore.AttackerMagic -= this.Cost;
 
 			int lucky = CheckLucky();
 			
@@ -45,7 +59,6 @@ namespace Escape
 			int damage = CheckDamage(lucky);
 
 			BattleCore.DefenderHealth -= damage;
-			BattleCore.AttackerMagic -= this.Cost;
 		}
 		#endregion
 
@@ -99,7 +112,14 @@ namespace Escape
 				return true;
 			else
 			{
-				Program.SetError("Not enough magic to attack!");
+				if (BattleCore.CurrentTurn == "player")
+				{
+					Program.SetError("Not enough magic! You flailed your arms.");
+				}
+				else
+				{
+					Program.SetError("The enemy is out of magic! It flailed its arms.");
+				}
 				return false;
 			}
 		}

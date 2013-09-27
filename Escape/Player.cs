@@ -143,6 +143,11 @@ namespace Escape
 				Attacks.Add(attackId);
 				Program.SetNotification("You learned the attack " + World.Attacks[attackId].Name + "!");
 			}
+			else
+			{
+				//Error: PL149
+				Program.SetError("Go tell the developer he dun goofed. Error: PL149");
+			}
 		}
 
 		public static void GiveItem(string itemName)
@@ -151,7 +156,7 @@ namespace Escape
 			{
 				int itemId = World.GetItemIDByName(itemName);
 				string notification = "You were given ";
-				
+
 				if (Text.isVowel(World.Items[itemId].Name[0]))
 				{
 					notification += "an ";
@@ -165,6 +170,11 @@ namespace Escape
 
 				Inventory.Add(itemId);
 				Program.SetNotification(notification);
+			}
+			else
+			{
+				//Error: PL177
+				Program.SetError("Go tell the developer he dun goofed. Error: PL177");
 			}
 		}
 		
