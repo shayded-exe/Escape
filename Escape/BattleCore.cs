@@ -15,7 +15,7 @@ namespace Escape
 		#endregion
 
 		#region Properties
-		public static int AttackerHealth
+		public static double AttackerHealth
 		{
 			get
 			{
@@ -27,13 +27,13 @@ namespace Escape
 			set
 			{
 				if (CurrentTurn == "player")
-					Player.Health = value;
+					Player.Health = (int)value;
 				else
-					CurrentEnemy.Health = value;
+					CurrentEnemy.Health = (int)value;
 			}
 		}
 
-		public static int AttackerMaxHealth
+		public static double AttackerMaxHealth
 		{
 			get
 			{
@@ -44,7 +44,7 @@ namespace Escape
 			}
 		}
 
-		public static int DefenderHealth
+		public static double DefenderHealth
 		{
 			get
 			{
@@ -56,13 +56,13 @@ namespace Escape
 			set
 			{
 				if (CurrentTurn == "player")
-					CurrentEnemy.Health = value;
+					CurrentEnemy.Health = (int)value;
 				else
-					Player.Health = value;
+					Player.Health = (int)value;
 			}
 		}
 
-		public static int DefenderMaxHealth
+		public static double DefenderMaxHealth
 		{
 			get
 			{
@@ -73,7 +73,7 @@ namespace Escape
 			}
 		}
 
-		public static int AttackerMagic
+		public static double AttackerMagic
 		{
 			get
 			{
@@ -85,13 +85,13 @@ namespace Escape
 			set
 			{
 				if (CurrentTurn == "player")
-					Player.Magic = value;
+					Player.Magic = (int)value;
 				else
-					CurrentEnemy.Magic = value;
+					CurrentEnemy.Magic = (int)value;
 			}
 		}
 
-		public static int AttackerPower
+		public static double AttackerPower
 		{
 			get
 			{
@@ -102,7 +102,7 @@ namespace Escape
 			}
 		}
 
-		public static int DefenderDefense
+		public static double DefenderDefense
 		{
 			get
 			{

@@ -55,7 +55,7 @@ namespace Escape
 			Random rand = new Random();
 			int random = rand.Next(0, 100);
 
-			double modifiedLuckyRate = BattleCore.BaseLuckyRate * ((100 - BattleCore.AttackerHealth) * 0.0125);
+			double modifiedLuckyRate = BattleCore.BaseLuckyRate * (2 - (BattleCore.AttackerHealth / BattleCore.AttackerMaxHealth));
 
 			if (random < modifiedLuckyRate)
 			{
@@ -80,7 +80,7 @@ namespace Escape
 
 			if ((BattleCore.AttackerHealth / BattleCore.AttackerMaxHealth) < 0.5)
 			{
-				modifiedAccuracy = this.Accuracy * (BattleCore.AttackerHealth * 0.02);
+				modifiedAccuracy = this.Accuracy * ConvertRange(0, 100, 80, 100, ((BattleCore.AttackerHealth / BattleCore.AttackerMaxHealth) * 200)) * 0.01;
 			}
 
 			if (random < modifiedAccuracy)
@@ -122,6 +122,15 @@ namespace Escape
 			}
 
 			return (int)damage;
+		}
+
+		public static int ConvertRange(
+			int originalStart, int originalEnd,
+			int newStart, int newEnd,
+			double value)
+		{
+			double scale = (double)(newEnd - newStart) / (originalEnd - originalStart);
+			return (int)(newStart + ((value - originalStart) * scale));
 		}
 		#endregion
 	}
