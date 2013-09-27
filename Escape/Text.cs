@@ -236,6 +236,11 @@ namespace Escape
 			
 			return barString;
 		}
+
+		public static bool isVowel(char letter)
+		{
+			return "aeiouAEIOU".IndexOf(letter) >= 0;
+		}
 		
 		public static void Clear()
 		{

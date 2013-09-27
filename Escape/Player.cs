@@ -23,7 +23,7 @@ namespace Escape
 		public static int NextLevel = 10;
 		
 		public static List<int> Inventory = new List<int>();
-		public static List<int> Attacks = new List<int>();
+		public static List<int> Attacks = new List<int>() { 1 };
 		#endregion
 		
 		#region Public Methods
@@ -131,6 +131,40 @@ namespace Escape
 							break;
 					}
 					break;
+			}
+		}
+
+		public static void GiveAttack(string attackName)
+		{
+			if (World.IsAttack(attackName))
+			{
+				int attackId = World.GetAttackIDByName(attackName);
+
+				Attacks.Add(attackId);
+				Program.SetNotification("You learned the attack " + World.Attacks[attackId].Name + "!");
+			}
+		}
+
+		public static void GiveItem(string itemName)
+		{
+			if (World.IsItem(itemName))
+			{
+				int itemId = World.GetItemIDByName(itemName);
+				string notification = "You were given ";
+				
+				if (Text.isVowel(World.Items[itemId].Name[0]))
+				{
+					notification += "an ";
+				}
+				else
+				{
+					notification += "a ";
+				}
+
+				notification += World.Items[0].Name + "!";
+
+				Inventory.Add(itemId);
+				Program.SetNotification(notification);
 			}
 		}
 		

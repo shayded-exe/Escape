@@ -20,8 +20,6 @@ namespace Escape
 			GenerateEnemies();
 			GenerateAttacks();
 			ConvertAttributeListsToIDs();
-
-			Player.Attacks.Add(GetAttackIDByName("flail"));
 		}
 		#endregion
 		
