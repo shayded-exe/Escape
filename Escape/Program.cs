@@ -113,6 +113,7 @@ namespace Escape
 			
 			BattleCore.BattleHUD();
 			BattleCore.NextTurn();
+			BattleCore.CheckResults();
 		}
 		
 		private static void QuitState()

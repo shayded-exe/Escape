@@ -145,6 +145,18 @@ namespace Escape
 
 			CurrentTurn = (CurrentTurn == "player") ? "enemy" : "player";
 		}
+
+		public static void CheckResults()
+		{
+			if (CurrentEnemy.Health <= 0)
+			{
+				Program.SetNotification("You defeated the " + CurrentEnemy.Name + "and gained " + CurrentEnemy.ExpValue + " EXP!");
+				Player.AddExp(CurrentEnemy.ExpValue);
+				Text.SetKeyPrompt("[Press any key to continue!]");
+				Text.Clear();
+				Program.GameState = Program.GameStates.Playing;
+			}
+		}
 		#endregion
 		
 		#region Public Methods

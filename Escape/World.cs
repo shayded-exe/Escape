@@ -78,13 +78,13 @@ namespace Escape
 			Enemies.Add(new Enemy(
 				"Rat",
 				"Its just a pwesious wittle wat that will KILL YOU!",
-				new List<int>() { 10, 5, 10, 5 },
+				new List<int>() { 10, 5, 10, 5, 5 },
 				new List<string>() { "scratch" }));
 
 			Enemies.Add(new Enemy(
 				"Hawk",
 				"It flies around looking for prey to feed on.",
-				new List<int>() { 15, 0, 15, 0 },
+				new List<int>() { 15, 0, 15, 0, 8 },
 				new List<string>() { "scratch" }));
 		}
 

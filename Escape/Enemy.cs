@@ -15,6 +15,8 @@ namespace Escape
 
 		public int Power;
 		public int Defense;
+		public int ExpValue;
+
 		public List<string> TempAttacks;
 		public List<int> Attacks;
 		#endregion
@@ -35,6 +37,7 @@ namespace Escape
 
 			this.Power = Stats[2];
 			this.Defense = Stats[3];
+			this.ExpValue = Stats[4];
 			this.TempAttacks = Attacks;
 		}
 		#endregion
