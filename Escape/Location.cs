@@ -62,26 +62,60 @@ namespace Escape
 		#region Public Methods
 		public bool ContainsExit(int aExit)
 		{
-			if (Exits.Contains(aExit))
+			if (this.Exits.Contains(aExit))
 				return true;
 			else
 				return false;
+		}
+
+		public void AddExit(int aExit)
+		{
+			this.Exits.Add(aExit);
+		}
+
+		public void RemoveExit(int aExit)
+		{
+			if (this.ContainsExit(aExit))
+			{
+				this.Exits.Remove(aExit);
+			}
 		}
 		
 		public bool ContainsItem(int aItem)
 		{
-			if (Items.Contains(aItem))
+			if (this.Items.Contains(aItem))
 				return true;
 			else
 				return false;
 		}
+
+		public void AddItem(int aItem)
+		{
+			this.Items.Add(aItem);
+		}
+
+		public void RemoveItem(int aItem)
+		{
+			if (this.ContainsItem(aItem))
+			{
+				this.Items.Remove(aItem);
+			}
+		}
 		
 		public bool ContainsEnemy(int aEnemy)
 		{
-			if (Enemies.Contains(aEnemy))
+			if (this.Enemies.Contains(aEnemy))
 				return true;
 			else
 				return false;
+		}
+
+		public void RemoveEnemy(int aEnemy)
+		{
+			if (this.ContainsEnemy(aEnemy))
+			{
+				this.Enemies.Remove(aEnemy);
+			}
 		}
 		
 		public bool CalculateRandomBattle()

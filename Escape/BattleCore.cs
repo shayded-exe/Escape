@@ -138,6 +138,12 @@ namespace Escape
 
 				CurrentEnemy.Attack();
 			}
+			else if (CurrentTurn == "end")
+			{
+				Text.SetKeyPrompt("[Press any key to continue!]");
+				Text.Clear();
+				Program.GameState = Program.GameStates.Playing;
+			}
 			else
 			{
 				Program.SetError("Errrr.... wanna fuk?");
@@ -148,13 +154,12 @@ namespace Escape
 
 		public static void CheckResults()
 		{
-			if (CurrentEnemy.Health <= 0)
+			if (CurrentEnemy.Health <= 0 && Program.GameState != Program.GameStates.Playing)
 			{
-				Program.SetNotification("You defeated the " + CurrentEnemy.Name + "and gained " + CurrentEnemy.ExpValue + " EXP!");
+				Program.SetNotification("You defeated the " + CurrentEnemy.Name + " and gained " + CurrentEnemy.ExpValue + " EXP!");
 				Player.AddExp(CurrentEnemy.ExpValue);
-				Text.SetKeyPrompt("[Press any key to continue!]");
-				Text.Clear();
-				Program.GameState = Program.GameStates.Playing;
+				World.Map[Player.Location].RemoveEnemy(CurrentEnemy.ID);
+				CurrentTurn = "end";
 			}
 		}
 		#endregion

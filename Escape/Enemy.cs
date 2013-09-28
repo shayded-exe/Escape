@@ -20,7 +20,17 @@ namespace Escape
 		public List<string> TempAttacks;
 		public List<int> Attacks;
 		#endregion
-		
+
+		#region Properties
+		public int ID
+		{
+			get
+			{
+				return World.GetEnemyIDByName(this.Name);
+			}
+		}
+		#endregion
+
 		#region Constructor
 		public Enemy(
 			string Name,

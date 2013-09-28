@@ -287,7 +287,7 @@ namespace Escape
 				
 				if (World.Map[Location].ContainsItem(itemId))
 				{
-					World.Map[Location].Items.Remove(itemId);
+					World.Map[Location].RemoveItem(itemId);
 					Inventory.Add(itemId);
 					Program.SetNotification("You put the " + World.Items[itemId].Name + " in your bag!");
 				}
@@ -311,7 +311,7 @@ namespace Escape
 				if (ItemIsInInventory(itemId))
 				{
 					Inventory.Remove(itemId);
-					World.Map[Location].Items.Add(itemId);
+					World.Map[Location].AddItem(itemId);
 					Program.SetNotification("You placed the " + World.Items[itemId].Name + " in the room!");
 				}
 				else
