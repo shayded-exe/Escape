@@ -126,9 +126,18 @@ namespace Escape
 							//items command
 							break;
 						default:
-							BattleCore.CurrentTurn = "enemy";
-							InputNotValid();
-							break;
+							{
+								if (World.IsAttack(verb))
+								{
+									AttackInBattle(verb);
+								}
+								else
+								{
+									BattleCore.CurrentTurn = "enemy";
+									InputNotValid();
+								}
+								break;
+							}
 					}
 					break;
 			}
