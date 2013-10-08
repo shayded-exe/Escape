@@ -25,6 +25,8 @@ namespace Escape
 		#region Public Methods
 		public virtual void Use() { }
 
+		public virtual void UseInBattle() { }
+
 		public void NoUse()
 		{
 			Program.SetError("There is a time and place for everything, but this is not the place to use that!");
@@ -108,6 +110,11 @@ namespace Escape
 		public override void Use()
 		{
 			Program.SetNotification("You threw the rock at a wall. Nothing happened.");
+		}
+
+		public override void UseInBattle()
+		{
+			Program.SetNotification("The rock hit the enemy in the head! It seems confused...");
 		}
 	}
 	#endregion

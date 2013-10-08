@@ -118,12 +118,17 @@ namespace Escape
 							break;
 						case "use":
 						case "item":
-							//use command
+							UseInBattle(noun);
 							break;
 						case "items":
 						case "inventory":
 						case "inv":
-							//items command
+							DisplayBattleInventory();
+							BattleCore.CurrentTurn = "enemy";
+							break;
+						case "exit":
+						case "quit":
+							Program.GameState = Program.GameStates.Quit;
 							break;
 						default:
 							{
@@ -133,9 +138,10 @@ namespace Escape
 								}
 								else
 								{
-									BattleCore.CurrentTurn = "enemy";
 									InputNotValid();
 								}
+
+								BattleCore.CurrentTurn = "enemy";
 								break;
 							}
 					}
@@ -405,6 +411,7 @@ namespace Escape
 		{
 			Text.WriteColor("`g`Available Battle Commands:`w`");
 			Text.WriteColor("help/? - Display this list.");
+			Text.BlankLines();
 		}
 
 		private static void AttackInBattle(string attackName)
@@ -426,6 +433,60 @@ namespace Escape
 			{
 				Program.SetError("That isn't a valid attack!");
 			}
+		}
+
+		private static void UseInBattle(string itemName)
+		{
+			if (World.IsItem(itemName))
+			{
+				int itemId = World.GetItemIDByName(itemName);
+
+				if (ItemIsInInventory(itemId))
+				{
+					if (World.Items[itemId].CanUseInBattle)
+					{
+						World.Items[itemId].UseInBattle();
+						return;
+					}
+					else
+					{
+						Program.SetError("You can't use that item in battle!");
+					}
+				}
+				else
+				{
+					Program.SetError("You aren't holding that item!");
+				}
+			}
+			else
+			{
+				Program.SetError("That isn't a valid item!");
+			}
+
+			BattleCore.CurrentTurn = "enemy";
+		}
+
+		private static void DisplayBattleInventory()
+		{
+			if (Inventory.Count <= 0)
+			{
+				Program.SetNotification("You aren't carrying anything!");
+				return;
+			}
+
+			Text.WriteColor("`m`/-----------------\\");
+			Text.WriteColor("|`w`    Inventory    `m`|");
+			Text.WriteColor("|`w`   Battle Only   `m`|");
+			Text.WriteLine(">-----------------<");
+
+			foreach (int item in Player.ItemsUsableInBattle())
+			{
+				string name = World.Items[item].Name;
+				Text.WriteColor("|`w` " + name + Text.BlankSpaces(16 - name.Length, true) + "`m`|");
+			}
+
+			Text.WriteColor("\\-----------------/`w`");
+			Text.BlankLines();
 		}
 		#endregion
 
