@@ -237,14 +237,28 @@ namespace Escape
 			return barString;
 		}
 
-		public static bool isVowel(char letter)
+		public static string AorAn(string word)
 		{
-			return "aeiouAEIOU".IndexOf(letter) >= 0;
+			if (Text.isVowel(word[0]))
+			{
+				return "an " + word;
+			}
+			else
+			{
+				return "a " + word;
+			}
 		}
 		
 		public static void Clear()
 		{
 			Console.Clear();
+		}
+		#endregion
+
+		#region Helper Methods
+		private static bool isVowel(char letter)
+		{
+			return "aeiouAEIOU".IndexOf(letter) >= 0;
 		}
 		#endregion
 	}

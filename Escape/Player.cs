@@ -170,21 +170,9 @@ namespace Escape
 			if (World.IsItem(itemName))
 			{
 				int itemId = World.GetItemIDByName(itemName);
-				string notification = "You were given ";
-
-				if (Text.isVowel(World.Items[itemId].Name[0]))
-				{
-					notification += "an ";
-				}
-				else
-				{
-					notification += "a ";
-				}
-
-				notification += World.Items[0].Name + "!";
-
 				Inventory.Add(itemId);
-				Program.SetNotification(notification);
+
+				Program.SetNotification("You were given " + Text.AorAn(World.Items[itemId].Name));
 			}
 			else
 			{

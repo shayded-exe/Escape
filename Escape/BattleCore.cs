@@ -115,11 +115,11 @@ namespace Escape
 		#endregion
 
 		#region Battle Methods
-		public static void StartBattle(int enemy)
+		public static void StartBattle(int enemy, string startingTurn = "player")
 		{
 			Program.GameState = Program.GameStates.Battle;
 
-			CurrentTurn = "player";
+			CurrentTurn = startingTurn;
 			CurrentEnemy = CloneEnemy(World.Enemies[enemy]);
 		}
 

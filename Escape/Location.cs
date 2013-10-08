@@ -118,12 +118,14 @@ namespace Escape
 			}
 		}
 		
-		public bool CalculateRandomBattle()
+		public void CalculateRandomBattle()
 		{
 			if (Program.Rand.Next(100) < BattleChance && Enemies.Count > 0)
-				return true;
-			else
-				return false;
+			{
+				int enemyId = Enemies[Program.Rand.Next(Enemies.Count)];
+				Program.SetNotification("You were attacked by " + Text.AorAn(World.Enemies[enemyId].Name));
+				BattleCore.StartBattle(enemyId, "enemy");
+			}
 		}
 
 		public void ConvertAttributeListsToIDs()
