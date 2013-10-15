@@ -128,6 +128,14 @@ namespace Escape
 			
 			return false;
 		}
+
+		public static bool IsLocation(int locationId)
+		{
+			if (Map.Count > locationId && Map[locationId] != null)
+				return true;
+
+			return false;
+		}
 		
 		public static int GetLocationIDByName(string locationName)
 		{

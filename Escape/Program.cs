@@ -44,12 +44,7 @@ namespace Escape
 			while(run)
 			{
 				if (!isError)
-				{
-					if (Player.Health <= 0)
-					{
-						GameState = GameStates.GameOver;
-					}
-					
+				{				
 					switch (GameState)
 					{
 						case GameStates.Start:

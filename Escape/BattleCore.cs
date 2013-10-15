@@ -157,7 +157,7 @@ namespace Escape
 			if (CurrentEnemy.Health <= 0 && Program.GameState != Program.GameStates.Playing)
 			{
 				Program.SetNotification("You defeated the " + CurrentEnemy.Name + " and gained " + CurrentEnemy.ExpValue + " EXP!");
-				Player.AddExp(CurrentEnemy.ExpValue);
+				Player.Exp = CurrentEnemy.ExpValue;
 				World.Map[Player.Location].RemoveEnemy(CurrentEnemy.ID);
 				CurrentTurn = "end";
 			}

@@ -6,26 +6,180 @@ namespace Escape
 	static class Player
 	{
 		#region Declarations
-		public static string Name;
-		public static int Location = 0;
+		private static string name;
+		private static int location = 0;
 		
-		public static int MaxHealth = 100;
-		public static int Health = MaxHealth;
+		private static int maxHealth = 100;
+		private static int health = maxHealth;
 
-		public static int MaxMagic = 100;
-		public static int Magic = MaxMagic;
+		private static int maxMagic = 100;
+		private static int magic = MaxMagic;
 
-		public static int Power = 10;
-		public static int Defense = 10;
+		private static int level = 1;
+		private static int exp = 0;
+		private static int nextLevel = 10;
 
-		public static int Level = 1;
-		public static int Exp = 0;
-		public static int NextLevel = 10;
+		private static int power = 10;
+		private static int defense = 10;
 		
 		public static List<int> Inventory = new List<int>();
 		public static List<int> Attacks = new List<int>() { 1 };
 		#endregion
-		
+
+		#region Properties
+		public static string Name
+		{
+			get
+			{
+				return name;
+			}
+			set
+			{
+				if (name != null)
+				{
+					name = value;
+				}
+				else
+				{
+					//Error: PL44
+					Program.SetError("Go tell the developer he dun goofed. Error: PL44");
+				}
+			}
+		}
+
+		public static int Location
+		{
+			get
+			{
+				return location;
+			}
+			set
+			{
+				if (World.IsLocation(value))
+				{
+					location = value;
+				}
+				else
+				{
+					//Error: PL64
+					Program.SetError("Go tell the developer he dun goofed. Error: PL64");
+				}
+			}
+		}
+
+		public static int Health
+		{
+			get
+			{
+				return health;
+			}
+			set
+			{
+				health = Math.Min(value, maxHealth);
+
+				if (health <= 0)
+				{
+					Program.GameState = Program.GameStates.GameOver;
+				}
+			}
+		}
+
+		public static int MaxHealth
+		{
+			get
+			{
+				return maxHealth;
+			}
+			set
+			{
+				maxHealth = value;
+
+				health = Math.Min(value, health);
+			}
+		}
+
+		public static int Magic
+		{
+			get
+			{
+				return magic;
+			}
+			set
+			{
+				magic = Math.Max(Math.Min(value, maxMagic), 0);
+			}
+		}
+
+		public static int MaxMagic
+		{
+			get
+			{
+				return maxMagic;
+			}
+			set
+			{
+				maxMagic = value;
+
+				magic = Math.Min(value, magic);
+			}
+		}
+
+		public static int Level
+		{
+			get
+			{
+				return level;
+			}
+			set
+			{
+				level = value;
+			}
+		}
+
+		public static int Exp
+		{
+			get
+			{
+				return exp;
+			}
+			set
+			{
+				exp += value;
+
+				while (exp >= NextLevel)
+				{
+					Level++;
+					exp -= NextLevel;
+					GenerateNextLevel();
+				}
+			}
+		}
+
+		public static int NextLevel
+		{
+			get
+			{
+				return nextLevel;
+			}
+		}
+
+		public static int Power
+		{
+			get
+			{
+				return power;
+			}
+		}
+
+		public static int Defense
+		{
+			get
+			{
+				return defense;
+			}
+		}
+		#endregion
+
 		#region Public Methods
 		public static void Do(string aString)
 		{		
@@ -87,7 +241,7 @@ namespace Escape
 							Player.Health -= Convert.ToInt32(noun);
 							break;
 						case "exp":
-							AddExp(Convert.ToInt32(noun));
+							Exp = (Convert.ToInt32(noun));
 							break;
 						case "save":
 							Program.Save();
@@ -202,18 +356,6 @@ namespace Escape
 			}
 
 			return result;
-		}
-
-		public static void AddExp(int expAmount)
-		{
-			Player.Exp += expAmount;
-
-			while (Player.Exp >= NextLevel)
-			{
-				Player.Level++;
-				Player.Exp -= NextLevel;
-				GenerateNextLevel();
-			}
 		}
 		#endregion
 		
@@ -502,11 +644,11 @@ namespace Escape
 
 		private static void GenerateNextLevel()
 		{
-			NextLevel = (int)Math.Pow(Level, 3);
+			nextLevel = (int)Math.Pow(Level, 3);
 
 			if (Player.Level < 5)
 			{
-				NextLevel += 10;
+				nextLevel += 10;
 			}
 		}
 		#endregion
