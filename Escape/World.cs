@@ -24,6 +24,7 @@ namespace Escape
 		#endregion
 		
 		#region World Generation Methods
+		//Format: (Name, Description, Exits, Items, Enemies, BattleChance)
 		private static void GenerateWorld()
 		{
 			Map.Add(new Location(
@@ -54,6 +55,7 @@ namespace Escape
 				new List<string>() { "room 3" }));
 		}
 		
+		//Format: (Name, Description, Special Attributes, #Uses, Usable in battle?)
 		private static void GenerateItems()
 		{
 			Items.Add(new Key(
@@ -73,6 +75,7 @@ namespace Escape
 				false, true));
 		}
 		
+		//Format: (Name, Description, Stats: (Health, Magic, Power, Defense, ExpValue), Attacks)
 		private static void GenerateEnemies()
 		{
 			Enemies.Add(new Enemy(
@@ -88,6 +91,7 @@ namespace Escape
 				new List<string>() { "scratch" }));
 		}
 
+		//Format: (Name, Description, Stats: (Power, Accuracy, Cost), Type)
 		private static void GenerateAttacks()
 		{
 			Attacks.Add(new Attack(
@@ -101,19 +105,6 @@ namespace Escape
 				"The Attacker digs it's claws into the skin of it's prey. Not really as painful as it sounds.",
 				new List<int>() { 10, 70, 1 },
 				Attack.AttackTypes.Physical));
-		}
-
-		private static void ConvertAttributeListsToIDs()
-		{
-			for (int i = 0; i < Map.Count; i++)
-			{
-				Map[i].ConvertAttributeListsToIDs();
-			}
-
-			for (int i = 0; i < Enemies.Count; i++)
-			{
-				Enemies[i].ConvertAttributeListsToIDs();
-			}
 		}
 		#endregion
 
@@ -327,6 +318,21 @@ namespace Escape
 			}
 
 			return false;
+		}
+		#endregion
+
+		#region Helper Methods
+		private static void ConvertAttributeListsToIDs()
+		{
+			for (int i = 0; i < Map.Count; i++)
+			{
+				Map[i].ConvertAttributeListsToIDs();
+			}
+
+			for (int i = 0; i < Enemies.Count; i++)
+			{
+				Enemies[i].ConvertAttributeListsToIDs();
+			}
 		}
 		#endregion
 	}

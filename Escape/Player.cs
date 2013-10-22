@@ -35,7 +35,7 @@ namespace Escape
 			}
 			set
 			{
-				if (name != null)
+				if (name != "")
 				{
 					name = value;
 				}
