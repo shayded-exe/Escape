@@ -6,21 +6,21 @@ namespace Escape
 	static class Player
 	{
 		#region Declarations
+		private const int baseHealth = 100;
+		private const int baseMagic = 100;
+
+		private const int power = 15;
+		private const int defense = 10;
+
 		private static string name;
 		private static int location = 0;
-		
-		private static int maxHealth = 100;
-		private static int health = maxHealth;
-
-		private static int maxMagic = 100;
-		private static int magic = MaxMagic;
 
 		private static int level = 1;
 		private static int exp = 0;
 		private static int nextLevel = 10;
-
-		private static int power = 10;
-		private static int defense = 10;
+		
+		private static int health = MaxHealth;
+		private static int magic = MaxMagic;	
 		
 		public static List<int> Inventory = new List<int>();
 		public static List<int> Attacks = new List<int>() { 1 };
@@ -75,7 +75,7 @@ namespace Escape
 			}
 			set
 			{
-				health = Math.Min(value, maxHealth);
+				health = Math.Min(value, MaxHealth);
 
 				if (health <= 0)
 				{
@@ -88,13 +88,7 @@ namespace Escape
 		{
 			get
 			{
-				return maxHealth;
-			}
-			set
-			{
-				maxHealth = value;
-
-				health = Math.Min(value, health);
+				return BattleCore.CalculateHealthStat(baseHealth, level);
 			}
 		}
 
@@ -106,7 +100,7 @@ namespace Escape
 			}
 			set
 			{
-				magic = Math.Max(Math.Min(value, maxMagic), 0);
+				magic = Math.Max(Math.Min(value, MaxMagic), 0);
 			}
 		}
 
@@ -114,13 +108,7 @@ namespace Escape
 		{
 			get
 			{
-				return maxMagic;
-			}
-			set
-			{
-				maxMagic = value;
-
-				magic = Math.Min(value, magic);
+				return BattleCore.CalculateHealthStat(baseMagic, level);
 			}
 		}
 
@@ -165,7 +153,7 @@ namespace Escape
 		{
 			get
 			{
-				return power;
+				return BattleCore.CalculateStat(power, level);
 			}
 		}
 
@@ -173,7 +161,7 @@ namespace Escape
 		{
 			get
 			{
-				return defense;
+				return BattleCore.CalculateStat(defense, level);
 			}
 		}
 		#endregion
@@ -644,8 +632,6 @@ namespace Escape
 		{
 			Level++;
 			exp -= NextLevel;
-
-
 
 			GenerateNextLevel();
 		}

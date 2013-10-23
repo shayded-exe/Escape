@@ -9,7 +9,7 @@ namespace Escape
 	{
 		#region Declarations
 		public static Enemy CurrentEnemy;
-		public static string CurrentTurn;
+		public static string CurrentTurn = "player";
 
 		public static double BaseLuckyRate = 7.5;
 		#endregion
@@ -266,6 +266,11 @@ namespace Escape
 		public static int CalculateStat(int baseStat, int level)
 		{
 			return (int)Math.Floor((2 * baseStat * level) / 100d + 5);
+		}
+
+		public static int CalculateHealthStat(int baseStat, int level)
+		{
+			return (int)Math.Floor((2 * baseStat * (level + 4)) / 100d + (level + 4) + 10);
 		}
 		#endregion
 
