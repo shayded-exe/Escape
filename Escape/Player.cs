@@ -148,9 +148,7 @@ namespace Escape
 
 				while (exp >= NextLevel)
 				{
-					Level++;
-					exp -= NextLevel;
-					GenerateNextLevel();
+					LevelUp();
 				}
 			}
 		}
@@ -640,6 +638,16 @@ namespace Escape
 				return true;
 			else
 				return false;
+		}
+
+		private static void LevelUp()
+		{
+			Level++;
+			exp -= NextLevel;
+
+
+
+			GenerateNextLevel();
 		}
 
 		private static void GenerateNextLevel()

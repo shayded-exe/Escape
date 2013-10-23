@@ -262,6 +262,11 @@ namespace Escape
 			Text.WriteLine("", false);
 			Text.WriteLine("", false);
 		}
+
+		public static int CalculateStat(int baseStat, int level)
+		{
+			return (int)Math.Floor((2 * baseStat * level) / 100d + 5);
+		}
 		#endregion
 
 		#region Helper Methods
