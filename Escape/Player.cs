@@ -135,7 +135,7 @@ namespace Escape
 			Text.WriteColor("exit/quit - Exit the game.");
 			Text.WriteColor("move/go <`c`location`w`> - Move to the specified location.");
 			Text.WriteColor("examine <`c`item`w`> - Show info about the specified item.");
-			Text.WriteColor("take/pickuip <`c`item`w`> - Put the specified item in your inventory.");
+			Text.WriteColor("take/pickup <`c`item`w`> - Put the specified item in your inventory.");
 			Text.WriteColor("drop/place <`c`item`w`> - Drop the specified item from your inventory and place it in the world.");
 			Text.WriteColor("items/inventory/inv - Display your current inventory.");
 			Text.WriteColor("use <`c`item`w`> - Use the specified item.");
