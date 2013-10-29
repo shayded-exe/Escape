@@ -17,7 +17,6 @@ namespace Escape
 
 		private static int level = 1;
 		private static int exp = 0;
-		private static int nextLevel = 10;
 		
 		private static int health = MaxHealth;
 		private static int magic = MaxMagic;	
@@ -132,20 +131,12 @@ namespace Escape
 			}
 			set
 			{
-				exp += value;
+				exp = value;
 
-				while (exp >= NextLevel)
+				while (exp >= GetNextLevel())
 				{
 					LevelUp();
 				}
-			}
-		}
-
-		public static int NextLevel
-		{
-			get
-			{
-				return nextLevel;
 			}
 		}
 
@@ -227,7 +218,7 @@ namespace Escape
 							Player.Health -= Convert.ToInt32(noun);
 							break;
 						case "exp":
-							Exp = (Convert.ToInt32(noun));
+							GiveExp(Convert.ToInt32(noun));
 							break;
 						case "save":
 							Program.Save();
@@ -339,6 +330,23 @@ namespace Escape
 				{
 					result.Add(item);
 				}
+			}
+
+			return result;
+		}
+
+		public static void GiveExp(int amount)
+		{
+			Exp += amount;
+		}
+
+		public static int GetNextLevel()
+		{
+			int result = (int)Math.Pow(Level, 3) + 10;
+
+			if (Level < 5)
+			{
+				result += 10;
 			}
 
 			return result;
@@ -630,20 +638,8 @@ namespace Escape
 
 		private static void LevelUp()
 		{
+			exp -= GetNextLevel();
 			Level++;
-			exp -= NextLevel;
-
-			GenerateNextLevel();
-		}
-
-		private static void GenerateNextLevel()
-		{
-			nextLevel = (int)Math.Pow(Level, 3);
-
-			if (Player.Level < 5)
-			{
-				nextLevel += 10;
-			}
 		}
 		#endregion
 	}

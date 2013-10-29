@@ -220,8 +220,8 @@ namespace Escape
 				Text.Write(" ");
 			}
 
-			Text.WriteColor(Player.Level + " [`g`" + Text.ToBar(Player.Exp, Player.NextLevel, 23) + "`w`] `c`|`w` " 
-			+ Player.Exp + "/" + Player.NextLevel + "`c` /", false);
+			Text.WriteColor(Player.Level + " [`g`" + Text.ToBar(Player.Exp, Player.GetNextLevel(), 23) + "`w`] `c`|`w` " 
+			+ Player.Exp + "/" + Player.GetNextLevel() + "`c` /", false);
 
 			int expLength = Console.CursorLeft;
 

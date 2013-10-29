@@ -157,7 +157,7 @@ namespace Escape
 			if (CurrentEnemy.Health <= 0 && Program.GameState != Program.GameStates.Playing)
 			{
 				Program.SetNotification("You defeated the " + CurrentEnemy.Name + " and gained " + CurrentEnemy.ExpValue + " EXP!");
-				Player.Exp = CurrentEnemy.ExpValue;
+				Player.GiveExp(CurrentEnemy.ExpValue);
 				World.Map[Player.Location].RemoveEnemy(CurrentEnemy.ID);
 				CurrentTurn = "end";
 			}
@@ -241,8 +241,8 @@ namespace Escape
 				Text.Write(" ");
 			}
 
-			Text.WriteColor(Player.Level + " [`g`" + Text.ToBar(Player.Exp, Player.NextLevel, 23) + "`w`] `c`|`w` "
-			+ Player.Exp + "/" + Player.NextLevel + "`c` /", false);
+			Text.WriteColor(Player.Level + " [`g`" + Text.ToBar(Player.Exp, Player.GetNextLevel(), 23) + "`w`] `c`|`w` "
+			+ Player.Exp + "/" + Player.GetNextLevel() + "`c` /", false);
 
 			int expLength = Console.CursorLeft;
 
