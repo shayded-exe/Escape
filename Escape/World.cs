@@ -6,6 +6,7 @@ namespace Escape
 	static class World
 	{
 		#region Declarations
+		//Creates empty lists to hold all the information about the world
 		public static List<Location> Map = new List<Location>();
 		public static List<Item> Items = new List<Item>();
 		public static List<Enemy> Enemies = new List<Enemy>();
@@ -13,6 +14,7 @@ namespace Escape
 		#endregion
 		
 		#region Initialization
+		//Generates the data that goes into the above lists
 		public static void Initialize()
 		{
 			GenerateWorld();
@@ -24,7 +26,18 @@ namespace Escape
 		#endregion
 		
 		#region World Generation Methods
-		//Format: (Name, Description, Exits, Items, Enemies, BattleChance)
+		/*
+		 * This defines all the locations that exist in the map along with their specific properties
+		 * 
+		 * Format:
+		 *     Map.Add(new Location(
+		 *         "Name",
+		 *         "Description",
+		 *         new List<string>() { List of exits by name },
+		 *         new List<string>() { List of items by name },
+		 *         new List<string>() { List of enemies by name },
+		 *         What the chance of a random battle in that room is ( x / 100 )));
+		 */
 		private static void GenerateWorld()
 		{
 			Map.Add(new Location(
@@ -54,8 +67,17 @@ namespace Escape
 				"This is a very awesome secret room.",
 				new List<string>() { "room 3" }));
 		}
-		
-		//Format: (Name, Description, Special Attributes, #Uses, Usable in battle?)
+
+		/*
+		 * This defines all the items exist in the game.
+		 * 
+		 * Format:
+		 *     Map.Add(new ItemType(
+		 *         "Name",
+		 *         "Description",
+		 *         If item has multiple uses (currently kinda broken),
+		 *         If item is usable in battle));
+		 */
 		private static void GenerateItems()
 		{
 			Items.Add(new Key(
@@ -75,7 +97,16 @@ namespace Escape
 				false, true));
 		}
 		
-		//Format: (Name, Description, Stats: (Health, Magic, Power, Defense, ExpValue), Attacks)
+		/*
+		 * This defines all the enemies that exist in the game
+		 * 
+		 * Format:
+		 *     Map.Add(new Enemy(    *Enemy could also be substituted by a specific subclass if an enemy has one*
+		 *         "Name",
+		 *         "Description",
+		 *         new List<int>() { Health, Magic, Power, Defense, ExpValue },
+		 *         new List<string>() { List of attacks by name }));
+		 */
 		private static void GenerateEnemies()
 		{
 			Enemies.Add(new Enemy(
@@ -92,6 +123,16 @@ namespace Escape
 		}
 
 		//Format: (Name, Description, Stats: (Power, Accuracy, Cost), Type)
+		/*
+		 * This defines all the enemies that exist in the game
+		 * 
+		 * Format:
+		 *     Map.Add(new Attack(    *Attack could also be substituted by a specific subclass if an attack has one*
+		 *         "Name",
+		 *         "Description",
+		 *         new List<int>() { Power, Accuracy, Magic Cost },
+		 *         Attack.AttackTypes.TypeOfAttack (Not fully implemented)));
+		 */
 		private static void GenerateAttacks()
 		{
 			Attacks.Add(new Attack(
@@ -109,8 +150,10 @@ namespace Escape
 		#endregion
 
 		#region Public Location Methods
+		//Checks if the provided string is a location
 		public static bool IsLocation(string locationName)
 		{
+			//Iterates through every location in the map and compares the names to the one provided
 			for (int i = 0; i < Map.Count; i++)
 			{
 				if (Map[i].Name.ToLower() == locationName.ToLower())
@@ -120,14 +163,18 @@ namespace Escape
 			return false;
 		}
 
+		//Checks if the provided ID is a location
 		public static bool IsLocation(int locationId)
 		{
+			//Checks if the provided ID is lower than the total locations in the map and if that location has data stored in it
 			if (Map.Count > locationId && Map[locationId] != null)
 				return true;
 
 			return false;
 		}
 		
+		//Returns the ID of a location given its name. 
+		//This works the same as IsLocation, but returns the name instead of a boolean
 		public static int GetLocationIDByName(string locationName)
 		{
 			for (int i = 0; i < Map.Count; i++)
@@ -139,6 +186,7 @@ namespace Escape
 			return -1;
 		}
 
+		//Prints the main HUD that is displayed for most of the game. Warning, this gets a little complex.
 		public static void LocationHUD()
 		{
 			Text.WriteColor("`c`/-----------------------------------------------------------------------\\", false);
@@ -244,6 +292,7 @@ namespace Escape
 		#endregion
 		
 		#region Public Item Methods
+		//This works the same as GetLocationIDByName
 		public static int GetItemIDByName(string itemName)
 		{
 			foreach (Item item in Items)
@@ -255,6 +304,7 @@ namespace Escape
 			return -1;
 		}
 
+		//This works the same as IsLocation
 		public static bool IsItem(string itemName)
 		{
 			foreach (Item item in Items)
@@ -266,6 +316,7 @@ namespace Escape
 			return false;
 		}
 
+		//Writes the description of an item (This will be revamped soon)
 		public static void ItemDescription(int itemId)
 		{
 			Text.WriteLine(Items[itemId].Description);
@@ -274,6 +325,7 @@ namespace Escape
 		#endregion
 
 		#region Public Enemy Methods
+		//This works the same as GetLocationIDByName
 		public static int GetEnemyIDByName(string enemyName)
 		{
 			foreach (Enemy enemy in Enemies)
@@ -285,6 +337,7 @@ namespace Escape
 			return -1;
 		}
 
+		//This works the same as IsLocation
 		public static bool IsEnemy(string enemyName)
 		{
 			foreach (Enemy enemy in Enemies)
@@ -298,6 +351,7 @@ namespace Escape
 		#endregion
 
 		#region Public Attack Methods
+		//This works the same as GetLocationIDByName
 		public static int GetAttackIDByName(string attackName)
 		{
 			foreach (Attack attack in Attacks)
@@ -309,6 +363,7 @@ namespace Escape
 			return -1;
 		}
 
+		//This works the same as IsLocation
 		public static bool IsAttack(string attackName)
 		{
 			foreach (Attack attack in Attacks)
@@ -322,6 +377,12 @@ namespace Escape
 		#endregion
 
 		#region Helper Methods
+		/*
+		 * This converts the names listed in the attributes of all the locations and enemies to IDs.
+		 * This allows those attributes to be written as names for ease of coding, but then used by the
+		 * game later on. This makes everything easier to work with later on in the game since the names
+		 * don't have to keep being converted to IDs for processing.
+		 */
 		private static void ConvertAttributeListsToIDs()
 		{
 			for (int i = 0; i < Map.Count; i++)
