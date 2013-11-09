@@ -28,44 +28,41 @@ namespace Escape
 		#region World Generation Methods
 		/*
 		 * This defines all the locations that exist in the map along with their specific properties
-		 * 
-		 * Format:
-		 *     Map.Add(new Location(
-		 *         "Name",
-		 *         "Description",
-		 *         new List<string>() { List of exits by name },
-		 *         new List<string>() { List of items by name },
-		 *         new List<string>() { List of enemies by name },
-		 *         What the chance of a random battle in that room is ( x / 100 )));
 		 */
 		private static void GenerateWorld()
 		{
-			Map.Add(new Location(
-				"Room 1",
-				"This is a room.",
-				new List<string>() { "room 2" },
-				new List<string>() { "brass key", "rock" }));
-				
-			Map.Add(new Location(
-				"Room 2",
-				"This is another room.",
-				new List<string>() { "room 1", "room 3" },
-				new List<string>() { "shiny stone" },
-				new List<string>() { "rat" },
-				50));
-				
-			Map.Add(new Location(
-				"Room 3",
-				"This is yet another room.",
-				new List<string>() { "room 2" },
-				new List<string>(),
-				new List<string>() { "rat", "hawk" },
-				75));
-			
-			Map.Add(new Location(
-				"Secret Room",
-				"This is a very awesome secret room.",
-				new List<string>() { "room 3" }));
+            // Room 1
+            Location room1 = new Location("Room 1");
+            room1.Description = "This is a room.";
+            room1.TempExits.Add("room 2");
+            room1.TempItems.Add("brass key");
+            room1.TempItems.Add("rock");
+            Map.Add(room1);
+
+            // Room 2
+            Location room2 = new Location("Room 2");
+            room2.Description = "This is another room.";
+            room2.TempExits.Add("room 1");
+            room2.TempExits.Add("room 3");
+            room2.TempItems.Add("shiny stone");
+            room2.TempEnemies.Add("rat");
+            room2.BattleChance = 50;
+            Map.Add(room2);
+
+            // Room 3
+            Location room3 = new Location("Room 3");
+            room3.Description = "This is yet another room.";
+            room3.TempExits.Add("room 2");
+            room3.TempEnemies.Add("rat");
+            room3.TempEnemies.Add("hawk");
+            room3.BattleChance = 75;
+            Map.Add(room3);
+
+            // Secret room
+            Location secretRoom = new Location("Secret Room");
+            secretRoom.Description = "This is a very awesome secret room.";
+            secretRoom.TempExits.Add("room 3");
+            Map.Add(secretRoom);
 		}
 
 		/*

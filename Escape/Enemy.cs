@@ -20,6 +20,7 @@ namespace Escape
         public int Defense;
         public int ExpValue;
 
+        // TODO: Revise this madness.
         public List<string> TempAttacks;
         public List<int> Attacks;
         #endregion
@@ -40,6 +41,7 @@ namespace Escape
             this.Name = name;
 
             // Defaults
+            // TODO: Handling health and mana max. without need for double lines outside.
             this.Description = String.Empty;
             this.Health = 0;
             this.MaxHealth = 0;
