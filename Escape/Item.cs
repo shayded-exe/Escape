@@ -1,121 +1,94 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Escape
 {
-	abstract class Item : Entity
-	{
-		#region Declarations
-		private bool uses;
-		public bool CanUseInBattle;
-		#endregion
-		
-		#region Constructor
-		public Item(
-			string Name,
-			string Description,
-			bool uses,
-			bool CanUseInBattle = false)
-		:base(Name, Description)
-		{
-			this.uses = uses;
-			this.CanUseInBattle = CanUseInBattle;
-		}
-		#endregion
-		
-		#region Public Methods
-		public virtual void Use() { }
+    [Serializable]
+    class Item
+    {
+        #region Event delegate definitions
+        public delegate void OnUse(Item item);
+        public delegate void OnUseInBattle(Item item, Enemy victim);
+        #endregion
 
-		public virtual void UseInBattle() { }
+        #region Declarations
+        public string Name;
+        public string Description;
 
-		public void NoUse()
-		{
-			Program.SetError("There is a time and place for everything, but this is not the place to use that!");
-		}
-		#endregion
-	}
+        public bool Usable;
+        private event OnUse uses;
+        public event OnUse Uses
+        {
+            add
+            {
+                uses += value;
 
-	#region Key
-	class Key : Item
-	{
-		private string targetLocation;
-		private string newLocation;
+                if (!Usable)
+                    Usable = true;
+            }
+            remove
+            {
+                uses -= value;
+            }
+        }
 
-		public Key(
-			string Name,
-			string Description,
-			string targetLocation,
-			string newLocation,
-			bool uses)
-		:base(Name, Description, uses)
-		{
-			this.targetLocation = targetLocation;
-			this.newLocation = newLocation;
-		}
+        public bool UsableInBattle;
+        [Obsolete("API backwards compatibility property. Replace with item.UsableInBattle.", false)]
+        public bool CanUseInBattle { get { return UsableInBattle; } }
+        private event OnUseInBattle battleUses;
+        public event OnUseInBattle BattleUses
+        {
+            add
+            {
+                battleUses += value;
 
-		public override void Use()
-		{
-			if (Player.Location == World.GetLocationIDByName(targetLocation))
-			{
-				Program.SetNotification("The " + this.Name + " opened the lock!");
-				World.Map[World.GetLocationIDByName(targetLocation)].Exits.Add(World.GetLocationIDByName(newLocation));
-			}
-			else
-			{
-				NoUse();
-				return;
-			}
-		}
-	}
-	#endregion
+                if (!UsableInBattle)
+                    UsableInBattle = true;
+            }
+            remove
+            {
+                battleUses -= value;
+            }
+        }
 
-	#region ShinyStone
-	class ShinyStone : Item
-	{
-		public ShinyStone(
-			string Name,
-			string Description,
-			bool uses,
-			bool CanUseInBattle)
-		: base(Name, Description, uses, CanUseInBattle)
-		{
-		}
+        public Dictionary<string, object> ExtendedAttributes;
+        #endregion
 
-		public override void Use()
-		{
-			if (Player.Location == World.GetLocationIDByName("secret room"))
-			{
-				Player.Health += Math.Min(Player.MaxHealth / 10, Player.MaxHealth - Player.Health);
-				Program.SetNotification("The magical stone restored your health by 10%!");
-			}
-			else
-			{
-				Program.SetNotification("The shiny stone glowed shiny colors!");
-			}
-		}
-	}
-	#endregion
+        #region Constructor
+        public Item(string name)
+        {
+            this.Name = name;
 
-	#region Rock
-	class Rock : Item
-	{
-		public Rock(
-			string Name,
-			string Description,
-			bool uses,
-			bool CanUseInBattle)
-		:base(Name, Description, uses, CanUseInBattle)
-		{
-		}
+            // Default values
+            this.Description = String.Empty;
+            this.Usable = false;
+            this.UsableInBattle = false;
 
-		public override void Use()
-		{
-			Program.SetNotification("You threw the rock at a wall. Nothing happened.");
-		}
+            this.ExtendedAttributes = new Dictionary<string, object>();
+        }
+        #endregion
 
-		public override void UseInBattle()
-		{
-			Program.SetNotification("The rock hit the enemy in the head! It seems confused...");
-		}
-	}
-	#endregion
+        #region Public Methods
+        public void Use()
+        {
+            if (uses != null && Usable)
+                uses(this);
+            else
+                NoUse();
+        }
+
+        public void UseInBattle(Enemy victim)
+        {
+            if (battleUses != null && UsableInBattle)
+                battleUses(this, victim);
+            else
+                NoUse();
+        }
+
+        public void NoUse()
+        {
+            Program.SetError("There is a time and place for everything, but this is not the place to use that!");
+        }
+        #endregion
+    }
 }

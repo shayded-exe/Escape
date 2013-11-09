@@ -70,31 +70,59 @@ namespace Escape
 
 		/*
 		 * This defines all the items exist in the game.
-		 * 
-		 * Format:
-		 *     Map.Add(new ItemType(
-		 *         "Name",
-		 *         "Description",
-		 *         If item has multiple uses (currently kinda broken),
-		 *         If item is usable in battle));
 		 */
 		private static void GenerateItems()
 		{
-			Items.Add(new Key(
-				"Brass Key",
-				"Just your generic key that's in almost every game.",
-				"room 3", "secret room",
-				true));
-				
-			Items.Add(new ShinyStone(
-				"Shiny Stone",
-				"Its a stone, and its shiny, what more could you ask for?",
-				true, true));
-				
-			Items.Add(new Rock(
-				"Rock",
-				"It doesn't do anything, however, it is said that the mystical game designer used this for testing.",
-				false, true));
+            // Key
+            Item key = new Item("Brass Key");
+            key.Description = "Just your generic key that's in almost every game.";
+            key.Usable = true;
+            key.ExtendedAttributes.Add("str_targetLocation", "room 3");
+            key.ExtendedAttributes.Add("str_newLocation", "secret room");
+            key.Uses += new Item.OnUse(delegate(Item self)
+                {
+                    if (Player.Location == World.GetLocationIDByName((string)self.ExtendedAttributes["str_targetLocation"]))
+                    {
+                        Program.SetNotification("The " + self.Name + " opened the lock!");
+                        World.Map[World.GetLocationIDByName((string)self.ExtendedAttributes["str_targetLocation"])].Exits.Add(
+                            World.GetLocationIDByName((string)self.ExtendedAttributes["str_newLocation"]));
+                    }
+                    else
+                        self.NoUse();
+                });
+            Items.Add(key);
+
+            // Shiny Stone
+            Item shinyStone = new Item("Shiny Stone");
+            shinyStone.Description = "It's a stone and it's shiny, what more could you ask for?";
+            shinyStone.Usable = true;
+            shinyStone.UsableInBattle = true;
+            shinyStone.Uses += new Item.OnUse(delegate(Item self)
+                {
+                    if (Player.Location == World.GetLocationIDByName("secret room"))
+                    {
+                        Player.Health += Math.Min(Player.MaxHealth / 10, Player.MaxHealth - Player.Health);
+                        Program.SetNotification("The magical stone restored your health by 10%!");
+                    }
+                    else
+                        Program.SetNotification("The shiny stone glowed shiny colors!");
+                });
+            Items.Add(shinyStone);
+
+            // Rock
+            Item rock = new Item("Rock");
+            rock.Description = "It doesn't do anything, however, it is said that the mystical game designer used this for testing.";
+            rock.Usable = true;
+            rock.UsableInBattle = true;
+            rock.Uses += new Item.OnUse(delegate(Item self)
+                {
+                    Program.SetNotification("You threw the rock at a wall. Nothing happened.");
+                });
+            rock.BattleUses += new Item.OnUseInBattle(delegate(Item self, Enemy victim)
+                {
+                    Program.SetNotification("The rock hit the enemy in the head! It seems confused...");
+                });
+            Items.Add(rock);
 		}
 		
 		/*

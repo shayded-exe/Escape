@@ -569,7 +569,7 @@ namespace Escape
 				{
 					if (World.Items[itemId].CanUseInBattle)
 					{
-						World.Items[itemId].UseInBattle();
+						World.Items[itemId].UseInBattle(BattleCore.CurrentEnemy);
 						return;
 					}
 					else
