@@ -127,53 +127,54 @@ namespace Escape
 		
 		/*
 		 * This defines all the enemies that exist in the game
-		 * 
-		 * Format:
-		 *     Map.Add(new Enemy(    *Enemy could also be substituted by a specific subclass if an enemy has one*
-		 *         "Name",
-		 *         "Description",
-		 *         new List<int>() { Health, Magic, Power, Defense, ExpValue },
-		 *         new List<string>() { List of attacks by name }));
 		 */
 		private static void GenerateEnemies()
 		{
-			Enemies.Add(new Enemy(
-				"Rat",
-				"Its just a pwesious wittle wat that will KILL YOU!",
-				new List<int>() { 10, 5, 10, 5, 5 },
-				new List<string>() { "scratch" }));
+            // Rat
+            Enemy rat = new Enemy("Rat");
+            rat.Description = "It's just a pwesious wittle wat that will KILL YOU!";
+            rat.Health = 10; rat.MaxHealth = 10;
+            rat.Magic = 5; rat.MaxMagic = 5;
+            rat.Power = 10;
+            rat.Defense = 5;
+            rat.ExpValue = 5;
+            rat.TempAttacks.Add("scratch");
+            Enemies.Add(rat);
 
-			Enemies.Add(new Enemy(
-				"Hawk",
-				"It flies around looking for prey to feed on.",
-				new List<int>() { 15, 0, 15, 0, 8 },
-				new List<string>() { "scratch" }));
+            // Hawk
+            Enemy hawk = new Enemy("Hawk");
+            hawk.Description = "It flies around looking for prey to feed on.";
+            hawk.Health = 15; hawk.MaxHealth = 15;
+            hawk.Magic = 0; hawk.MaxMagic = 0;
+            hawk.Power = 15;
+            hawk.Defense = 0;
+            hawk.ExpValue = 8;
+            hawk.TempAttacks.Add("scratch");
+            Enemies.Add(hawk);
 		}
 
-		//Format: (Name, Description, Stats: (Power, Accuracy, Cost), Type)
 		/*
 		 * This defines all the enemies that exist in the game
-		 * 
-		 * Format:
-		 *     Map.Add(new Attack(    *Attack could also be substituted by a specific subclass if an attack has one*
-		 *         "Name",
-		 *         "Description",
-		 *         new List<int>() { Power, Accuracy, Magic Cost },
-		 *         Attack.AttackTypes.TypeOfAttack (Not fully implemented)));
 		 */
 		private static void GenerateAttacks()
 		{
-			Attacks.Add(new Attack(
-				"Flail",
-				"Flail your arms like a fish out of water and hope something happens",
-				new List<int>() { 5, 70, 0 },
-				Attack.AttackTypes.Physical));
+            // Flail
+            Attack flail = new Attack("Flail");
+            flail.Description = "Flail your arms like a fish out of water and hope something happens";
+            flail.Power = 5;
+            flail.Accuracy = 70;
+            flail.Cost = 0;
+            flail.Type = Attack.AttackType.Physical;
+            Attacks.Add(flail);
 
-			Attacks.Add(new Attack(
-				"Scratch",
-				"The Attacker digs it's claws into the skin of it's prey. Not really as painful as it sounds.",
-				new List<int>() { 10, 70, 1 },
-				Attack.AttackTypes.Physical));
+            // Scratch
+            Attack scratch = new Attack("Scratch");
+            scratch.Description = "The Attacker digs its claws into the skin of its prey. Not really as painful as it sounds.";
+            scratch.Power = 10;
+            scratch.Accuracy = 70;
+            scratch.Cost = 1;
+            scratch.Type = Attack.AttackType.Physical;
+            Attacks.Add(scratch);
 		}
 		#endregion
 

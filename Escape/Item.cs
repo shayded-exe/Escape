@@ -6,7 +6,7 @@ namespace Escape
     [Serializable]
     class Item
     {
-        #region Event delegate definitions
+        #region Definitions
         public delegate void OnUse(Item item);
         public delegate void OnUseInBattle(Item item, Enemy victim);
         #endregion
