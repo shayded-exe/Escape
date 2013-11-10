@@ -10,16 +10,16 @@ namespace Escape
         public string Name;
         public string Description;
 
-        // TODO: Revise this clusterf.ck.
-        public List<string> TempExits;
-        public List<string> TempItems;
-        public List<string> TempEnemies;
+        private List<Location> _Exits;
+        public List<Location> Exits { get { return new List<Location>(_Exits); } }
 
-        public List<int> Exits;
-        public List<int> Items;
-        public List<int> Enemies;
+        private List<Item> _Items;
+        public List<Item> Items { get { return new List<Item>(_Items); } }
 
-        public int BattleChance; // TODO: This was originall private
+        private List<Enemy> _Enemies;
+        public List<Enemy> Enemies { get { return new List<Enemy>(_Enemies); } }
+
+        public int BattleChance;
         #endregion
 
         #region Constructor(s)
@@ -29,113 +29,73 @@ namespace Escape
 
             // Default values
             this.Description = String.Empty;
-            this.TempExits = new List<string>();
-            this.TempItems = new List<string>();
-            this.TempEnemies = new List<string>();
-            this.Exits = new List<int>();
-            this.Items = new List<int>();
-            this.Enemies = new List<int>();
+            this._Exits = new List<Location>();
+            this._Items = new List<Item>();
+            this._Enemies = new List<Enemy>();
             this.BattleChance = 0;
         }
         #endregion
 
         #region Public Methods
-        public bool ContainsExit(int aExit)
+        public void AddExit(Location exit)
         {
-            if (this.Exits.Contains(aExit))
-                return true;
-            else
-                return false;
+            if (!this.ContainsExit(exit))
+                this.Exits.Add(exit);
         }
 
-        public void AddExit(int aExit)
+        public bool ContainsExit(Location exit)
         {
-            this.Exits.Add(aExit);
+            return this.Exits.Contains(exit);
         }
 
-        public void RemoveExit(int aExit)
+        public void RemoveExit(Location exit)
         {
-            if (this.ContainsExit(aExit))
-            {
-                this.Exits.Remove(aExit);
-            }
+            if (this.ContainsExit(exit))
+                this.Exits.Remove(exit);
         }
 
-        public bool ContainsItem(int aItem)
+        public void AddItem(Item item)
         {
-            if (this.Items.Contains(aItem))
-                return true;
-            else
-                return false;
+            if (!this.ContainsItem(item))
+                this.Items.Add(item);
         }
 
-        public void AddItem(int aItem)
+        public bool ContainsItem(Item item)
         {
-            this.Items.Add(aItem);
+            return this.Items.Contains(item);
         }
 
-        public void RemoveItem(int aItem)
+        public void RemoveItem(Item item)
         {
-            if (this.ContainsItem(aItem))
-            {
-                this.Items.Remove(aItem);
-            }
+            if (this.ContainsItem(item))
+                this.Items.Remove(item);
         }
 
-        public bool ContainsEnemy(int aEnemy)
+        public void AddEnemy(Enemy enemy)
         {
-            if (this.Enemies.Contains(aEnemy))
-                return true;
-            else
-                return false;
+            if (!this.ContainsEnemy(enemy))
+                this.Enemies.Add(enemy);
         }
 
-        public void RemoveEnemy(int aEnemy)
+        public bool ContainsEnemy(Enemy enemy)
         {
-            if (this.ContainsEnemy(aEnemy))
-            {
-                this.Enemies.Remove(aEnemy);
-            }
+            return this.Enemies.Contains(enemy);
+        }
+
+        public void RemoveEnemy(Enemy enemy)
+        {
+            if (this.ContainsEnemy(enemy))
+                this.Enemies.Remove(enemy);
         }
 
         public void CalculateRandomBattle()
         {
             if (Program.Rand.Next(100) < BattleChance && Enemies.Count > 0)
             {
-                int enemyId = Enemies[Program.Rand.Next(Enemies.Count)];
-                Program.SetNotification("You were attacked by " + Text.AorAn(World.Enemies[enemyId].Name));
-                BattleCore.StartBattle(enemyId, "enemy");
+                Enemy enemy = Enemies[Program.Rand.Next(Enemies.Count)];
+                Program.SetNotification("You were attacked by " + Text.AorAn(enemy.Name));
+                BattleCore.StartBattle(enemy, "enemy");
             }
-        }
-
-        public void ConvertAttributeListsToIDs()
-        {
-            List<int> ExitsResult = new List<int>();
-
-            for (int i = 0; i < TempExits.Count; i++)
-            {
-                ExitsResult.Add(World.GetLocationIDByName(TempExits[i]));
-            }
-
-            this.Exits = ExitsResult;
-
-            List<int> ItemsResult = new List<int>();
-
-            for (int i = 0; i < TempItems.Count; i++)
-            {
-                ItemsResult.Add(World.GetItemIDByName(TempItems[i]));
-            }
-
-            this.Items = ItemsResult;
-
-            List<int> EnemiesResult = new List<int>();
-
-            for (int i = 0; i < TempEnemies.Count; i++)
-            {
-                EnemiesResult.Add(World.GetEnemyIDByName(TempEnemies[i]));
-            }
-
-            this.Enemies = EnemiesResult;
         }
         #endregion
     }

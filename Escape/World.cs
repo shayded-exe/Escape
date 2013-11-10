@@ -1,68 +1,326 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Collections;
 
 namespace Escape
 {
-	static class World
+    // This better be something...
+    // Some sort of abomination between a Dictionary and a List.
+    // Basically a wrapper so we don't need all those "GetSomethingByID" and "GetSomethingByName" methods,
+    // and neither need to do all those conversions.
+    //
+    // This collection may contain it all.
+    /// <summary>
+    /// A collection wrapper to store values with string and ID keys.
+    /// </summary>
+    /// <typeparam name="TEntry">Type of the value</typeparam>
+    public class EntryDatabase<TEntry>
+    {
+        #region Declarations
+        private List<TEntry> _BackingList; // Storage for elements
+        private Dictionary<string, int> _Index; // Link between the key and the value
+        #endregion
+
+        #region Constructor
+        /// <summary>
+        /// Set up a new EntryDatabase with the specified key and value type.
+        /// </summary>
+        public EntryDatabase()
+        {
+            this._BackingList = new List<TEntry>();
+            this._Index = new Dictionary<string, int>();
+
+            Console.WriteLine("Initialized.");
+        }
+        #endregion
+
+        #region Modifiers
+        /// <summary>
+        /// Add an entry to the collection
+        /// </summary>
+        public void Add(string key, TEntry value)
+        {
+            if (this.Contains(key.ToLowerInvariant()))
+                throw new ArgumentException("An item with the same key has already been added.");
+
+            _BackingList.Add(value);
+            _Index.Add(key.ToLowerInvariant(), _BackingList.IndexOf(value));
+        }
+
+        /// <summary>
+        /// Remove the entry with the specified value
+        /// </summary>
+        public void Remove(TEntry value)
+        {
+            if(this.Contains(value))
+            {
+                int entryIndex = _BackingList.IndexOf(value);
+
+                // Remove the entry itself
+                _BackingList.RemoveAt(entryIndex);
+
+                // Remove link from index
+                // The center line searches for the TPrimaryKey for the entry's index
+                _Index.Remove(
+                    _Index.First(e => e.Value == entryIndex).Key.ToLowerInvariant()
+                );
+            }
+            else
+                throw new ArgumentException("Value is not in collection");
+        }
+
+        /// <summary>
+        /// Remove the entry at the specified index
+        /// </summary>
+        public void Remove(int index)
+        {
+            try
+            {
+                // Delete the item
+                _BackingList.RemoveAt(index);
+
+                // Remove link from index
+                _Index.Remove(
+                    _Index.First(e => e.Value == index).Key.ToLowerInvariant()
+                );
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                // If the index of the element we want to delete is out of range, rethrow the exception.
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Remove the entry with the specified key
+        /// </summary>
+        public void Remove(string key)
+        {
+            try
+            {
+                // Fetch the index for the key and remove the value
+                _BackingList.RemoveAt(
+                    _Index[key.ToLowerInvariant()]
+                );
+
+                // Update the index
+                _Index.Remove(key.ToLowerInvariant());
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                // If the key of the element we want to delete is out of range, rethrow the exception.
+                throw;
+            }
+        }
+        #endregion
+
+        #region Accessors
+        /// <summary>
+        /// Get the entry based on its key
+        /// </summary>
+        public TEntry this[string key]
+        {
+            get
+            {
+                return _BackingList[
+                    _Index[key.ToLowerInvariant()]
+                ];
+            }
+        }
+
+        /// <summary>
+        /// Get the entry based on its ID
+        /// </summary>
+        public TEntry this[int id]
+        {
+            get
+            {
+                return _BackingList[id];
+            }
+        }
+        #endregion
+
+        #region Lookups
+        /// <summary>
+        /// The count of elements in the collection
+        /// </summary>
+        public int Count
+        {
+            get
+            {
+            return _BackingList.Count;
+            }
+        }
+
+        /// <summary>
+        /// Get the index associanted with the value
+        /// </summary>
+        public int IndexOf(TEntry value)
+        {
+            if(this.Contains(value))
+                 return _BackingList.IndexOf(value);
+            else
+                throw new ArgumentException("Value is not in collection");
+        }
+
+        /// <summary>
+        /// Get the key for a specified value
+        /// </summary>
+        public string KeyOf(TEntry value)
+        {
+            if (this.Contains(value))
+            {
+                int entryIndex = _BackingList.IndexOf(value);
+
+                // Find the key for the entry's index in the Dictionary
+                return _Index.Where(i => i.Value == entryIndex).Select(s => s.Key).First().ToLowerInvariant();
+            }
+            else
+                throw new ArgumentException("Value is not in collection");
+        }
+
+        /// <summary>
+        /// Get whether the specified value exits in the collection
+        /// </summary>
+        public bool Contains(TEntry value)
+        {
+            return _BackingList.Contains(value);
+        }
+
+        /// <summary>
+        /// Get whether a value with the specified index exits in the collection
+        /// </summary>
+        public bool Contains(int index)
+        {
+            try
+            {
+                // Trying to access the element at the specified index will throw an exception if missing.
+                _BackingList.ElementAt(index);
+                return true;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Get whether a value with the specified key exits in the collection
+        /// </summary>
+        public bool Contains(string key)
+        {
+            return _Index.ContainsKey(key.ToLowerInvariant());
+        }
+        #endregion
+
+        #region Enumerators
+        /// <summary>
+        /// Get an IEnumerable containing the entries of the collection
+        /// </summary>
+        public IEnumerable<TEntry> GetEntries()
+        {
+            foreach (TEntry entry in _BackingList)
+                yield return entry;
+        }
+
+        /// <summary>
+        /// Get an IEnumerable containing KeyValuePair<>s where the Key is the numerical ID and the Value is the entry
+        /// </summary>
+        public IEnumerable<KeyValuePair<int, TEntry>> GetIDPairs()
+        {
+            foreach (KeyValuePair<string, int> indexEntry in _Index)
+                yield return new KeyValuePair<int, TEntry>(indexEntry.Value, _BackingList[indexEntry.Value]);
+        }
+
+        /// <summary>
+        /// Get an IEnumerable containing KeyValuePair<>s where the Key is the string key and the Value is the entry
+        /// </summary>
+        public IEnumerable<KeyValuePair<string, TEntry>> GetNamePairs()
+        {
+            foreach (KeyValuePair<string, int> indexEntry in _Index)
+                yield return new KeyValuePair<string, TEntry>(indexEntry.Key, _BackingList[indexEntry.Value]);
+        }
+        #endregion
+    }
+
+    static class World
 	{
 		#region Declarations
 		//Creates empty lists to hold all the information about the world
-		public static List<Location> Map = new List<Location>();
-		public static List<Item> Items = new List<Item>();
-		public static List<Enemy> Enemies = new List<Enemy>();
-		public static List<Attack> Attacks = new List<Attack>();
+        public static EntryDatabase<Location> Locations = new EntryDatabase<Location>();
+        public static EntryDatabase<Item> Items = new EntryDatabase<Item>();
+        public static EntryDatabase<Enemy> Enemies = new EntryDatabase<Enemy>();
+        public static EntryDatabase<Attack> Attacks = new EntryDatabase<Attack>();
 		#endregion
 		
 		#region Initialization
 		//Generates the data that goes into the above lists
 		public static void Initialize()
 		{
+            DefineIndex();
 			GenerateWorld();
 			GenerateItems();
 			GenerateEnemies();
 			GenerateAttacks();
-			ConvertAttributeListsToIDs();
 		}
 		#endregion
 		
 		#region World Generation Methods
+        /*
+         * Creates every world object's variable and assigns them to the database.
+         */
+        private static void DefineIndex()
+        {
+            // Locations
+            Locations.Add("Room 1", new Location("Room 1"));
+            Locations.Add("Room 2", new Location("Room 2"));
+            Locations.Add("Room 3", new Location("Room 3"));
+            Locations.Add("Secret Room", new Location("Secret Room"));
+
+            // Items
+            Items.Add("Brass Key", new Item("Brass Key"));
+            Items.Add("Shiny Stone", new Item("Shiny Stone"));
+            Items.Add("Rock", new Item("Rock"));
+
+            // Enemies
+            Enemies.Add("Rat", new Enemy("Rat"));
+            Enemies.Add("Hawk", new Enemy("Hawk"));
+
+            // Attacks
+            Attacks.Add("Flail", new Attack("Flail"));
+            Attacks.Add("Scratch", new Attack("Scratch"));
+        }
+
 		/*
 		 * This defines all the locations that exist in the map along with their specific properties
 		 */
 		private static void GenerateWorld()
 		{
             // Room 1
-            Location room1 = new Location("Room 1");
-            room1.Description = "This is a room.";
-            room1.TempExits.Add("room 2");
-            room1.TempItems.Add("brass key");
-            room1.TempItems.Add("rock");
-            Map.Add(room1);
+            Locations["Room 1"].Description = "This is a room.";
+            Locations["Room 1"].AddExit(Locations["Room 2"]);
+            Locations["Room 1"].AddItem(Items["Brass Key"]);
+            Locations["Room 1"].AddItem(Items["Rock"]);
 
             // Room 2
-            Location room2 = new Location("Room 2");
-            room2.Description = "This is another room.";
-            room2.TempExits.Add("room 1");
-            room2.TempExits.Add("room 3");
-            room2.TempItems.Add("shiny stone");
-            room2.TempEnemies.Add("rat");
-            room2.BattleChance = 50;
-            Map.Add(room2);
+            Locations["Room 2"].Description = "This is another room.";
+            Locations["Room 2"].AddExit(Locations["Room 1"]);
+            Locations["Room 2"].AddExit(Locations["Room 3"]);
+            Locations["Room 2"].AddItem(Items["Shiny Stone"]);
+            Locations["Room 2"].AddEnemy(Enemies["Rat"]);
+            Locations["Room 2"].BattleChance = 50;
 
             // Room 3
-            Location room3 = new Location("Room 3");
-            room3.Description = "This is yet another room.";
-            room3.TempExits.Add("room 2");
-            room3.TempEnemies.Add("rat");
-            room3.TempEnemies.Add("hawk");
-            room3.BattleChance = 75;
-            Map.Add(room3);
+            Locations["Room 3"].Description = "This is yet another room.";
+            Locations["Room 3"].AddExit(Locations["Room 2"]);
+            Locations["Room 3"].AddEnemy(Enemies["Rat"]);
+            Locations["Room 3"].AddEnemy(Enemies["Hawk"]);
+            Locations["Room 3"].BattleChance = 75;
 
             // Secret room
-            Location secretRoom = new Location("Secret Room");
-            secretRoom.Description = "This is a very awesome secret room.";
-            secretRoom.TempExits.Add("room 3");
-            Map.Add(secretRoom);
+            Locations["Secret Room"].Description = "This is a very awesome secret room.";
+            Locations["Secret Room"].AddExit(Locations["Room 3"]);
 		}
 
 		/*
@@ -70,31 +328,28 @@ namespace Escape
 		 */
 		private static void GenerateItems()
 		{
-            // Key
-            Item key = new Item("Brass Key");
-            key.Description = "Just your generic key that's in almost every game.";
-            key.Usable = true;
-            key.ExtendedAttributes.Add("str_targetLocation", "room 3");
-            key.ExtendedAttributes.Add("str_newLocation", "secret room");
-            key.Uses += new Item.OnUse(delegate(Item self)
+            // Brass Key
+            Items["Brass Key"].Description = "Just your generic key that's in almost every game.";
+            Items["Brass Key"].Usable = true;
+            Items["Brass Key"].ExtendedAttributes.Add("str_targetLocation", "room 3");
+            Items["Brass Key"].ExtendedAttributes.Add("str_newLocation", "secret room");
+            Items["Brass Key"].Uses += new Item.OnUse(delegate(Item self)
                 {
                     if (Player.Location == World.GetLocationIDByName((string)self.ExtendedAttributes["str_targetLocation"]))
                     {
                         Program.SetNotification("The " + self.Name + " opened the lock!");
-                        World.Map[World.GetLocationIDByName((string)self.ExtendedAttributes["str_targetLocation"])].Exits.Add(
-                            World.GetLocationIDByName((string)self.ExtendedAttributes["str_newLocation"]));
+                        /*World.Map[World.GetLocationIDByName((string)self.ExtendedAttributes["str_targetLocation"])].Exits.Add(
+                            World.GetLocationIDByName((string)self.ExtendedAttributes["str_newLocation"]));*/
                     }
                     else
                         self.NoUse();
                 });
-            Items.Add(key);
 
             // Shiny Stone
-            Item shinyStone = new Item("Shiny Stone");
-            shinyStone.Description = "It's a stone and it's shiny, what more could you ask for?";
-            shinyStone.Usable = true;
-            shinyStone.UsableInBattle = true;
-            shinyStone.Uses += new Item.OnUse(delegate(Item self)
+            Items["Shiny Stone"].Description = "It's a stone and it's shiny, what more could you ask for?";
+            Items["Shiny Stone"].Usable = true;
+            Items["Shiny Stone"].UsableInBattle = true;
+            Items["Shiny Stone"].Uses += new Item.OnUse(delegate(Item self)
                 {
                     if (Player.Location == World.GetLocationIDByName("secret room"))
                     {
@@ -104,22 +359,20 @@ namespace Escape
                     else
                         Program.SetNotification("The shiny stone glowed shiny colors!");
                 });
-            Items.Add(shinyStone);
 
             // Rock
-            Item rock = new Item("Rock");
-            rock.Description = "It doesn't do anything, however, it is said that the mystical game designer used this for testing.";
-            rock.Usable = true;
-            rock.UsableInBattle = true;
-            rock.Uses += new Item.OnUse(delegate(Item self)
+            Items["Rock"].Description =
+                "It doesn't do anything, however, it is said that the mystical game designer used this for testing.";
+            Items["Rock"].Usable = true;
+            Items["Rock"].UsableInBattle = true;
+            Items["Rock"].Uses += new Item.OnUse(delegate(Item self)
                 {
                     Program.SetNotification("You threw the rock at a wall. Nothing happened.");
                 });
-            rock.BattleUses += new Item.OnUseInBattle(delegate(Item self, Enemy victim)
+            Items["Rock"].BattleUses += new Item.OnUseInBattle(delegate(Item self, Enemy victim)
                 {
                     Program.SetNotification("The rock hit the enemy in the head! It seems confused...");
                 });
-            Items.Add(rock);
 		}
 		
 		/*
@@ -128,26 +381,22 @@ namespace Escape
 		private static void GenerateEnemies()
 		{
             // Rat
-            Enemy rat = new Enemy("Rat");
-            rat.Description = "It's just a pwesious wittle wat that will KILL YOU!";
-            rat.Health = 10; rat.MaxHealth = 10;
-            rat.Magic = 5; rat.MaxMagic = 5;
-            rat.Power = 10;
-            rat.Defense = 5;
-            rat.ExpValue = 5;
-            rat.TempAttacks.Add("scratch");
-            Enemies.Add(rat);
+            Enemies["Rat"].Description = "It's just a pwesious wittle wat that will KILL YOU!";
+            Enemies["Rat"].Health = 10; Enemies["Rat"].MaxHealth = 10;
+            Enemies["Rat"].Magic = 5; Enemies["Rat"].MaxMagic = 5;
+            Enemies["Rat"].Power = 10;
+            Enemies["Rat"].Defense = 5;
+            Enemies["Rat"].ExpValue = 5;
+            Enemies["Rat"].AddAttack(Attacks["Scratch"]);
 
             // Hawk
-            Enemy hawk = new Enemy("Hawk");
-            hawk.Description = "It flies around looking for prey to feed on.";
-            hawk.Health = 15; hawk.MaxHealth = 15;
-            hawk.Magic = 0; hawk.MaxMagic = 0;
-            hawk.Power = 15;
-            hawk.Defense = 0;
-            hawk.ExpValue = 8;
-            hawk.TempAttacks.Add("scratch");
-            Enemies.Add(hawk);
+            Enemies["Hawk"].Description = "It flies around looking for prey to feed on.";
+            Enemies["Hawk"].Health = 15; Enemies["Hawk"].MaxHealth = 15;
+            Enemies["Hawk"].Magic = 0; Enemies["Hawk"].MaxMagic = 0;
+            Enemies["Hawk"].Power = 15;
+            Enemies["Hawk"].Defense = 0;
+            Enemies["Hawk"].ExpValue = 8;
+            Enemies["Hawk"].AddAttack(Attacks["Scratch"]);
 		}
 
 		/*
@@ -156,22 +405,18 @@ namespace Escape
 		private static void GenerateAttacks()
 		{
             // Flail
-            Attack flail = new Attack("Flail");
-            flail.Description = "Flail your arms like a fish out of water and hope something happens";
-            flail.Power = 5;
-            flail.Accuracy = 70;
-            flail.Cost = 0;
-            flail.Type = Attack.AttackType.Physical;
-            Attacks.Add(flail);
+            Attacks["Flail"].Description = "Flail your arms like a fish out of water and hope something happens";
+            Attacks["Flail"].Power = 5;
+            Attacks["Flail"].Accuracy = 70;
+            Attacks["Flail"].Cost = 0;
+            Attacks["Flail"].Type = Attack.AttackType.Physical;
 
             // Scratch
-            Attack scratch = new Attack("Scratch");
-            scratch.Description = "The Attacker digs its claws into the skin of its prey. Not really as painful as it sounds.";
-            scratch.Power = 10;
-            scratch.Accuracy = 70;
-            scratch.Cost = 1;
-            scratch.Type = Attack.AttackType.Physical;
-            Attacks.Add(scratch);
+            Attacks["Scratch"].Description = "The Attacker digs its claws into the skin of its prey. Not really as painful as it sounds.";
+            Attacks["Scratch"].Power = 10;
+            Attacks["Scratch"].Accuracy = 70;
+            Attacks["Scratch"].Cost = 1;
+            Attacks["Scratch"].Type = Attack.AttackType.Physical;
 		}
 		#endregion
 
