@@ -8,15 +8,15 @@ namespace Escape
 	{
 		#region Declarations
 		public string Player_Name = Player.Name;
-		public int Player_Location = Player.Location;
+		public Location Player_Location = Player.Location;
 		public int Player_Health = Player.Health;
 		public int Player_Magic = Player.Magic;
 		public int Player_Level = Player.Level;
 		public int Player_Exp = Player.Exp;
 		
-		public List<int> Player_Inventory = Player.Inventory;
+		public List<Item> Player_Inventory = Player.Inventory;
 		
-		public List<Location> World_Map = World.Map;
+		public List<Location> World_Map = (List<Location>)World.Locations.GetEntries();
 		#endregion
 		
 		#region Loading Method
@@ -31,7 +31,8 @@ namespace Escape
 			
 			Player.Inventory = this.Player_Inventory;
 			
-			World.Map = this.World_Map;
+            foreach (Location location in this.World_Map)
+                World.Locations.Add(location.Name, location);
 		}
 		#endregion
 	}

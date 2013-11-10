@@ -5,153 +5,163 @@ using System.Text;
 
 namespace Escape
 {
-	class Attack : Entity
-	{
-		#region Declarations
-		public int Power;
-		public int Accuracy;
-		public int Cost;
-		public AttackTypes Type;
+    class Attack
+    {
+        #region Definitions
+        public enum AttackType
+        {
+            None,
+            Physical,
+            Magic,
+            Self
+        };
+        #endregion
 
-		public enum AttackTypes { Physical, Magic, Self };
-		#endregion
+        #region Declarations
+        public string Name;
+        public string Description;
 
-		#region Constructor
-		public Attack(
-			string Name,
-			string Description,
-			List<int> Stats,
-			AttackTypes Type)
-		:base(Name, Description)
-		{
-			this.Power = Stats[0];
-			this.Accuracy = Stats[1];
-			this.Cost = Stats[2];
-			this.Type = Type;
-		}
-		#endregion
+        public int Power;
+        public int Accuracy;
+        public int Cost;
+        public AttackType Type;
+        #endregion
 
-		#region Public Methods
-		public virtual void Use() 
-		{
-			if (BattleCore.CurrentTurn == "player")
-			{
-				Program.SetNotification("You used " + this.Name + "!");
-			}
-			else
-			{
-				Program.SetNotification("The enemy used " + this.Name + "!");
-			}
+        #region Constructor
+        public Attack(string name)
+        {
+            this.Name = name;
 
-			if (!CheckMagic())
-			{
-				World.Attacks[World.GetAttackIDByName("flail")].Use();
-				return;
-			}
+            // Defaults
+            this.Description = String.Empty;
+            this.Power = 0;
+            this.Accuracy = 0;
+            this.Cost = 0;
+            this.Type = AttackType.None;
+        }
+        #endregion
 
-			BattleCore.AttackerMagic -= this.Cost;
+        #region Public Methods
+        public void Use()
+        {
+            if (BattleCore.CurrentTurn == "player")
+            {
+                Program.SetNotification("You used " + this.Name + "!");
+            }
+            else
+            {
+                Program.SetNotification("The enemy used " + this.Name + "!");
+            }
 
-			int lucky = CheckLucky();
-			
-			if (!CheckAccuracy(lucky))
-				return;
+            if (!CheckMagic())
+            {
+                World.Attacks["flail"].Use();
+                return;
+            }
 
-			int damage = CheckDamage(lucky);
+            BattleCore.AttackerMagic -= this.Cost;
 
-			BattleCore.DefenderHealth -= damage;
-		}
-		#endregion
+            int lucky = CheckLucky();
 
-		#region Helper Methods
-		private int CheckLucky()
-		{
-			Random rand = new Random();
-			int random = rand.Next(0, 100);
+            if (!CheckAccuracy(lucky))
+                return;
 
-			double modifiedLuckyRate = BattleCore.BaseLuckyRate * (2 - (BattleCore.AttackerHealth / BattleCore.AttackerMaxHealth));
+            int damage = CheckDamage(lucky);
 
-			if (random < modifiedLuckyRate)
-			{
-				Program.SetNotification("Lucky Hit!");
-				return 2;
-			}
-			else
-				return 1;
-		}
+            BattleCore.DefenderHealth -= damage;
+        }
+        #endregion
 
-		private bool CheckAccuracy(int lucky)
-		{
-			if (lucky == 2)
-			{
-				return true;
-			}
+        #region Helper Methods
+        private int CheckLucky()
+        {
+            Random rand = new Random();
+            int random = rand.Next(0, 100);
 
-			Random rand = new Random();
-			int random = rand.Next(0, 100);
+            double modifiedLuckyRate = BattleCore.BaseLuckyRate * (2 - (BattleCore.AttackerHealth / BattleCore.AttackerMaxHealth));
 
-			double modifiedAccuracy = this.Accuracy;
+            if (random < modifiedLuckyRate)
+            {
+                Program.SetNotification("Lucky Hit!");
+                return 2;
+            }
+            else
+                return 1;
+        }
 
-			if ((BattleCore.AttackerHealth / BattleCore.AttackerMaxHealth) < 0.5)
-			{
-				modifiedAccuracy = this.Accuracy * ConvertRange(0, 100, 80, 100, ((BattleCore.AttackerHealth / BattleCore.AttackerMaxHealth) * 200)) * 0.01;
-			}
+        private bool CheckAccuracy(int lucky)
+        {
+            if (lucky == 2)
+            {
+                return true;
+            }
 
-			if (random < modifiedAccuracy)
-				return true;
-			else
-			{
-				Program.SetError("The attack missed!");
-				return false;
-			}
-				
-		}
+            Random rand = new Random();
+            int random = rand.Next(0, 100);
 
-		private bool CheckMagic()
-		{
-			if (BattleCore.AttackerMagic >= this.Cost)
-				return true;
-			else
-			{
-				if (BattleCore.CurrentTurn == "player")
-				{
-					Program.SetError("Not enough magic! You flailed your arms.");
-				}
-				else
-				{
-					Program.SetError("The enemy is out of magic! It flailed its arms.");
-				}
-				return false;
-			}
-		}
+            double modifiedAccuracy = this.Accuracy;
 
-		private int CheckDamage(int lucky)
-		{
-			Random random = new Random();
-			double modifier = lucky * 0.6;
-			double variation = (random.Next(85, 115) / 100d);
-			
-			double damage = ((BattleCore.AttackerPower * this.Power) / Math.Max(BattleCore.DefenderDefense, 1)) * modifier * variation;
+            if ((BattleCore.AttackerHealth / BattleCore.AttackerMaxHealth) < 0.5)
+            {
+                modifiedAccuracy = this.Accuracy * ConvertRange(0, 100, 80, 100, ((BattleCore.AttackerHealth / BattleCore.AttackerMaxHealth) * 200)) * 0.01;
+            }
 
-			if (BattleCore.CurrentTurn == "player")
-			{
-				Program.SetNotification("You did " + (int)damage + " damage!");
-			}
-			else
-			{
-				Program.SetNotification("The enemy did " + (int)damage + " damage");
-			}
+            if (random < modifiedAccuracy)
+                return true;
+            else
+            {
+                Program.SetError("The attack missed!");
+                return false;
+            }
 
-			return (int)damage;
-		}
+        }
 
-		public static int ConvertRange(
-			int originalStart, int originalEnd,
-			int newStart, int newEnd,
-			double value)
-		{
-			double scale = (double)(newEnd - newStart) / (originalEnd - originalStart);
-			return (int)(newStart + ((value - originalStart) * scale));
-		}
-		#endregion
-	}
+        private bool CheckMagic()
+        {
+            if (BattleCore.AttackerMagic >= this.Cost)
+                return true;
+            else
+            {
+                if (BattleCore.CurrentTurn == "player")
+                {
+                    Program.SetError("Not enough magic! You flailed your arms.");
+                }
+                else
+                {
+                    Program.SetError("The enemy is out of magic! It flailed its arms.");
+                }
+                return false;
+            }
+        }
+
+        private int CheckDamage(int lucky)
+        {
+            Random random = new Random();
+            double modifier = lucky * 0.6;
+            double variation = (random.Next(85, 115) / 100d);
+
+            double damage = ((BattleCore.AttackerPower * this.Power) / Math.Max(BattleCore.DefenderDefense, 1)) * modifier * variation;
+
+            if (BattleCore.CurrentTurn == "player")
+            {
+                Program.SetNotification("You did " + (int)damage + " damage!");
+            }
+            else
+            {
+                Program.SetNotification("The enemy did " + (int)damage + " damage");
+            }
+
+            return (int)damage;
+        }
+
+        public static int ConvertRange(
+            int originalStart, int originalEnd,
+            int newStart, int newEnd,
+            double value)
+        {
+            double scale = (double)(newEnd - newStart) / (originalEnd - originalStart);
+            return (int)(newStart + ((value - originalStart) * scale));
+        }
+        #endregion
+    }
 }

@@ -115,19 +115,19 @@ namespace Escape
 		#endregion
 
 		#region Battle Methods
-		public static void StartBattle(int enemy, string startingTurn = "player")
+		public static void StartBattle(Enemy enemy, string startingTurn = "player")
 		{
 			Program.GameState = Program.GameStates.Battle;
 
 			CurrentTurn = startingTurn;
-			CurrentEnemy = CloneEnemy(World.Enemies[enemy]);
+			CurrentEnemy = CloneEnemy(enemy);
 		}
 
 		public static void NextTurn()
 		{
 			if (CurrentTurn == "player")
 			{
-				string temp = Text.SetPrompt("[" + World.Map[Player.Location].Name + "] > ");
+				string temp = Text.SetPrompt("[" + Player.Location.Name + "] > ");
 				Text.Clear();
 				Player.Do(temp);
 			}
@@ -158,7 +158,7 @@ namespace Escape
 			{
 				Program.SetNotification("You defeated the " + CurrentEnemy.Name + " and gained " + CurrentEnemy.ExpValue + " EXP!");
 				Player.GiveExp(CurrentEnemy.ExpValue);
-				World.Map[Player.Location].RemoveEnemy(CurrentEnemy.ID);
+				Player.Location.RemoveEnemy(CurrentEnemy);
 				CurrentTurn = "end";
 			}
 		}
@@ -192,24 +192,16 @@ namespace Escape
 
 			Console.SetCursorPosition(18, currentY);
 
-			foreach (int attack in Player.Attacks)
-			{
-				string name = World.Attacks[attack].Name;
-				Text.WriteColor("  " + name);
-				i++;
-			}
+            foreach (Attack attack in Player.Attacks)
+				Text.WriteColor("  " + attack.Name);
 
 			longestList = (i > longestList) ? i : longestList;
 			i = 0;
 
 			Console.SetCursorPosition(36, currentY);
 
-			foreach (int item in Player.ItemsUsableInBattle())
-			{
-				string name = World.Items[item].Name;
-				Text.WriteColor("  " + name);
-				i++;
-			}
+            foreach (Item item in Player.Inventory.FindAll(j => j.UsableInBattle)) // Use 'j' instead of 'i' because 'i' is already used
+				Text.WriteColor("  " + item.Name);
 
 			longestList = (i > longestList) ? i : longestList;
 			i = 0;
@@ -275,17 +267,21 @@ namespace Escape
 		#endregion
 
 		#region Helper Methods
-		private static T CloneEnemy<T>(T obj)
-		{
-			using (var ms = new MemoryStream())
-			{
-				var formatter = new BinaryFormatter();
-				formatter.Serialize(ms, obj);
-				ms.Position = 0;
+        private static Enemy CloneEnemy(Enemy enemy)
+        {
+            Enemy ret = new Enemy(enemy.Name);
+            ret.Description = enemy.Description;
+            ret.Health = enemy.Health; ret.MaxHealth = enemy.MaxHealth;
+            ret.Magic = enemy.Magic; ret.MaxMagic = enemy.MaxMagic;
+            ret.Power = enemy.Power;
+            ret.Defense = enemy.Defense;
+            ret.ExpValue = enemy.ExpValue;
 
-				return (T) formatter.Deserialize(ms);
-			}
-		}
+            foreach (Attack attack in enemy.Attacks)
+                ret.AddAttack(attack);
+
+            return ret;
+        }
 		#endregion
 	}
 }

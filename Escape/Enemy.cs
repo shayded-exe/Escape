@@ -3,75 +3,68 @@ using System.Collections.Generic;
 
 namespace Escape
 {
-	[Serializable]
-	class Enemy : Entity
-	{
-		#region Declarations
-		public int Health;
-		public int MaxHealth;
+    [Serializable]
+    class Enemy
+    {
+        #region Declarations
+        public string Name;
+        public string Description;
 
-		public int Magic;
-		public int MaxMagic;
+        public int Health;
+        public int MaxHealth;
 
-		public int Power;
-		public int Defense;
-		public int ExpValue;
+        public int Magic;
+        public int MaxMagic;
 
-		public List<string> TempAttacks;
-		public List<int> Attacks;
-		#endregion
+        public int Power;
+        public int Defense;
+        public int ExpValue;
 
-		#region Properties
-		public int ID
-		{
-			get
-			{
-				return World.GetEnemyIDByName(this.Name);
-			}
-		}
-		#endregion
+        private List<Attack> _Attacks;
+        public List<Attack> Attacks { get { return new List<Attack>(_Attacks); } }
+        #endregion
 
-		#region Constructor
-		public Enemy(
-			string Name,
-			string Description,
-			List<int> Stats,
-			List<string> Attacks)
-		:base(Name, Description)
-		{
-			this.Health = Stats[0];
-			this.MaxHealth = Health;
+        #region Constructor
+        public Enemy(string name)
+        {
+            this.Name = name;
 
-			this.Magic = Stats[1];
-			this.MaxMagic = Magic;
+            // Defaults
+            // TODO: Handling health and mana max. without need for double lines outside.
+            this.Description = String.Empty;
+            this.Health = 0;
+            this.MaxHealth = 0;
+            this.Magic = 0;
+            this.MaxMagic = 0;
+            this.Power = 0;
+            this.Defense = 0;
+            this.ExpValue = 0;
+            this._Attacks = new List<Attack>();
+        }
+        #endregion
 
-			this.Power = Stats[2];
-			this.Defense = Stats[3];
-			this.ExpValue = Stats[4];
-			this.TempAttacks = Attacks;
-		}
-		#endregion
+        #region Public Methods
+        public void AddAttack(Attack attack)
+        {
+            if (!this.ContainsAttack(attack))
+                this._Attacks.Add(attack);
+        }
 
-		#region Public Methods
-		public virtual void Attack() 
-		{
-			Random rand = new Random();
-			int attackToUse = rand.Next(0, this.Attacks.Count);
+        public bool ContainsAttack(Attack attack)
+        {
+            return this._Attacks.Contains(attack);
+        }
 
-			World.Attacks[Attacks[attackToUse]].Use();
-		}
+        public void RemoveAttack(Attack attack)
+        {
+            if (this.ContainsAttack(attack))
+                this._Attacks.Remove(attack);
+        }
 
-		public void ConvertAttributeListsToIDs()
-		{
-			List<int> AttacksResult = new List<int>();
-
-			for (int i = 0; i < TempAttacks.Count; i++)
-			{
-				AttacksResult.Add(World.GetAttackIDByName(TempAttacks[i]));
-			}
-
-			this.Attacks = AttacksResult;
-		}
-		#endregion
-	}
+        public void Attack()
+        {
+            _Attacks[new Random().Next(this._Attacks.Count)].Use();
+        }
+        #endregion
+    }
 }

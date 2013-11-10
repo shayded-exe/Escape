@@ -50,7 +50,7 @@
     <Compile Include="Attack.cs" />
     <Compile Include="BattleCore.cs" />
     <Compile Include="Enemy.cs" />
-    <Compile Include="Entity.cs" />
+    <Compile Include="EntryDatabase.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="Location.cs" />
     <Compile Include="Player.cs" />
