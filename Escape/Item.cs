@@ -33,8 +33,6 @@ namespace Escape
         }
 
         public bool UsableInBattle;
-        [Obsolete("API backwards compatibility property. Replace with item.UsableInBattle.", false)]
-        public bool CanUseInBattle { get { return UsableInBattle; } }
         private event OnUseInBattle battleUses;
         public event OnUseInBattle BattleUses
         {
@@ -51,6 +49,11 @@ namespace Escape
             }
         }
 
+        // A list of arbitrary attributes indexed by a string key.
+        // The usage of Hungarian Notation (the name of the variable is prefixed by its type) is advised here
+        // (even though it is generally discouraged by now)
+        //
+        // For example: the Brass Key uses two strings, str_targetLocation and str_newLocation.
         public Dictionary<string, object> ExtendedAttributes;
         #endregion
 

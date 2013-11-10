@@ -55,7 +55,7 @@ namespace Escape
 
             if (!CheckMagic())
             {
-                World.Attacks[World.GetAttackIDByName("flail")].Use();
+                World.Attacks["flail"].Use();
                 return;
             }
 

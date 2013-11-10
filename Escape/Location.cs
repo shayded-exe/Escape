@@ -40,59 +40,59 @@ namespace Escape
         public void AddExit(Location exit)
         {
             if (!this.ContainsExit(exit))
-                this.Exits.Add(exit);
+                this._Exits.Add(exit);
         }
 
         public bool ContainsExit(Location exit)
         {
-            return this.Exits.Contains(exit);
+            return this._Exits.Contains(exit);
         }
 
         public void RemoveExit(Location exit)
         {
             if (this.ContainsExit(exit))
-                this.Exits.Remove(exit);
+                this._Exits.Remove(exit);
         }
 
         public void AddItem(Item item)
         {
             if (!this.ContainsItem(item))
-                this.Items.Add(item);
+                this._Items.Add(item);
         }
 
         public bool ContainsItem(Item item)
         {
-            return this.Items.Contains(item);
+            return this._Items.Contains(item);
         }
 
         public void RemoveItem(Item item)
         {
             if (this.ContainsItem(item))
-                this.Items.Remove(item);
+                this._Items.Remove(item);
         }
 
         public void AddEnemy(Enemy enemy)
         {
             if (!this.ContainsEnemy(enemy))
-                this.Enemies.Add(enemy);
+                this._Enemies.Add(enemy);
         }
 
         public bool ContainsEnemy(Enemy enemy)
         {
-            return this.Enemies.Contains(enemy);
+            return this._Enemies.Contains(enemy);
         }
 
         public void RemoveEnemy(Enemy enemy)
         {
             if (this.ContainsEnemy(enemy))
-                this.Enemies.Remove(enemy);
+                this._Enemies.Remove(enemy);
         }
 
         public void CalculateRandomBattle()
         {
-            if (Program.Rand.Next(100) < BattleChance && Enemies.Count > 0)
+            if (new Random().Next(100) < BattleChance && Enemies.Count > 0)
             {
-                Enemy enemy = Enemies[Program.Rand.Next(Enemies.Count)];
+                Enemy enemy = _Enemies[new Random().Next(Enemies.Count)];
                 Program.SetNotification("You were attacked by " + Text.AorAn(enemy.Name));
                 BattleCore.StartBattle(enemy, "enemy");
             }

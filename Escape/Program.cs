@@ -30,9 +30,6 @@ namespace Escape
 		
 		private static bool isNotification = false;
 		private static List<string> notifications = new List<string>();
-		
-		//Random number usable by the whole game
-		public static Random Rand = new Random();
 		#endregion
 		
 		#region Main
@@ -107,7 +104,7 @@ namespace Escape
 			World.LocationHUD();
 			
 			//Get input from the player
-			string temp = Text.SetPrompt("[" + World.Map[Player.Location].Name + "] > ");
+			string temp = Text.SetPrompt("[" + Player.Location.Name + "] > ");
 			Text.Clear();
 			Player.Do(temp);
 		}

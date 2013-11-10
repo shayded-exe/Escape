@@ -13,16 +13,16 @@ namespace Escape
 		private const int defense = 10;
 
 		private static string name;
-		private static int location = 0;
+		private static Location location = World.Locations[0];
 
 		private static int level = 1;
 		private static int exp = 0;
 		
 		private static int health = MaxHealth;
-		private static int magic = MaxMagic;	
-		
-		public static List<int> Inventory = new List<int>();
-		public static List<int> Attacks = new List<int>() { 1 };
+		private static int magic = MaxMagic;
+
+        public static List<Item> Inventory = new List<Item>();
+        public static List<Attack> Attacks = new List<Attack>();
 		#endregion
 
 		#region Properties
@@ -46,7 +46,7 @@ namespace Escape
 			}
 		}
 
-		public static int Location
+		public static Location Location
 		{
 			get
 			{
@@ -54,7 +54,7 @@ namespace Escape
 			}
 			set
 			{
-				if (World.IsLocation(value))
+				if (World.Locations.Contains(value))
 				{
 					location = value;
 				}
@@ -263,14 +263,10 @@ namespace Escape
 							break;
 						default:
 							{
-								if (World.IsAttack(verb))
-								{
-									AttackInBattle(verb);
-								}
-								else
-								{
-									InputNotValid();
-								}
+                                if (World.Attacks.Contains(verb))
+                                    AttackInBattle(verb);
+                                else
+                                    InputNotValid();
 
 								BattleCore.CurrentTurn = "enemy";
 								break;
@@ -282,12 +278,10 @@ namespace Escape
 
 		public static void GiveAttack(string attackName)
 		{
-			if (World.IsAttack(attackName))
-			{
-				int attackId = World.GetAttackIDByName(attackName);
-
-				Attacks.Add(attackId);
-				Program.SetNotification("You learned the attack " + World.Attacks[attackId].Name + "!");
+            if(World.Attacks.Contains(attackName))
+            {
+                Attacks.Add(World.Attacks[attackName]);
+				Program.SetNotification("You learned the attack " + World.Attacks[attackName].Name + "!");
 			}
 			else
 			{
@@ -298,12 +292,11 @@ namespace Escape
 
 		public static void GiveItem(string itemName)
 		{
-			if (World.IsItem(itemName))
+            if (World.Items.Contains(itemName))
 			{
-				int itemId = World.GetItemIDByName(itemName);
-				Inventory.Add(itemId);
+                Inventory.Add(World.Items[itemName]);
 
-				Program.SetNotification("You were given " + Text.AorAn(World.Items[itemId].Name));
+				Program.SetNotification("You were given " + Text.AorAn(World.Items[itemName].Name));
 			}
 			else
 			{
@@ -314,25 +307,8 @@ namespace Escape
 		
 		public static void RemoveItemFromInventory(int itemId)
 		{
-			if (ItemIsInInventory(itemId))
-			{
-				Inventory.Remove(itemId);
-			}
-		}
-
-		public static List<int> ItemsUsableInBattle()
-		{
-			List<int> result = new List<int>();
-
-			foreach (int item in Inventory)
-			{
-				if (World.Items[item].CanUseInBattle)
-				{
-					result.Add(item);
-				}
-			}
-
-			return result;
+            if (Inventory.Contains(World.Items[itemId]))
+                Inventory.Remove(World.Items[itemId]);
 		}
 
 		public static void GiveExp(int amount)
@@ -372,40 +348,43 @@ namespace Escape
 		
 		private static void MoveTo(string locationName)
 		{
-			if (World.IsLocation(locationName))
-			{
-				int locationId = World.GetLocationIDByName(locationName);
-				
-				if (World.Map[Location].ContainsExit(locationId))
-				{
-					Location = locationId;
-					
-					World.Map[Location].CalculateRandomBattle();
-				}
-				else if (Player.Location == locationId)
-				{
-					Program.SetError("You are already there!");
-				}
-				else
-				{
-					Program.SetError("You can't get there from here!");
-				}
-			}
-			else
-			{
-				Program.SetError("That isn't a valid location!");
-			}
+            if (World.Locations.Contains(locationName))
+            {
+                // Need to specify as this because Location is ambigous between
+                // Player.Location (the field) and Escape.Location (the type)
+                Escape.Location location = World.Locations[locationName];
+
+                if(Player.Location.ContainsExit(location))
+                {
+                    Player.Location = location;
+
+                    Location.CalculateRandomBattle();
+                }
+                else if (Player.Location == location)
+                {
+                    Program.SetError("You are already there!");
+                }
+                else
+                {
+                    Program.SetError("You can't get there from here!");
+                }
+            }
+            else
+            {
+                Program.SetError("This isn't a valid location!");
+            }
 		}
 		
 		private static void Examine(string itemName)
 		{
-			int itemId = World.GetItemIDByName(itemName);
-			
-			if (World.IsItem(itemName))
-			{				
-				if (World.Map[Location].ContainsItem(itemId) || ItemIsInInventory(itemId))
+			if (World.Items.Contains(itemName))
+			{
+                Item item = World.Items[itemName];
+
+                if (Location.ContainsItem(item) || Inventory.Contains(item))
 				{
-					World.ItemDescription(itemId);
+                    Text.WriteLine(item.Description);
+                    Text.BlankLines();
 				}
 				else
 				{
@@ -420,15 +399,15 @@ namespace Escape
 		
 		private static void Pickup(string itemName)
 		{
-			if (World.IsItem(itemName))
-			{
-				int itemId = World.GetItemIDByName(itemName);
-				
-				if (World.Map[Location].ContainsItem(itemId))
+			if (World.Items.Contains(itemName))
+		    {
+                Item item = World.Items[itemName];
+
+                if (Location.ContainsItem(item))
 				{
-					World.Map[Location].RemoveItem(itemId);
-					Inventory.Add(itemId);
-					Program.SetNotification("You put the " + World.Items[itemId].Name + " in your bag!");
+                    Location.RemoveItem(item);
+                    Inventory.Add(item);
+                    Program.SetNotification("You put the " + item.Name + " in your bag!");
 				}
 				else
 				{
@@ -443,15 +422,15 @@ namespace Escape
 		
 		private static void Place(string itemName)
 		{
-			if (World.IsItem(itemName))
+			if (World.Items.Contains(itemName))
 			{
-				int itemId = World.GetItemIDByName(itemName);
-				
-				if (ItemIsInInventory(itemId))
+                Item item = World.Items[itemName];
+
+                if (Inventory.Contains(item))
 				{
-					Inventory.Remove(itemId);
-					World.Map[Location].AddItem(itemId);
-					Program.SetNotification("You placed the " + World.Items[itemId].Name + " in the room!");
+                    Inventory.Remove(item);
+                    Location.AddItem(item);
+                    Program.SetNotification("You placed the " + item.Name + " in the room!");
 				}
 				else
 				{
@@ -466,13 +445,12 @@ namespace Escape
 		
 		private static void Use(string itemName)
 		{
-			if (World.IsItem(itemName))
+			if (World.Items.Contains(itemName))
 			{
-				int itemId = World.GetItemIDByName(itemName);
-				
-				if (ItemIsInInventory(itemId))
+                Item item = World.Items[itemName];
+                if (Inventory.Contains(item))
 				{
-					World.Items[itemId].Use();
+                    item.Use();
 				}
 				else
 				{
@@ -487,14 +465,14 @@ namespace Escape
 
 		private static void Attack(string enemyName)
 		{
-			if (World.IsEnemy(enemyName))
+			if (World.Enemies.Contains(enemyName))
 			{
-				int enemyId = World.GetEnemyIDByName(enemyName);
+                Enemy enemy = World.Enemies[enemyName];
 
-				if (World.Map[Location].ContainsEnemy(enemyId))
+				if (Location.ContainsEnemy(enemy))
 				{
-					BattleCore.StartBattle(enemyId);
-					Program.SetNotification("You attacked the " + World.Enemies[enemyId].Name + ". Prepare for battle!");
+					BattleCore.StartBattle(enemy);
+					Program.SetNotification("You attacked the " + enemy.Name + ". Prepare for battle!");
 				}
 				else
 				{
@@ -519,11 +497,8 @@ namespace Escape
 			Text.WriteColor("|`w`    Inventory    `m`|");
 			Text.WriteLine(">-----------------<");
 			
-			for (int i = 0; i < Inventory.Count; i++)
-			{
-				string name = World.Items[Inventory[i]].Name;
-				Text.WriteColor("|`w` " + name + Text.BlankSpaces(16 - name.Length, true) + "`m`|");
-			}
+            foreach (Item item in Inventory)
+                Text.WriteColor("|`w` " + item.Name + Text.BlankSpaces(16 - item.Name.Length, true) + "`m`|");
 			
 			Text.WriteColor("\\-----------------/`w`");
 			Text.BlankLines();
@@ -540,36 +515,36 @@ namespace Escape
 
 		private static void AttackInBattle(string attackName)
 		{
-			if (World.IsAttack(attackName))
-			{
-				int attackID = World.GetAttackIDByName(attackName);
+            if (World.Attacks.Contains(attackName))
+            {
+                Attack attack = World.Attacks[attackName];
 
-				if (AttackIsInInventory(attackID))
-				{
-					World.Attacks[attackID].Use();
-				}
-				else
-				{
-					Program.SetError("You don't know that attack!");
-				}
-			}
-			else
-			{
-				Program.SetError("That isn't a valid attack!");
-			}
+                if (Attacks.Contains(attack))
+                {
+                    attack.Use();
+                }
+                else
+                {
+                    Program.SetError("You don't know that attack!");
+                }
+            }
+            else
+            {
+                Program.SetError("That isn't a valid attack!");
+            }
 		}
 
 		private static void UseInBattle(string itemName)
 		{
-			if (World.IsItem(itemName))
+			if (World.Items.Contains(itemName))
 			{
-				int itemId = World.GetItemIDByName(itemName);
+                Item item = World.Items[itemName];
 
-				if (ItemIsInInventory(itemId))
+				if (Inventory.Contains(item))
 				{
-					if (World.Items[itemId].CanUseInBattle)
+					if (item.UsableInBattle)
 					{
-						World.Items[itemId].UseInBattle(BattleCore.CurrentEnemy);
+						item.UseInBattle(BattleCore.CurrentEnemy);
 						return;
 					}
 					else
@@ -603,11 +578,8 @@ namespace Escape
 			Text.WriteColor("|`w`   Battle Only   `m`|");
 			Text.WriteLine(">-----------------<");
 
-			foreach (int item in Player.ItemsUsableInBattle())
-			{
-				string name = World.Items[item].Name;
-				Text.WriteColor("|`w` " + name + Text.BlankSpaces(16 - name.Length, true) + "`m`|");
-			}
+            foreach (Item item in Inventory.FindAll(i => i.UsableInBattle))
+				Text.WriteColor("|`w` " + item.Name + Text.BlankSpaces(16 - item.Name.Length, true) + "`m`|");
 
 			Text.WriteColor("\\-----------------/`w`");
 			Text.BlankLines();
@@ -620,22 +592,6 @@ namespace Escape
 			Program.SetError("That isn't a valid command!");
 		}
 		
-		private static bool ItemIsInInventory(int itemId)
-		{
-			if (Inventory.Contains(itemId))
-				return true;
-			else
-				return false;
-		}
-
-		private static bool AttackIsInInventory(int attackId)
-		{
-			if (Attacks.Contains(attackId))
-				return true;
-			else
-				return false;
-		}
-
 		private static void LevelUp()
 		{
 			exp -= GetNextLevel();

@@ -20,19 +20,8 @@ namespace Escape
         public int Defense;
         public int ExpValue;
 
-        // TODO: Revise this madness.
-        public List<string> TempAttacks;
-        public List<int> Attacks;
-        #endregion
-
-        #region Properties
-        public int ID
-        {
-            get
-            {
-                return World.GetEnemyIDByName(this.Name);
-            }
-        }
+        private List<Attack> _Attacks;
+        public List<Attack> Attacks { get { return new List<Attack>(_Attacks); } }
         #endregion
 
         #region Constructor
@@ -50,30 +39,31 @@ namespace Escape
             this.Power = 0;
             this.Defense = 0;
             this.ExpValue = 0;
-            this.TempAttacks = new List<string>();
-            this.Attacks = new List<int>();
+            this._Attacks = new List<Attack>();
         }
         #endregion
 
         #region Public Methods
-        public void Attack()
+        public void AddAttack(Attack attack)
         {
-            Random rand = new Random();
-            int attackToUse = rand.Next(0, this.Attacks.Count);
-
-            World.Attacks[Attacks[attackToUse]].Use();
+            if (!this.ContainsAttack(attack))
+                this._Attacks.Add(attack);
         }
 
-        public void ConvertAttributeListsToIDs()
+        public bool ContainsAttack(Attack attack)
         {
-            List<int> AttacksResult = new List<int>();
+            return this._Attacks.Contains(attack);
+        }
 
-            for (int i = 0; i < TempAttacks.Count; i++)
-            {
-                AttacksResult.Add(World.GetAttackIDByName(TempAttacks[i]));
-            }
+        public void RemoveAttack(Attack attack)
+        {
+            if (this.ContainsAttack(attack))
+                this._Attacks.Remove(attack);
+        }
 
-            this.Attacks = AttacksResult;
+        public void Attack()
+        {
+            _Attacks[new Random().Next(this._Attacks.Count)].Use();
         }
         #endregion
     }
