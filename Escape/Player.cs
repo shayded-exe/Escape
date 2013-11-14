@@ -6,26 +6,35 @@ namespace Escape
 	static class Player
 	{
 		#region Declarations
+		//Defines all the base stats for the player. These don't change as the they are modified based on the player's level at runtime
 		private const int baseHealth = 100;
 		private const int baseMagic = 100;
 
 		private const int power = 15;
 		private const int defense = 10;
 
+		//Defines the player's name and what their current location is
 		private static string name;
 		private static int location = 0;
 
+		//Defines the player's current level and exp point total
 		private static int level = 1;
 		private static int exp = 0;
 		
+		//Set's the player's starting health and magic to their max.
 		private static int health = MaxHealth;
 		private static int magic = MaxMagic;	
 		
+		//Creates and empty list for the player's inventory
 		public static List<int> Inventory = new List<int>();
+
+		//Creates a list for the player's attacks and gives them the default "scratch"
 		public static List<int> Attacks = new List<int>() { 1 };
 		#endregion
 
 		#region Properties
+		//All properties expose the player's private variables to the other classes. This allows for additional logic and bug checking
+		//Name allows the player's name to be write-once then read-only
 		public static string Name
 		{
 			get
@@ -46,6 +55,7 @@ namespace Escape
 			}
 		}
 
+		//Location checks that the value assigned is actually a location. This should normally never cause error PL64 though
 		public static int Location
 		{
 			get
@@ -66,6 +76,7 @@ namespace Escape
 			}
 		}
 
+		//Health checks that the value assigned is never more than the max. It also ends the game if the value is below 0
 		public static int Health
 		{
 			get
@@ -83,6 +94,7 @@ namespace Escape
 			}
 		}
 
+		//MaxHealth returns baseHealth modified by the player's level
 		public static int MaxHealth
 		{
 			get
@@ -91,6 +103,7 @@ namespace Escape
 			}
 		}
 
+		//Magic checks that the value assigned is never more than the max
 		public static int Magic
 		{
 			get
@@ -102,7 +115,8 @@ namespace Escape
 				magic = Math.Max(Math.Min(value, MaxMagic), 0);
 			}
 		}
-
+		
+		//MaxMagic returns baseMagic modified by the player's level
 		public static int MaxMagic
 		{
 			get
@@ -111,6 +125,7 @@ namespace Escape
 			}
 		}
 
+		//Level doesn't currently add any logic
 		public static int Level
 		{
 			get
@@ -123,6 +138,7 @@ namespace Escape
 			}
 		}
 
+		//Exp levels the player up when the new exp value is greater than the amount required to level up
 		public static int Exp
 		{
 			get
@@ -140,6 +156,7 @@ namespace Escape
 			}
 		}
 
+		//Power returns power modified by the player's level
 		public static int Power
 		{
 			get
@@ -148,6 +165,7 @@ namespace Escape
 			}
 		}
 
+		//Defense returns defense modified by the player's level
 		public static int Defense
 		{
 			get
@@ -158,17 +176,20 @@ namespace Escape
 		#endregion
 
 		#region Public Methods
+		//This interprets the player's input
 		public static void Do(string aString)
 		{		
 			string verb = "";
 			string noun = "";
 			
+			//This splits the player's input into a verb and a noun
 			if (aString.IndexOf(" ") > 0)
 			{
 				string[] temp = aString.Split(new char[] {' '}, 2);
 				verb = temp[0].ToLower();
 				noun = temp[1].ToLower();
 			}
+			//If the player didn't give a noun, just set a verb
 			else
 			{
 				verb = aString.ToLower();
