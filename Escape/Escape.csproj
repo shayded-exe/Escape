@@ -49,6 +49,10 @@
   <ItemGroup>
     <Compile Include="Attack.cs" />
     <Compile Include="BattleCore.cs" />
+    <Compile Include="Definitions\Attacks.cs" />
+    <Compile Include="Definitions\Enemies.cs" />
+    <Compile Include="Definitions\Items.cs" />
+    <Compile Include="Definitions\Locations.cs" />
     <Compile Include="Enemy.cs" />
     <Compile Include="EntryDatabase.cs" />
     <Compile Include="Item.cs" />

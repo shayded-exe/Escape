@@ -15,77 +15,71 @@ namespace Escape
         public string Name;
         public string Description;
 
-        public bool Usable;
-        private event OnUse uses;
-        public event OnUse Uses
-        {
-            add
-            {
-                uses += value;
+        // This should behave the same way as before, except that it can't be switched dynamically.
+        // You can add that with the code from the Alternative branch, and probably should add an optional parameter into the constructor.
+#if !Alternative
+        public bool Usable { get { return Uses != null; } }
+#else
+        private bool usable = true;
+        public bool Usable { get { return usable && Uses != null; } set { usable = value; } }
+#endif
+        public event OnUse Uses;
 
-                if (!Usable)
-                    Usable = true;
-            }
-            remove
-            {
-                uses -= value;
-            }
-        }
+        // Same here.
+        public bool UsableInBattle { get { return BattleUses != null; } }
+        public event OnUseInBattle BattleUses;
 
-        public bool UsableInBattle;
-        private event OnUseInBattle battleUses;
-        public event OnUseInBattle BattleUses
-        {
-            add
-            {
-                battleUses += value;
-
-                if (!UsableInBattle)
-                    UsableInBattle = true;
-            }
-            remove
-            {
-                battleUses -= value;
-            }
-        }
-
+        //TODO: Get rid of this!
         // A list of arbitrary attributes indexed by a string key.
         // The usage of Hungarian Notation (the name of the variable is prefixed by its type) is advised here
         // (even though it is generally discouraged by now)
         //
         // For example: the Brass Key uses two strings, str_targetLocation and str_newLocation.
-        public Dictionary<string, object> ExtendedAttributes;
+        public Dictionary<string, object> ExtendedAttributes = new Dictionary<string, object>();
         #endregion
 
         #region Constructor
-        public Item(string name)
+        public Item(
+            string name,
+            string description = "",
+            OnUse uses = null,
+            OnUseInBattle battleUses = null,
+            IDictionary<string, object> extendedAttributes = null)
         {
             this.Name = name;
+            this.Description = description;
+            this.Uses = uses;
+            this.BattleUses = battleUses;
 
-            // Default values
-            this.Description = String.Empty;
-            this.Usable = false;
-            this.UsableInBattle = false;
-
-            this.ExtendedAttributes = new Dictionary<string, object>();
+            if (extendedAttributes != null)
+            {
+                foreach (var kvPair in extendedAttributes)
+                {
+                    this.ExtendedAttributes.Add(kvPair.Key, kvPair.Value);
+                }
+            }
         }
         #endregion
 
         #region Public Methods
         public void Use()
         {
-            if (uses != null && Usable)
-                uses(this);
+            // Usable now implies Uses != null.
+            // I've added curly braces as not having them is usually discouraged.
+            // This version makes it clear that commenting out the line can have side-effects.
+            if (Usable)
+            { Uses(this); }
             else
-                NoUse();
+            { NoUse(); }
         }
 
         public void UseInBattle(Enemy victim)
         {
-            if (battleUses != null && UsableInBattle)
-                battleUses(this, victim);
+            // See above.
+            if (UsableInBattle)
+            { BattleUses(this, victim); }
             else
-                NoUse();
+            { NoUse(); }
         }
 
         public void NoUse()

@@ -28,16 +28,23 @@ namespace Escape
         #endregion
 
         #region Constructor
-        public Attack(string name)
+        public Attack(
+            string name,
+            // A lot of these defaults probably aren't reasonable.
+            // Make them required if you think they should be set in almost all cases,
+            // that way you'll err slightly towards the side of safety.
+            string description = "",
+            int power = 0,
+            int accuracy = 0,
+            int cost = 0,
+            AttackType type = AttackType.None)
         {
             this.Name = name;
-
-            // Defaults
-            this.Description = String.Empty;
-            this.Power = 0;
-            this.Accuracy = 0;
-            this.Cost = 0;
-            this.Type = AttackType.None;
+            this.Description = description;
+            this.Power = power;
+            this.Accuracy = accuracy;
+            this.Cost = cost;
+            this.Type = type;
         }
         #endregion
 
