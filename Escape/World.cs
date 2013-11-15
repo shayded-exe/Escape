@@ -1,124 +1,33 @@
-﻿using System;
+﻿using Escape.Definitions;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace Escape
 {
     static class World
     {
         #region Declarations
-        //Creates empty lists to hold all the information about the world
-        public static EntryDatabase<Location> Locations = new EntryDatabase<Location>();
-        public static EntryDatabase<Item> Items = new EntryDatabase<Item>();
-        public static EntryDatabase<Enemy> Enemies = new EntryDatabase<Enemy>();
-        public static EntryDatabase<Attack> Attacks = new EntryDatabase<Attack>();
+        // Creates lists that hold all the information about the world
+        public static EntryDatabase<Location> Locations = new EntryDatabase<Location>(ExtractDefinitions<Location>(typeof(Locations)), x => x.Name);
+        public static EntryDatabase<Item> Items = new EntryDatabase<Item>(ExtractDefinitions<Item>(typeof(Items)), x => x.Name);
+        public static EntryDatabase<Enemy> Enemies = new EntryDatabase<Enemy>(ExtractDefinitions<Enemy>(typeof(Enemies)), x => x.Name);
+        public static EntryDatabase<Attack> Attacks = new EntryDatabase<Attack>(ExtractDefinitions<Attack>(typeof(Attacks)), x => x.Name);
         #endregion
 
         #region Initialization
-        //Generates the data that goes into the above lists
-        public static void Initialize()
+
+        private static IEnumerable<T> ExtractDefinitions<T>(Type definitionClassType)
         {
-            DefineIndex();
-            GenerateWorld();
-            GenerateEnemies();
-            GenerateAttacks();
-        }
-        #endregion
-
-        #region World Generation Methods
-        /*
-         * Creates every world object's variable and assigns them to the database.
-         */
-        private static void DefineIndex()
-        {
-            // Locations
-            Locations.Add("Room 1", new Location("Room 1"));
-            Locations.Add("Room 2", new Location("Room 2"));
-            Locations.Add("Room 3", new Location("Room 3"));
-            Locations.Add("Secret Room", new Location("Secret Room"));
-
-            // Enemies
-            Enemies.Add("Rat", new Enemy("Rat"));
-            Enemies.Add("Hawk", new Enemy("Hawk"));
-
-            // Attacks
-            Attacks.Add("Flail", new Attack("Flail"));
-            Attacks.Add("Scratch", new Attack("Scratch"));
+            // What this does is retrieve the names and values of all public fields
+            // in the definitions classes, filtered by the type of the field.
+            return
+                from field in definitionClassType.GetFields(BindingFlags.Public | BindingFlags.Static)
+                where field.FieldType == typeof(T)
+                select (T)field.GetValue(null);
         }
 
-        /*
-         * This defines all the locations that exist in the map along with their specific properties
-         */
-        private static void GenerateWorld()
-        {
-            // Room 1
-            Locations["Room 1"].Description = "This is a room.";
-            Locations["Room 1"].AddExit(Locations["Room 2"]);
-            Locations["Room 1"].AddItem(Items["Brass Key"]);
-            Locations["Room 1"].AddItem(Items["Rock"]);
-
-            // Room 2
-            Locations["Room 2"].Description = "This is another room.";
-            Locations["Room 2"].AddExit(Locations["Room 1"]);
-            Locations["Room 2"].AddExit(Locations["Room 3"]);
-            Locations["Room 2"].AddItem(Items["Shiny Stone"]);
-            Locations["Room 2"].AddEnemy(Enemies["Rat"]);
-            Locations["Room 2"].BattleChance = 50;
-
-            // Room 3
-            Locations["Room 3"].Description = "This is yet another room.";
-            Locations["Room 3"].AddExit(Locations["Room 2"]);
-            Locations["Room 3"].AddEnemy(Enemies["Rat"]);
-            Locations["Room 3"].AddEnemy(Enemies["Hawk"]);
-            Locations["Room 3"].BattleChance = 75;
-
-            // Secret room
-            Locations["Secret Room"].Description = "This is a very awesome secret room.";
-            Locations["Secret Room"].AddExit(Locations["Room 3"]);
-        }
-
-        /*
-         * This defines all the enemies that exist in the game
-         */
-        private static void GenerateEnemies()
-        {
-            // Rat
-            Enemies["Rat"].Description = "It's just a pwesious wittle wat that will KILL YOU!";
-            Enemies["Rat"].Health = 10; Enemies["Rat"].MaxHealth = 10;
-            Enemies["Rat"].Magic = 5; Enemies["Rat"].MaxMagic = 5;
-            Enemies["Rat"].Power = 10;
-            Enemies["Rat"].Defense = 5;
-            Enemies["Rat"].ExpValue = 5;
-            Enemies["Rat"].AddAttack(Attacks["Scratch"]);
-
-            // Hawk
-            Enemies["Hawk"].Description = "It flies around looking for prey to feed on.";
-            Enemies["Hawk"].Health = 15; Enemies["Hawk"].MaxHealth = 15;
-            Enemies["Hawk"].Magic = 0; Enemies["Hawk"].MaxMagic = 0;
-            Enemies["Hawk"].Power = 15;
-            Enemies["Hawk"].Defense = 0;
-            Enemies["Hawk"].ExpValue = 8;
-            Enemies["Hawk"].AddAttack(Attacks["Scratch"]);
-        }
-
-        /*
-         * This defines all the enemies that exist in the game
-         */
-        private static void GenerateAttacks()
-        {
-            // Flail
-            Attacks["Flail"].Description = "Flail your arms like a fish out of water and hope something happens";
-            Attacks["Flail"].Power = 5;
-            Attacks["Flail"].Accuracy = 70;
-            Attacks["Flail"].Cost = 0;
-            Attacks["Flail"].Type = Attack.AttackType.Physical;
-
-            // Scratch
-            Attacks["Scratch"].Description = "The Attacker digs its claws into the skin of its prey. Not really as painful as it sounds.";
-            Attacks["Scratch"].Power = 10;
-            Attacks["Scratch"].Accuracy = 70;
-            Attacks["Scratch"].Cost = 1;
-            Attacks["Scratch"].Type = Attack.AttackType.Physical;
-        }
         #endregion
 
         #region Public Location Methods

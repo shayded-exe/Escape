@@ -29,13 +29,7 @@ namespace Escape
         public bool UsableInBattle { get { return BattleUses != null; } }
         public event OnUseInBattle BattleUses;
 
-        //TODO: Get rid of this!
-        // A list of arbitrary attributes indexed by a string key.
-        // The usage of Hungarian Notation (the name of the variable is prefixed by its type) is advised here
-        // (even though it is generally discouraged by now)
-        //
-        // For example: the Brass Key uses two strings, str_targetLocation and str_newLocation.
-        public Dictionary<string, object> ExtendedAttributes = new Dictionary<string, object>();
+        // I removed the extended attributes, if necessary they can be put directly into the uses parameter.
         #endregion
 
         #region Constructor
@@ -43,21 +37,12 @@ namespace Escape
             string name,
             string description = "",
             OnUse uses = null,
-            OnUseInBattle battleUses = null,
-            IDictionary<string, object> extendedAttributes = null)
+            OnUseInBattle battleUses = null)
         {
             this.Name = name;
             this.Description = description;
             this.Uses = uses;
             this.BattleUses = battleUses;
-
-            if (extendedAttributes != null)
-            {
-                foreach (var kvPair in extendedAttributes)
-                {
-                    this.ExtendedAttributes.Add(kvPair.Key, kvPair.Value);
-                }
-            }
         }
         #endregion
 

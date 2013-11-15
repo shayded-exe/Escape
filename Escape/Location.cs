@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Escape
 {
@@ -10,89 +11,61 @@ namespace Escape
         public string Name;
         public string Description;
 
-        private List<Location> _Exits;
-        public List<Location> Exits { get { return new List<Location>(_Exits); } }
+        private IEnumerable<Func<Location>> unboundExits { get; set; }
 
-        private List<Item> _Items;
-        public List<Item> Items { get { return new List<Item>(_Items); } }
-
-        private List<Enemy> _Enemies;
-        public List<Enemy> Enemies { get { return new List<Enemy>(_Enemies); } }
+        // This one is a bit questionable, but the alternative would just move the hack to Locations;
+        private List<Location> exits = new List<Location>();
+        public List<Location> Exits
+        {
+            get
+            {
+                if (unboundExits != null)
+                {
+                    foreach (var exitFunc in unboundExits)
+                    { exits.Add(exitFunc()); }
+                    unboundExits = null;
+                }
+                return exits;
+            }
+            set
+            {
+                exits = value;
+                unboundExits = null;
+            }
+        }
+        public List<Item> Items { get; private set; }
+        public List<Enemy> Enemies { get; private set; }
 
         public int BattleChance;
         #endregion
 
         #region Constructor(s)
-        public Location(string name)
+        public Location(
+            string name,
+            string description = "",
+            IEnumerable<Func<Location>> unboundExits = null,
+            IEnumerable<Item> items = null,
+            IEnumerable<Enemy> enemies = null,
+            int battleChance = 0)
         {
             this.Name = name;
-
-            // Default values
-            this.Description = String.Empty;
-            this._Exits = new List<Location>();
-            this._Items = new List<Item>();
-            this._Enemies = new List<Enemy>();
-            this.BattleChance = 0;
+            this.Description = description;
+            this.unboundExits = unboundExits;
+            this.Items = new List<Item>(items ?? Enumerable.Empty<Item>());
+            this.Enemies = new List<Enemy>(enemies ?? Enumerable.Empty<Enemy>());
+            this.BattleChance = battleChance;
         }
         #endregion
 
         #region Public Methods
-        public void AddExit(Location exit)
-        {
-            if (!this.ContainsExit(exit))
-                this._Exits.Add(exit);
-        }
-
-        public bool ContainsExit(Location exit)
-        {
-            return this._Exits.Contains(exit);
-        }
-
-        public void RemoveExit(Location exit)
-        {
-            if (this.ContainsExit(exit))
-                this._Exits.Remove(exit);
-        }
-
-        public void AddItem(Item item)
-        {
-            if (!this.ContainsItem(item))
-                this._Items.Add(item);
-        }
-
-        public bool ContainsItem(Item item)
-        {
-            return this._Items.Contains(item);
-        }
-
-        public void RemoveItem(Item item)
-        {
-            if (this.ContainsItem(item))
-                this._Items.Remove(item);
-        }
-
-        public void AddEnemy(Enemy enemy)
-        {
-            if (!this.ContainsEnemy(enemy))
-                this._Enemies.Add(enemy);
-        }
-
-        public bool ContainsEnemy(Enemy enemy)
-        {
-            return this._Enemies.Contains(enemy);
-        }
-
-        public void RemoveEnemy(Enemy enemy)
-        {
-            if (this.ContainsEnemy(enemy))
-                this._Enemies.Remove(enemy);
-        }
+        // I removed the collection wrappers, just operating on the collections shouldn't do any harm.
 
         public void CalculateRandomBattle()
         {
-            if (new Random().Next(100) < BattleChance && Enemies.Count > 0)
+            // Creating new randoms on the fly yields repeat numbers. It's also slow.
+            if (Program.Random.Next(100) < BattleChance && Enemies.Count > 0)
             {
-                Enemy enemy = _Enemies[new Random().Next(Enemies.Count)];
+                Enemy enemy = Enemies[Program.Random.Next(Enemies.Count)];
                 Program.SetNotification("You were attacked by " + Text.AorAn(enemy.Name));
                 BattleCore.StartBattle(enemy, "enemy");
             }

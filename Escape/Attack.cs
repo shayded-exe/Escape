@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Escape.Definitions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -62,7 +63,7 @@ namespace Escape
 
             if (!CheckMagic())
             {
-                World.Attacks["flail"].Use();
+                Attacks.Flail.Use();
                 return;
             }
 
@@ -82,7 +83,7 @@ namespace Escape
         #region Helper Methods
         private int CheckLucky()
         {
-            Random rand = new Random();
+            Random rand = Program.Random;
             int random = rand.Next(0, 100);
 
             double modifiedLuckyRate = BattleCore.BaseLuckyRate * (2 - (BattleCore.AttackerHealth / BattleCore.AttackerMaxHealth));
@@ -143,7 +144,7 @@ namespace Escape
 
         private int CheckDamage(int lucky)
         {
-            Random random = new Random();
+            Random random = Program.Random;
             double modifier = lucky * 0.6;
             double variation = (random.Next(85, 115) / 100d);
 

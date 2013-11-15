@@ -30,6 +30,13 @@ namespace Escape
             this._BackingList = new List<TEntry>();
             this._Index = new Dictionary<string, int>();
         }
+
+        public EntryDatabase(IEnumerable<TEntry> entries, Func<TEntry, string> nameSelector)
+            : this()
+        {
+            foreach (var item in entries)
+            { this.Add(nameSelector(item), item); }
+        }
         #endregion
 
         #region Modifiers

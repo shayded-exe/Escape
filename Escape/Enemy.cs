@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Escape
 {
@@ -20,50 +21,45 @@ namespace Escape
         public int Defense;
         public int ExpValue;
 
-        private List<Attack> _Attacks;
-        public List<Attack> Attacks { get { return new List<Attack>(_Attacks); } }
+        public List<Attack> Attacks { get; set; }
         #endregion
 
         #region Constructor
-        public Enemy(string name)
+        public Enemy(
+            string name,
+            // Some of these default values may not be sensible,
+            // normally you'd always set some of them.
+            string description = "",
+            int health = 0,
+            int maxHealth = 0,
+            int magic = 0,
+            int maxMagic = 0,
+            int power = 0,
+            int defense = 0,
+            int expValue = 0,
+            IEnumerable<Attack> attacks = null)
         {
             this.Name = name;
 
-            // Defaults
             // TODO: Handling health and mana max. without need for double lines outside.
-            this.Description = String.Empty;
-            this.Health = 0;
-            this.MaxHealth = 0;
-            this.Magic = 0;
-            this.MaxMagic = 0;
-            this.Power = 0;
-            this.Defense = 0;
-            this.ExpValue = 0;
-            this._Attacks = new List<Attack>();
+            this.Description = description;
+            this.Health = health;
+            this.MaxHealth = maxHealth;
+            this.Magic = magic;
+            this.MaxMagic = maxMagic;
+            this.Power = power;
+            this.Defense = defense;
+            this.ExpValue = expValue;
+            this.Attacks = new List<Attack>(attacks ?? Enumerable.Empty<Attack>());
         }
         #endregion
 
         #region Public Methods
-        public void AddAttack(Attack attack)
-        {
-            if (!this.ContainsAttack(attack))
-                this._Attacks.Add(attack);
-        }
-
-        public bool ContainsAttack(Attack attack)
-        {
-            return this._Attacks.Contains(attack);
-        }
-
-        public void RemoveAttack(Attack attack)
-        {
-            if (this.ContainsAttack(attack))
-                this._Attacks.Remove(attack);
-        }
+        // Removed attack accessors
 
         public void Attack()
         {
-            _Attacks[new Random().Next(this._Attacks.Count)].Use();
+            Attacks[Program.Random.Next(this.Attacks.Count)].Use();
         }
         #endregion
     }

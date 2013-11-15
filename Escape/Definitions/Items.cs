@@ -12,19 +12,14 @@ namespace Escape.Definitions
         public static readonly Item BrassKey = new Item(
             name: "Brass Key",
             description: "Just your generic key that's in almost every game.",
-            extendedAttributes: new Dictionary<string, object>
-                {
-                    //TODO: This is unnecessary, replace with direct reference.
-                    {"str_targetLocation", "room 3"},
-                    {"str_newLocation", "secret room"}
-                },
             uses: (self) =>
             {
-                if (Player.Location == World.Locations[(string)self.ExtendedAttributes["str_targetLocation"]])
+                var targetLocation = Locations.Room3;
+                var newLocation = Locations.SecretRoom;
+                if (Player.Location == targetLocation)
                 {
                     Program.SetNotification("The " + self.Name + " opened the lock!");
-                    World.Locations[(string)self.ExtendedAttributes["str_targetLocation"]].AddExit(
-                        World.Locations[(string)self.ExtendedAttributes["str_newLocation"]]);
+                    targetLocation.Exits.Add(newLocation);
                 }
                 else
                     self.NoUse();
@@ -34,7 +29,7 @@ namespace Escape.Definitions
             description: "It's a stone and it's shiny, what more could you ask for?",
             uses: (self) => // Can be (Item self), but that's not necessary due to type inference.
                 {
-                    if (Player.Location == World.Locations["Secret Room"])
+                    if (Player.Location == Locations.SecretRoom)
                     {
                         Player.Health += Math.Min(Player.MaxHealth / 10, Player.MaxHealth - Player.Health);
                         Program.SetNotification("The magical stone restored your health by 10%!");

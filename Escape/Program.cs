@@ -12,6 +12,10 @@ namespace Escape
 	class Program
 	{
 		#region Declarations
+        // The gloabal Random instance, possibly should be moved into an instance for repeatable plays,
+        // but that wasn't possible before either.
+        public static Random Random = new Random();
+
 		//The width and height of the console
 		private const int width = 73;
 		private const int height = 30;
@@ -42,8 +46,8 @@ namespace Escape
 			Console.BufferWidth = width;
 			Console.BufferHeight = height;
 
-			//This generates all the locations, items, enemies, and attacks in the game
-			World.Initialize();
+			// All the locations, items, enemies, and attacks in the game are generated
+            // automatically when the definition classes are accessed.
 
 			//The game executes different code depending on the GameState
 			while(run)
