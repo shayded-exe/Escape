@@ -146,6 +146,8 @@ namespace Escape
         }
         #endregion
 
+        public Action LoadHandler { get; set; }
+
         #region Public Methods
         public void DoPlaying(string input, BattleCore battleCore)
         {
@@ -197,10 +199,10 @@ namespace Escape
                     GiveExp(Convert.ToInt32(noun));
                     break;
                 case "save":
-                    Program.Save();
+                    Program.Save(this);
                     break;
                 case "load":
-                    Program.Load();
+                    LoadHandler();
                     break;
                 default:
                     InputNotValid();

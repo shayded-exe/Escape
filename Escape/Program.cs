@@ -16,9 +16,6 @@ namespace Escape
         // but that wasn't possible before either.
         public static Random Random = new Random();
 
-        // Temporary?
-        private static Player player;
-
         //The width and height of the console
         private const int width = 73;
         private const int height = 30;
@@ -44,12 +41,6 @@ namespace Escape
             Console.BufferWidth = width;
             Console.BufferHeight = height;
 
-            // Create a new world and set the player's location
-            player = new Player();
-            player.Died += ply => GameOverState();
-            player.World = new World(initialize: true);
-            player.Location = player.World.StartLocation;
-
             // The control flow with inner loops represents how the game works a bit better.
             // It's also much easier to follow.
             StartState();
@@ -57,20 +48,37 @@ namespace Escape
         #endregion
 
         #region GameState Methods
+
         private static void StartState()
         {
+            // Create a new world and set the player's location
+            var player = new Player();
+            player.LoadHandler = () =>
+                {
+                    Player loadedPlayer;
+                    if (Load(out loadedPlayer))
+                    {
+                        loadedPlayer.LoadHandler = player.LoadHandler;
+                        loadedPlayer.Died += ply => GameOverState();
+                    }
+                };
+            player.Died += ply => GameOverState();
+            player.World = new World(initialize: true);
+            player.Location = player.World.StartLocation;
+
             if (isError)
             {
                 DisplayError();
             }
+
             //Get the player's name and set the game to the playing state
             Text.WriteLine("Hello adventurer! What is your name?");
             player.Name = Text.SetPrompt("> ");
             Text.Clear();
-            PlayingState();
+            PlayingState(player);
         }
 
-        private static void PlayingState()
+        private static void PlayingState(Player player)
         {
             BattleCore battleCore = new BattleCore()
             {
@@ -255,7 +263,7 @@ namespace Escape
 
         #region Save and Load
         //This saves the game (wow really?)
-        public static void Save()
+        public static void Save(Player player)
         {
             //Creates a new SaveGame object that captures all the current variables that need to be saved. See SaveGame.cs for more.
             SaveGame saveGame = new SaveGame(player);
@@ -283,7 +291,7 @@ namespace Escape
         }
 
         //This basically does the exact opposite of save (whodda thunk it!)
-        public static void Load()
+        public static bool Load(out Player player)
         {
             try
             {
@@ -293,8 +301,8 @@ namespace Escape
                     SaveGame saveGame = (SaveGame)bin.Deserialize(stream);
                     player = saveGame.Load();
                 }
-
                 Program.SetNotification("Load Successful!");
+                return true;
             }
             catch (FileNotFoundException)
             {
@@ -308,6 +316,8 @@ namespace Escape
             {
                 Program.SetError("Load failed! An unspecified error occurred.");
             }
+            player = default(Player);
+            return false;
         }
         #endregion
     }
