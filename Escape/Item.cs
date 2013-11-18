@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Escape
 {
     [Serializable]
-    class Item
+    class Item : INamed
     {
         #region Definitions
         public delegate void OnUse(Item item);
@@ -12,7 +12,7 @@ namespace Escape
         #endregion
 
         #region Declarations
-        public string Name;
+        public string Name { get; set; }
         public string Description;
 
         // This should behave the same way as before, except that it can't be switched dynamically.

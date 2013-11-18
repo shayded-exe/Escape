@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Escape
 {
-    class Attack
+    class Attack : INamed
     {
         #region Definitions
         public enum AttackType
@@ -19,7 +19,7 @@ namespace Escape
         #endregion
 
         #region Declarations
-        public string Name;
+        public string Name { get; set; }
         public string Description;
 
         public int Power;

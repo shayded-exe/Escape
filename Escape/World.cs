@@ -10,11 +10,13 @@ namespace Escape
     class World
     {
         #region Declarations
+        public Location StartLocation { get; set; }
+
         // Creates lists that hold all the information about the world
-        public EntryDatabase<Location> Locations = new EntryDatabase<Location>(x => x.Name);
-        public EntryDatabase<Item> Items = new EntryDatabase<Item>(x => x.Name);
-        public EntryDatabase<Enemy> Enemies = new EntryDatabase<Enemy>(x => x.Name);
-        public EntryDatabase<Attack> Attacks = new EntryDatabase<Attack>(x => x.Name);
+        public AutomaticDictionary<string, Location> Locations = new AutomaticDictionary<string, Location>(x => x.Name.ToLower());
+        public AutomaticDictionary<string, Item> Items = new AutomaticDictionary<string, Item>(x => x.Name.ToLower());
+        public AutomaticDictionary<string, Enemy> Enemies = new AutomaticDictionary<string, Enemy>(x => x.Name.ToLower());
+        public AutomaticDictionary<string, Attack> Attacks = new AutomaticDictionary<string, Attack>(x => x.Name.ToLower());
         #endregion
 
         #region Initialization
@@ -130,6 +132,7 @@ namespace Escape
                             rock
                         });
                 Locations.Add(room1);
+                StartLocation = room1;
 
                 room2 = new Location(
                     name: "Room 2",

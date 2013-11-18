@@ -48,7 +48,7 @@ namespace Escape
 
 			// Create a new world and set the player's location
             Player.World = new World(initialize: true);
-            Player.Location = Player.World.Locations[0];
+            Player.Location = Player.World.StartLocation;
 
 			//The game executes different code depending on the GameState
 			while(run)

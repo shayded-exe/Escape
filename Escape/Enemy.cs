@@ -5,10 +5,10 @@ using System.Linq;
 namespace Escape
 {
     [Serializable]
-    class Enemy
+    class Enemy : INamed
     {
         #region Declarations
-        public string Name;
+        public string Name { get; set; }
         public string Description;
 
         public int Health;

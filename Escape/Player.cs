@@ -15,7 +15,10 @@ namespace Escape
         private const int defense = 10;
 
         private static string name;
-        private static Location location;
+
+        // Removed check whether location is in World,
+        // it doesn't matter to the program and the code is simpler this way
+        public static Location Location { get; set; }
 
         private static int level = 1;
         private static int exp = 0;
@@ -44,26 +47,6 @@ namespace Escape
                 {
                     //Error: PL44
                     Program.SetError("Go tell the developer he dun goofed. Error: PL44");
-                }
-            }
-        }
-
-        public static Location Location
-        {
-            get
-            {
-                return location;
-            }
-            set
-            {
-                if (World.Locations.Contains(value))
-                {
-                    location = value;
-                }
-                else
-                {
-                    //Error: PL64
-                    Program.SetError("Go tell the developer he dun goofed. Error: PL64");
                 }
             }
         }
@@ -265,10 +248,8 @@ namespace Escape
                             break;
                         default:
                             {
-                                if (World.Attacks.Contains(verb))
-                                    AttackInBattle(verb);
-                                else
-                                    InputNotValid();
+                                // Moved attack check to player
+                                AttackInBattle(verb);
 
                                 BattleCore.CurrentTurn = "enemy";
                                 break;
@@ -278,12 +259,14 @@ namespace Escape
             }
         }
 
+        // Only look up item once
         public static void GiveAttack(string attackName)
         {
-            if (World.Attacks.Contains(attackName))
+            Attack attack;
+            if (World.Attacks.TryGetValue(attackName, out attack))
             {
-                Attacks.Add(World.Attacks[attackName]);
-                Program.SetNotification("You learned the attack " + World.Attacks[attackName].Name + "!");
+                Attacks.Add(attack);
+                Program.SetNotification("You learned the attack " + attack.Name + "!");
             }
             else
             {
@@ -294,23 +277,17 @@ namespace Escape
 
         public static void GiveItem(string itemName)
         {
-            if (World.Items.Contains(itemName))
+            Item item;
+            if (World.Items.TryGetValue(itemName, out item))
             {
-                Inventory.Add(World.Items[itemName]);
-
-                Program.SetNotification("You were given " + Text.AorAn(World.Items[itemName].Name));
+                Inventory.Add(item);
+                Program.SetNotification("You were given " + Text.AorAn(item.Name));
             }
             else
             {
                 //Error: PL177
                 Program.SetError("Go tell the developer he dun goofed. Error: PL177");
             }
-        }
-
-        public static void RemoveItemFromInventory(int itemId)
-        {
-            if (Inventory.Contains(World.Items[itemId]))
-                Inventory.Remove(World.Items[itemId]);
         }
 
         public static void GiveExp(int amount)
@@ -350,139 +327,109 @@ namespace Escape
 
         private static void MoveTo(string locationName)
         {
-            if (World.Locations.Contains(locationName))
+            Location exit;
+            if (TryGetFromName(locationName, out exit, Player.Location.Exits))
             {
-                // Need to specify as this because Location is ambigous between
-                // Player.Location (the field) and Escape.Location (the type)
-                Escape.Location location = World.Locations[locationName];
+                Player.Location = exit;
 
-                if (Player.Location.Exits.Contains(location))
-                {
-                    Player.Location = location;
-
-                    Location.CalculateRandomBattle();
-                }
-                else if (Player.Location == location)
-                {
-                    Program.SetError("You are already there!");
-                }
-                else
-                {
-                    Program.SetError("You can't get there from here!");
-                }
+                Location.CalculateRandomBattle();
+            }
+            else if (Player.Location.Name == locationName)
+            {
+                Program.SetError("You are already there!");
             }
             else
             {
-                Program.SetError("This isn't a valid location!");
+                //REWRITE
+                //Program.SetError("This isn't a valid location!");
+                //Program.SetError("You can't get there from here!");
+                Program.SetError("This isn't a valid location or you can't get there from here!");
             }
         }
 
         private static void Examine(string itemName)
         {
-            if (World.Items.Contains(itemName))
+            Item item;
+            if (TryGetFromName(itemName, out item, Location.Items, Inventory))
             {
-                Item item = World.Items[itemName];
-
-                if (Location.Items.Contains(item) || Inventory.Contains(item))
-                {
-                    Text.WriteLine(item.Description);
-                    Text.BlankLines();
-                }
-                else
-                {
-                    Program.SetError("That item isn't here!");
-                }
+                Text.WriteLine(item.Description);
+                Text.BlankLines();
             }
             else
             {
-                Program.SetError("That isn't a valid item!");
+                //REWRITE
+                //Program.SetError("That item isn't here!");
+                //Program.SetError("That isn't a valid item!");
+                Program.SetError("That item isn't here or that isn't a valid item!");
             }
         }
 
         private static void Pickup(string itemName)
         {
-            if (World.Items.Contains(itemName))
+            Item item;
+            if (TryGetFromName(itemName, out item, Location.Items))
             {
-                Item item = World.Items[itemName];
-
-                if (Location.Items.Remove(item))
-                {
-                    Inventory.Add(item);
-                    Program.SetNotification("You put the " + item.Name + " in your bag!");
-                }
-                else
-                {
-                    Program.SetError("That item isn't here!");
-                }
+                Location.Items.Remove(item);
+                Inventory.Add(item);
+                Program.SetNotification("You put the " + item.Name + " in your bag!");
             }
             else
             {
-                Program.SetError("That isn't a valid item!");
+                //REWRITE
+                //Program.SetError("That item isn't here!");
+                //Program.SetError("That isn't a valid item!");
+                Program.SetError("That item isn't here or that isn't a valid item!");
             }
         }
 
         private static void Place(string itemName)
         {
-            if (World.Items.Contains(itemName))
+            Item item;
+            if (TryGetFromName(itemName, out item, Inventory))
             {
-                Item item = World.Items[itemName];
-
-                if (Inventory.Contains(item))
-                {
-                    Inventory.Remove(item);
-                    Location.Items.Add(item);
-                    Program.SetNotification("You placed the " + item.Name + " in the room!");
-                }
-                else
-                {
-                    Program.SetError("You aren't holding that item!");
-                }
+                Inventory.Remove(item);
+                Location.Items.Add(item);
+                Program.SetNotification("You placed the " + item.Name + " in the room!");
             }
             else
             {
-                Program.SetError("That isn't a valid item!");
+                //REWRITE
+                //Program.SetError("You aren't holding that item!");
+                //Program.SetError("That isn't a valid item!");
+                Program.SetError("You aren't holding that item or that isn't a valid item!");
             }
         }
 
         private static void Use(string itemName)
         {
-            if (World.Items.Contains(itemName))
+            Item item;
+            if (TryGetFromName(itemName, out item, Inventory))
             {
-                Item item = World.Items[itemName];
-                if (Inventory.Contains(item))
-                {
-                    item.Use();
-                }
-                else
-                {
-                    Program.SetError("You aren't holding that item!");
-                }
+                item.Use();
             }
             else
             {
-                Program.SetError("That isn't a valid item!");
+                //REWRITE
+                //Program.SetError("You aren't holding that item!");
+                //Program.SetError("That isn't a valid item!");
+                Program.SetError("You aren't holding that item or that isn't a valid item!");
             }
         }
 
         private static void Attack(string enemyName)
         {
-            if (World.Enemies.Contains(enemyName))
+            Enemy enemy;
+            if (TryGetFromName(enemyName, out enemy, Location.Enemies))
             {
-                Enemy enemy = World.Enemies[enemyName];
-
-                if (Location.Enemies.Contains(enemy))
-                {
-                    BattleCore.StartBattle(enemy);
-                    Program.SetNotification("You attacked the " + enemy.Name + ". Prepare for battle!");
-                }
-                else
-                {
-                    Program.SetError("That enemy isn't able to take your call at the moment, please leave a message!..... **BEEP**");
-                }
+                BattleCore.StartBattle(enemy);
+                Program.SetNotification("You attacked the " + enemy.Name + ". Prepare for battle!");
             }
             else
             {
-                Program.SetError("That isn't a valid enemy!");
+                //REWRITE
+                //Program.SetError("That isn't a valid enemy!");
+                //Program.SetError("That enemy isn't able to take your call at the moment, please leave a message!..... **BEEP**");
+                Program.SetError("That isn't a valid enemy or hat enemy isn't able to take your call at the moment, please leave a message!..... **BEEP**");
             }
         }
 
@@ -516,51 +463,41 @@ namespace Escape
 
         private static void AttackInBattle(string attackName)
         {
-            if (World.Attacks.Contains(attackName))
+            Attack attack;
+            if (TryGetFromName(attackName, out attack, Attacks))
             {
-                Attack attack = World.Attacks[attackName];
-
-                if (Attacks.Contains(attack))
-                {
-                    attack.Use();
-                }
-                else
-                {
-                    Program.SetError("You don't know that attack!");
-                }
+                attack.Use();
             }
             else
             {
-                Program.SetError("That isn't a valid attack!");
+                //REWRITE
+                //Program.SetError("That isn't a valid attack!");
+                //Program.SetError("You don't know that attack!");
+                Program.SetError("You don't know that attack or that isn't a valid attack!");
             }
         }
 
         private static void UseInBattle(string itemName)
         {
-            if (World.Items.Contains(itemName))
+            Item item;
+            if (TryGetFromName(itemName, out item, Inventory))
             {
-                Item item = World.Items[itemName];
-
-                if (Inventory.Contains(item))
+                if (item.UsableInBattle)
                 {
-                    if (item.UsableInBattle)
-                    {
-                        item.UseInBattle(BattleCore.CurrentEnemy);
-                        return;
-                    }
-                    else
-                    {
-                        Program.SetError("You can't use that item in battle!");
-                    }
+                    item.UseInBattle(BattleCore.CurrentEnemy);
+                    return;
                 }
                 else
                 {
-                    Program.SetError("You aren't holding that item!");
+                    Program.SetError("You can't use that item in battle!");
                 }
             }
             else
             {
-                Program.SetError("That isn't a valid item!");
+                //REWRITE
+                //Program.SetError("You aren't holding that item!");
+                //Program.SetError("That isn't a valid item!");
+                Program.SetError("You aren't holding that item or that isn't a valid item!");
             }
 
             BattleCore.CurrentTurn = "enemy";
@@ -588,6 +525,26 @@ namespace Escape
         #endregion
 
         #region Helper Methods
+        private static bool TryGetFromName<T>(
+            string name,
+            out T result,
+            params IEnumerable<T>[] collections)
+            where T : INamed
+        {
+            foreach (var c in collections)
+            {
+                foreach (var i in c)
+                {
+                    if (i.Name.ToLower() == name)
+                    {
+                        result = i;
+                        return true;
+                    }
+                }
+            }
+            result = default(T);
+            return false;
+        }
         private static void InputNotValid()
         {
             Program.SetError("That isn't a valid command!");
