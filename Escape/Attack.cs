@@ -1,6 +1,6 @@
-﻿using Escape.Definitions;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -26,6 +26,8 @@ namespace Escape
         public int Accuracy;
         public int Cost;
         public AttackType Type;
+
+        public Attack Fallback;
         #endregion
 
         #region Constructor
@@ -38,14 +40,20 @@ namespace Escape
             int power = 0,
             int accuracy = 0,
             int cost = 0,
-            AttackType type = AttackType.None)
+            AttackType type = AttackType.None,
+            Attack fallback = null)
         {
+            // The assertion here isn't 100% foolproof,
+            // weird things (errors) happen when someone's magic pool is negative.
+            Debug.Assert(fallback != null || cost <= 1);
+
             this.Name = name;
             this.Description = description;
             this.Power = power;
             this.Accuracy = accuracy;
             this.Cost = cost;
             this.Type = type;
+            this.Fallback = fallback;
         }
         #endregion
 
@@ -63,7 +71,7 @@ namespace Escape
 
             if (!CheckMagic())
             {
-                Attacks.Flail.Use();
+                Fallback.Use();
                 return;
             }
 

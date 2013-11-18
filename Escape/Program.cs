@@ -46,8 +46,9 @@ namespace Escape
 			Console.BufferWidth = width;
 			Console.BufferHeight = height;
 
-			// All the locations, items, enemies, and attacks in the game are generated
-            // automatically when the definition classes are accessed.
+			// Create a new world and set the player's location
+            Player.World = new World(initialize: true);
+            Player.Location = Player.World.Locations[0];
 
 			//The game executes different code depending on the GameState
 			while(run)

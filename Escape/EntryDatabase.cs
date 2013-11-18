@@ -17,25 +17,21 @@ namespace Escape
     public class EntryDatabase<TEntry>
     {
         #region Declarations
-        private List<TEntry> _BackingList; // Storage for elements
-        private Dictionary<string, int> _Index; // Link between the key and the value
+        // readonly enforces initializations
+        private readonly Func<TEntry, string> _KeySelector; // For getting keys for added values
+        private readonly List<TEntry> _BackingList; // Storage for elements
+        private readonly Dictionary<string, int> _Index; // Link between the key and the value
         #endregion
 
         #region Constructor
         /// <summary>
         /// Set up a new EntryDatabase with the specified key and value type.
         /// </summary>
-        public EntryDatabase()
+        public EntryDatabase(Func<TEntry, string> keySelector)
         {
             this._BackingList = new List<TEntry>();
             this._Index = new Dictionary<string, int>();
-        }
-
-        public EntryDatabase(IEnumerable<TEntry> entries, Func<TEntry, string> nameSelector)
-            : this()
-        {
-            foreach (var item in entries)
-            { this.Add(nameSelector(item), item); }
+            this._KeySelector = keySelector;
         }
         #endregion
 
@@ -43,8 +39,9 @@ namespace Escape
         /// <summary>
         /// Add an entry to the collection
         /// </summary>
-        public void Add(string key, TEntry value)
+        public void Add(TEntry value)
         {
+            var key = _KeySelector(value);
             if (this.Contains(key.ToLowerInvariant()))
                 throw new ArgumentException("An item with the same key has already been added.");
 

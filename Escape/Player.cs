@@ -1,5 +1,4 @@
-﻿using Escape.Definitions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Escape
@@ -7,6 +6,8 @@ namespace Escape
     static class Player
     {
         #region Declarations
+        public static World World;
+
         private const int baseHealth = 100;
         private const int baseMagic = 100;
 
@@ -14,7 +15,7 @@ namespace Escape
         private const int defense = 10;
 
         private static string name;
-        private static Location location = Locations.Room1;
+        private static Location location;
 
         private static int level = 1;
         private static int exp = 0;
