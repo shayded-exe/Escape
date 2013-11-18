@@ -11,17 +11,15 @@ namespace Escape
         public ICombatant Attacker { get; set; }
         public ICombatant Defender { get; set; }
 
-        bool isEnd = false;
-
         public static double BaseLuckyRate = 7.5;
         #endregion
+
+        public Action<BattleCore> BattleHandler { get; set; }
 
         #region Battle Methods
         public void StartBattle(ICombatant attacker, ICombatant defender)
         {
-            Program.GameState = Program.GameStates.Battle;
-
-            // Maybe cloning should be moved to a higher scope
+            // Maybe cloning should be a property of the combatant class
             if (attacker is Enemy)
             {
                 attacker = CloneEnemy((Enemy)attacker);
@@ -33,24 +31,20 @@ namespace Escape
             this.Attacker = attacker;
             this.Defender = defender;
 
-            isEnd = false;
+            BattleHandler(this);
         }
 
         public void NextTurn()
         {
-            if (isEnd)
-            {
-                Text.SetKeyPrompt("[Press any key to continue!]");
-                Text.Clear();
-                Program.GameState = Program.GameStates.Playing;
-            }
+            // -snip- should have been unreachable
+
             //TODO: Unify
-            else if (Attacker is Player)
+            if (Attacker is Player)
             {
                 var player = (Player)Attacker;
                 string temp = Text.SetPrompt("[" + player.Location.Name + "] > ");
                 Text.Clear();
-                player.Do(temp, this);
+                player.DoBattle(temp, this);
             }
             else if (Attacker is Enemy)
             {
@@ -70,17 +64,21 @@ namespace Escape
             Defender = tempCombatant;
         }
 
-        public void CheckResults()
+        public void CheckResults(out bool isEnd)
         {
             // The status messages should be moved into event handlers.
             var currentEnemy = Attacker as Enemy ?? (Enemy)Defender;
             var player = Attacker as Player ?? (Player)Defender;
-            if (currentEnemy.Health <= 0 && Program.GameState != Program.GameStates.Playing)
+            if (currentEnemy.Health <= 0) // I took out the second part of the condition because this should only be called during battles
             {
                 Program.SetNotification("You defeated the " + currentEnemy.Name + " and gained " + currentEnemy.ExpValue + " EXP!");
                 player.GiveExp(currentEnemy.ExpValue);
                 player.Location.Enemies.Remove(currentEnemy);
                 isEnd = true;
+            }
+            else
+            {
+                isEnd = false;
             }
         }
         #endregion

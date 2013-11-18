@@ -53,6 +53,8 @@ namespace Escape
             }
         }
 
+        public event Action<Player> Died;
+
         public int Health
         {
             get
@@ -65,7 +67,7 @@ namespace Escape
 
                 if (health <= 0)
                 {
-                    Program.GameState = Program.GameStates.GameOver;
+                    if (Died != null) { Died(this); }
                 }
             }
         }
@@ -145,10 +147,113 @@ namespace Escape
         #endregion
 
         #region Public Methods
-        public void Do(string aString, BattleCore battleCore)
+        public void DoPlaying(string input, BattleCore battleCore)
         {
-            string verb = "";
-            string noun = "";
+            string verb;
+            string noun;
+            SplitInputToLower(input, out verb, out noun);
+
+            switch (verb)
+            {
+                case "help":
+                case "?":
+                    WriteCommands();
+                    break;
+                case "exit":
+                case "quit":
+                    Program.QuitState();
+                    break;
+                case "move":
+                case "go":
+                    MoveTo(noun, battleCore);
+                    break;
+                case "examine":
+                    Examine(noun);
+                    break;
+                case "take":
+                case "pickup":
+                    Pickup(noun);
+                    break;
+                case "drop":
+                case "place":
+                    Place(noun);
+                    break;
+                case "use":
+                case "item":
+                    Use(noun);
+                    break;
+                case "items":
+                case "inventory":
+                case "inv":
+                    DisplayInventory();
+                    break;
+                case "attack":
+                    Attack(noun, battleCore);
+                    break;
+                case "hurt":
+                    Health -= Convert.ToInt32(noun);
+                    break;
+                case "exp":
+                    GiveExp(Convert.ToInt32(noun));
+                    break;
+                case "save":
+                    Program.Save();
+                    break;
+                case "load":
+                    Program.Load();
+                    break;
+                default:
+                    InputNotValid();
+                    break;
+            }
+        }
+
+        public void DoBattle(string input, BattleCore battleCore)
+        {
+            string verb;
+            string noun;
+            SplitInputToLower(input, out verb, out noun);
+
+            switch (verb)
+            {
+                case "help":
+                case "?":
+                    WriteBattleCommands();
+                    break;
+                case "attack":
+                    AttackInBattle(noun, battleCore);
+                    break;
+                case "flee":
+                case "escape":
+                case "run":
+                    //flee command
+                    break;
+                case "use":
+                case "item":
+                    UseInBattle(noun, battleCore);
+                    break;
+                case "items":
+                case "inventory":
+                case "inv":
+                    DisplayBattleInventory();
+                    break;
+                case "exit":
+                case "quit":
+                    Program.QuitState();
+                    break;
+                default:
+                    {
+                        // Moved attack check to player
+                        AttackInBattle(verb, battleCore);
+                        break;
+                    }
+            }
+        }
+
+        private static void SplitInputToLower(string aString, out string verb, out string noun)
+        {
+            verb = "";
+            noun = "";
 
             if (aString.IndexOf(" ") > 0)
             {
@@ -159,102 +264,6 @@ namespace Escape
             else
             {
                 verb = aString.ToLower();
-            }
-
-            switch (Program.GameState)
-            {
-                case Program.GameStates.Playing:
-                    switch (verb)
-                    {
-                        case "help":
-                        case "?":
-                            WriteCommands();
-                            break;
-                        case "exit":
-                        case "quit":
-                            Program.GameState = Program.GameStates.Quit;
-                            break;
-                        case "move":
-                        case "go":
-                            MoveTo(noun, battleCore);
-                            break;
-                        case "examine":
-                            Examine(noun);
-                            break;
-                        case "take":
-                        case "pickup":
-                            Pickup(noun);
-                            break;
-                        case "drop":
-                        case "place":
-                            Place(noun);
-                            break;
-                        case "use":
-                        case "item":
-                            Use(noun);
-                            break;
-                        case "items":
-                        case "inventory":
-                        case "inv":
-                            DisplayInventory();
-                            break;
-                        case "attack":
-                            Attack(noun, battleCore);
-                            break;
-                        case "hurt":
-                            Health -= Convert.ToInt32(noun);
-                            break;
-                        case "exp":
-                            GiveExp(Convert.ToInt32(noun));
-                            break;
-                        case "save":
-                            Program.Save();
-                            break;
-                        case "load":
-                            Program.Load();
-                            break;
-                        default:
-                            InputNotValid();
-                            break;
-                    }
-                    break;
-
-                case Program.GameStates.Battle:
-                    switch (verb)
-                    {
-                        case "help":
-                        case "?":
-                            WriteBattleCommands();
-                            break;
-                        case "attack":
-                            AttackInBattle(noun, battleCore);
-                            break;
-                        case "flee":
-                        case "escape":
-                        case "run":
-                            //flee command
-                            break;
-                        case "use":
-                        case "item":
-                            UseInBattle(noun, battleCore);
-                            break;
-                        case "items":
-                        case "inventory":
-                        case "inv":
-                            DisplayBattleInventory();
-                            break;
-                        case "exit":
-                        case "quit":
-                            Program.GameState = Program.GameStates.Quit;
-                            break;
-                        default:
-                            {
-                                // Moved attack check to player
-                                AttackInBattle(verb, battleCore);
-                                break;
-                            }
-                    }
-                    break;
             }
         }
 
