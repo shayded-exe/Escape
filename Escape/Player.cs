@@ -6,9 +6,6 @@ namespace Escape
     class Player : ICombatant
     {
         #region Declarations
-        // Possibly temporary
-        public World World;
-
         private const int baseHealth = 100;
         private const int baseMagic = 100;
 
@@ -270,10 +267,10 @@ namespace Escape
         }
 
         // Only look up item once
-        public void GiveAttack(string attackName)
+        public void GiveAttack(string attackName, Dictionary<string, Attack> attacks)
         {
             Attack attack;
-            if (World.Attacks.TryGetValue(attackName, out attack))
+            if (attacks.TryGetValue(attackName, out attack))
             {
                 Attacks.Add(attack);
                 Program.SetNotification("You learned the attack " + attack.Name + "!");
@@ -285,10 +282,10 @@ namespace Escape
             }
         }
 
-        public void GiveItem(string itemName)
+        public void GiveItem(string itemName, Dictionary<string, Item> items)
         {
             Item item;
-            if (World.Items.TryGetValue(itemName, out item))
+            if (items.TryGetValue(itemName, out item))
             {
                 Inventory.Add(item);
                 Program.SetNotification("You were given " + Text.AorAn(item.Name));

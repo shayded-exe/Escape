@@ -9,172 +9,162 @@ namespace Escape
     // This also helps with loading, as the previous state can simply be discarded and won't interfere with the new one.
     class World
     {
-        #region Declarations
+        #region Definitions
         public Location StartLocation { get; set; }
-
-        // Creates lists that hold all the information about the world
-        public AutomaticDictionary<string, Location> Locations = new AutomaticDictionary<string, Location>(x => x.Name.ToLower());
-        public AutomaticDictionary<string, Item> Items = new AutomaticDictionary<string, Item>(x => x.Name.ToLower());
-        public AutomaticDictionary<string, Enemy> Enemies = new AutomaticDictionary<string, Enemy>(x => x.Name.ToLower());
-        public AutomaticDictionary<string, Attack> Attacks = new AutomaticDictionary<string, Attack>(x => x.Name.ToLower());
+        public AutomaticDictionary<string, Attack> Attacks { get; set; }
+        public AutomaticDictionary<string, Item> Items { get; set; }
+        public AutomaticDictionary<string, Enemy> Enemies { get; set; }
+        public AutomaticDictionary<string, Location> Locations { get; set; }
         #endregion
 
         #region Initialization
-        public World(bool initialize)
+        public World()
         {
-            if (initialize == true)
-            {
-                // Location declarations
-                // These appear here because the variables are caught in lambdas.
-                Location
-                    room1 = null,
-                    room2 = null,
-                    room3 = null,
-                    secretRoom = null;
+            Attacks = new AutomaticDictionary<string, Attack>(x => x.Name);
+            Items = new AutomaticDictionary<string, Item>(x => x.Name);
+            Enemies = new AutomaticDictionary<string, Enemy>(x => x.Name);
+            Locations = new AutomaticDictionary<string, Location>(x => x.Name);
 
-                // Attacks
-                var flail = new Attack(
-                    name: "Flail",
-                    description: "Flail your arms like a fish out of water and hope something happens",
-                    power: 5,
-                    accuracy: 70,
-                    cost: 0,
-                    type: Attack.AttackType.Physical);
-                Attacks.Add(flail);
+            // Location declarations
+            // These appear here because the variables are caught in lambdas.
+            Location
+                room1 = null,
+                room2 = null,
+                room3 = null,
+                secretRoom = null;
 
-                var scratch = new Attack(
-                    name: "Scratch",
-                    description: "The Attacker digs its claws into the skin of its prey. Not really as painful as it sounds.",
-                    power: 10,
-                    accuracy: 70,
-                    cost: 1,
-                    type: Attack.AttackType.Physical,
-                    fallback: flail);
-                Attacks.Add(scratch);
+            // Attacks
+            var flail = new Attack(
+                name: "Flail",
+                description: "Flail your arms like a fish out of water and hope something happens",
+                power: 5,
+                accuracy: 70,
+                cost: 0,
+                type: Attack.AttackType.Physical);
+            Attacks.Add(flail);
 
-                // Enemies
-                var rat = new Enemy(
-                    name: "Rat",
-                    description: "It's just a pwesious wittle wat that will KILL YOU!",
-                    health: 10, maxHealth: 10,
-                    magic: 5, maxMagic: 5,
-                    power: 10,
-                    defense: 5,
-                    expValue: 5,
-                    attacks: new[] { scratch });
-                Enemies.Add(rat);
+            var scratch = new Attack(
+                name: "Scratch",
+                description: "The Attacker digs its claws into the skin of its prey. Not really as painful as it sounds.",
+                power: 10,
+                accuracy: 70,
+                cost: 1,
+                type: Attack.AttackType.Physical,
+                fallback: flail);
+            Attacks.Add(scratch);
 
-                var hawk = new Enemy(
-                    name: "Hawk",
-                    description: "It flies around looking for prey to feed on.",
-                    health: 15, maxHealth: 15,
-                    magic: 0, maxMagic: 0,
-                    power: 15,
-                    defense: 0,
-                    expValue: 8,
-                    attacks: new[] { scratch });
-                Enemies.Add(hawk);
+            // Enemies
+            var rat = new Enemy(
+                name: "Rat",
+                description: "It's just a pwesious wittle wat that will KILL YOU!",
+                health: 10, maxHealth: 10,
+                magic: 5, maxMagic: 5,
+                power: 10,
+                defense: 5,
+                expValue: 5,
+                attacks: new[] { scratch });
+            Enemies.Add(rat);
 
-                // Items
-                var brassKey = new Item(
-                    name: "Brass Key",
-                    description: "Just your generic key that's in almost every game.",
-                    uses: (user, self) =>
+            var hawk = new Enemy(
+                name: "Hawk",
+                description: "It flies around looking for prey to feed on.",
+                health: 15, maxHealth: 15,
+                magic: 0, maxMagic: 0,
+                power: 15,
+                defense: 0,
+                expValue: 8,
+                attacks: new[] { scratch });
+            Enemies.Add(hawk);
+
+            // Items
+            var brassKey = new Item(
+                name: "Brass Key",
+                description: "Just your generic key that's in almost every game.",
+                uses: (user, self) =>
+                    {
+                        var targetLocation = room3;
+                        var newLocation = secretRoom;
+                        if (user.Location == targetLocation)
                         {
-                            var targetLocation = room3;
-                            var newLocation = secretRoom;
-                            if (user.Location == targetLocation)
-                            {
-                                Program.SetNotification("The " + self.Name + " opened the lock!");
-                                targetLocation.Exits.Add(newLocation);
-                            }
-                            else
-                                self.NoUse();
-                        });
-                Items.Add(brassKey);
+                            Program.SetNotification("The " + self.Name + " opened the lock!");
+                            targetLocation.Exits.Add(newLocation);
+                        }
+                        else
+                            self.NoUse();
+                    });
+            Items.Add(brassKey);
 
-                var shinyStone = new Item(
-                    name: "Shiny Stone",
-                    description: "It's a stone and it's shiny, what more could you ask for?",
-                    uses: (user, self) => // Can be (Item self), but that's not necessary due to type inference.
+            var shinyStone = new Item(
+                name: "Shiny Stone",
+                description: "It's a stone and it's shiny, what more could you ask for?",
+                uses: (user, self) => // Can be (Item self), but that's not necessary due to type inference.
+                    {
+                        if (user.Location == secretRoom)
                         {
-                            if (user.Location == secretRoom)
-                            {
-                                user.Health += Math.Min(user.MaxHealth / 10, user.MaxHealth - user.Health);
-                                Program.SetNotification("The magical stone restored your health by 10%!");
-                            }
-                            else
-                                Program.SetNotification("The shiny stone glowed shiny colors!");
-                        });
-                Items.Add(shinyStone);
+                            user.Health += Math.Min(user.MaxHealth / 10, user.MaxHealth - user.Health);
+                            Program.SetNotification("The magical stone restored your health by 10%!");
+                        }
+                        else
+                            Program.SetNotification("The shiny stone glowed shiny colors!");
+                    });
+            Items.Add(shinyStone);
 
-                var rock = new Item(
-                    name: "Rock",
-                    description: "It doesn't do anything, however, it is said that the mystical game designer used this for testing.",
-                    uses: (user, self) =>
-                        {
-                            Program.SetNotification("You threw the rock at a wall. Nothing happened.");
-                        },
-                    battleUses: (user, self, victim) =>
-                        {
-                            Program.SetNotification("The rock hit the enemy in the head! It seems confused...");
-                        });
-                Items.Add(rock);
+            var rock = new Item(
+                name: "Rock",
+                description: "It doesn't do anything, however, it is said that the mystical game designer used this for testing.",
+                uses: (user, self) =>
+                    {
+                        Program.SetNotification("You threw the rock at a wall. Nothing happened.");
+                    },
+                battleUses: (user, self, victim) =>
+                    {
+                        Program.SetNotification("The rock hit the enemy in the head! It seems confused...");
+                    });
+            Items.Add(rock);
 
-                // Location initialization
-                room1 = new Location(
-                    name: "Room 1",
-                    description: "This is a room.",
-                    unboundExits: new Func<Location>[] { () => room2 },
-                    items: new[]
+            // Location initialization
+            room1 = new Location(
+                name: "Room 1",
+                description: "This is a room.",
+                unboundExits: new Func<Location>[] { () => room2 },
+                items: new[]
                         {
                             brassKey,
                             rock
                         });
-                Locations.Add(room1);
-                StartLocation = room1;
+            StartLocation = room1;
+            Locations.Add(room1);
 
-                room2 = new Location(
-                    name: "Room 2",
-                    description: "This is another room.",
-                    unboundExits: new Func<Location>[]
+            room2 = new Location(
+                name: "Room 2",
+                description: "This is another room.",
+                unboundExits: new Func<Location>[]
                         {
                             () => room1,
                             () => room3
                         },
-                    items: new[] { shinyStone },
-                    enemies: new[] { rat },
-                    battleChance: 50);
-                Locations.Add(room2);
+                items: new[] { shinyStone },
+                enemies: new[] { rat },
+                battleChance: 50);
+            Locations.Add(room2);
 
-                room3 = new Location(
-                    name: "Room 3",
-                    description: "This is yet another room.",
-                    unboundExits: new Func<Location>[] { () => room2 },
-                    enemies: new[]
+            room3 = new Location(
+                name: "Room 3",
+                description: "This is yet another room.",
+                unboundExits: new Func<Location>[] { () => room2 },
+                enemies: new[]
                         {
                             rat,
                             hawk
                         },
-                    battleChance: 75);
-                Locations.Add(room3);
+                battleChance: 75);
+            Locations.Add(room3);
 
-                secretRoom = new Location(
-                    name: "Secret Room",
-                    description: "This is a very awesome secret room.",
-                    unboundExits: new Func<Location>[] { () => room3 });
-                Locations.Add(secretRoom);
-            }
-        }
-
-        private static IEnumerable<T> ExtractDefinitions<T>(Type definitionClassType)
-        {
-            // What this does is retrieve the names and values of all public fields
-            // in the definitions classes, filtered by the type of the field.
-            return
-                from field in definitionClassType.GetFields(BindingFlags.Public | BindingFlags.Static)
-                where field.FieldType == typeof(T)
-                select (T)field.GetValue(null);
+            secretRoom = new Location(
+                name: "Secret Room",
+                description: "This is a very awesome secret room.",
+                unboundExits: new Func<Location>[] { () => room3 });
+            Locations.Add(secretRoom);
         }
 
         #endregion

@@ -14,7 +14,6 @@ namespace Escape
         public int Player_Magic;
         public int Player_Level;
         public int Player_Exp;
-        public World Player_World;
 
         public List<Item> Player_Inventory;
         #endregion
@@ -27,7 +26,6 @@ namespace Escape
             Player_Magic = player.Magic;
             Player_Level = player.Level;
             Player_Exp = player.Exp;
-            Player_World = player.World;
 
             Player_Inventory = new List<Item>(player.Inventory);
         }
@@ -44,10 +42,6 @@ namespace Escape
             player.Exp = this.Player_Exp;
 
             player.Inventory = this.Player_Inventory;
-
-            // Replace world instead of locations
-            // I think this is better as there won't be any version mix (as long as loading succeeds).
-            player.World = this.Player_World;
 
             return player;
         }

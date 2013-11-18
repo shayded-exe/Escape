@@ -63,8 +63,8 @@ namespace Escape
                     }
                 };
             player.Died += ply => GameOverState();
-            player.World = new World(initialize: true);
-            player.Location = player.World.StartLocation;
+            var world = new World();
+            player.Location = world.StartLocation;
 
             if (isError)
             {
