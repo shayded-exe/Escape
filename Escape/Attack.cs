@@ -58,9 +58,11 @@ namespace Escape
         #endregion
 
         #region Public Methods
-        public void Use()
+        // The flow of references here is really off.
+        // The BattleCore should handle the messages if it can't be normalized.
+        public void Use(BattleCore battleCore)
         {
-            if (BattleCore.CurrentTurn == "player")
+            if (battleCore.CurrentTurn == "player")
             {
                 Program.SetNotification("You used " + this.Name + "!");
             }
@@ -69,32 +71,32 @@ namespace Escape
                 Program.SetNotification("The enemy used " + this.Name + "!");
             }
 
-            if (!CheckMagic())
+            if (!CheckMagic(battleCore))
             {
-                Fallback.Use();
+                Fallback.Use(battleCore);
                 return;
             }
 
-            BattleCore.AttackerMagic -= this.Cost;
+            battleCore.AttackerMagic -= this.Cost;
 
-            int lucky = CheckLucky();
+            int lucky = CheckLucky(battleCore);
 
-            if (!CheckAccuracy(lucky))
+            if (!CheckAccuracy(lucky, battleCore))
                 return;
 
-            int damage = CheckDamage(lucky);
+            int damage = CheckDamage(lucky, battleCore);
 
-            BattleCore.DefenderHealth -= damage;
+            battleCore.DefenderHealth -= damage;
         }
         #endregion
 
         #region Helper Methods
-        private int CheckLucky()
+        private int CheckLucky(BattleCore battleCore)
         {
             Random rand = Program.Random;
             int random = rand.Next(0, 100);
 
-            double modifiedLuckyRate = BattleCore.BaseLuckyRate * (2 - (BattleCore.AttackerHealth / BattleCore.AttackerMaxHealth));
+            double modifiedLuckyRate = BattleCore.BaseLuckyRate * (2 - (battleCore.AttackerHealth / battleCore.AttackerMaxHealth));
 
             if (random < modifiedLuckyRate)
             {
@@ -105,7 +107,7 @@ namespace Escape
                 return 1;
         }
 
-        private bool CheckAccuracy(int lucky)
+        private bool CheckAccuracy(int lucky, BattleCore battleCore)
         {
             if (lucky == 2)
             {
@@ -117,9 +119,9 @@ namespace Escape
 
             double modifiedAccuracy = this.Accuracy;
 
-            if ((BattleCore.AttackerHealth / BattleCore.AttackerMaxHealth) < 0.5)
+            if ((battleCore.AttackerHealth / battleCore.AttackerMaxHealth) < 0.5)
             {
-                modifiedAccuracy = this.Accuracy * ConvertRange(0, 100, 80, 100, ((BattleCore.AttackerHealth / BattleCore.AttackerMaxHealth) * 200)) * 0.01;
+                modifiedAccuracy = this.Accuracy * ConvertRange(0, 100, 80, 100, ((battleCore.AttackerHealth / battleCore.AttackerMaxHealth) * 200)) * 0.01;
             }
 
             if (random < modifiedAccuracy)
@@ -132,13 +134,13 @@ namespace Escape
 
         }
 
-        private bool CheckMagic()
+        private bool CheckMagic(BattleCore battleCore)
         {
-            if (BattleCore.AttackerMagic >= this.Cost)
+            if (battleCore.AttackerMagic >= this.Cost)
                 return true;
             else
             {
-                if (BattleCore.CurrentTurn == "player")
+                if (battleCore.CurrentTurn == "player")
                 {
                     Program.SetError("Not enough magic! You flailed your arms.");
                 }
@@ -150,15 +152,15 @@ namespace Escape
             }
         }
 
-        private int CheckDamage(int lucky)
+        private int CheckDamage(int lucky, BattleCore battleCore)
         {
             Random random = Program.Random;
             double modifier = lucky * 0.6;
             double variation = (random.Next(85, 115) / 100d);
 
-            double damage = ((BattleCore.AttackerPower * this.Power) / Math.Max(BattleCore.DefenderDefense, 1)) * modifier * variation;
+            double damage = ((battleCore.AttackerPower * this.Power) / Math.Max(battleCore.DefenderDefense, 1)) * modifier * variation;
 
-            if (BattleCore.CurrentTurn == "player")
+            if (battleCore.CurrentTurn == "player")
             {
                 Program.SetNotification("You did " + (int)damage + " damage!");
             }

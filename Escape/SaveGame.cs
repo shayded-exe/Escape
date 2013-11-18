@@ -8,43 +8,48 @@ namespace Escape
     class SaveGame
     {
         #region Declarations
-        public string Player_Name = Player.Name;
-        public Location Player_Location = Player.Location;
-        public int Player_Health = Player.Health;
-        public int Player_Magic = Player.Magic;
-        public int Player_Level = Player.Level;
-        public int Player_Exp = Player.Exp;
-        public World Player_World = Player.World;
+        public string Player_Name;
+        public Location Player_Location;
+        public int Player_Health;
+        public int Player_Magic;
+        public int Player_Level;
+        public int Player_Exp;
+        public World Player_World;
 
-        public List<Item> Player_Inventory = Player.Inventory;
+        public List<Item> Player_Inventory;
         #endregion
 
-        public SaveGame()
+        public SaveGame(Player player)
         {
-            Player_Name = Player.Name;
-            Player_Location = Player.Location;
-            Player_Health = Player.Health;
-            Player_Magic = Player.Magic;
-            Player_Level = Player.Level;
-            Player_Exp = Player.Exp;
-            Player_World = Player.World;
+            Player_Name = player.Name;
+            Player_Location = player.Location;
+            Player_Health = player.Health;
+            Player_Magic = player.Magic;
+            Player_Level = player.Level;
+            Player_Exp = player.Exp;
+            Player_World = player.World;
+
+            Player_Inventory = new List<Item>(player.Inventory);
         }
 
         #region Loading Method
-        public void Load()
+        public Player Load()
         {
-            Player.Name = this.Player_Name;
-            Player.Location = this.Player_Location;
-            Player.Health = this.Player_Health;
-            Player.Magic = this.Player_Magic;
-            Player.Level = this.Player_Level;
-            Player.Exp = this.Player_Exp;
+            Player player = new Player();
+            player.Name = this.Player_Name;
+            player.Location = this.Player_Location;
+            player.Health = this.Player_Health;
+            player.Magic = this.Player_Magic;
+            player.Level = this.Player_Level;
+            player.Exp = this.Player_Exp;
 
-            Player.Inventory = this.Player_Inventory;
+            player.Inventory = this.Player_Inventory;
 
             // Replace world instead of locations
             // I think this is better as there won't be any version mix (as long as loading succeeds).
-            Player.World = this.Player_World;
+            player.World = this.Player_World;
+
+            return player;
         }
         #endregion
     }

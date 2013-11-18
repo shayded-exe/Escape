@@ -79,11 +79,11 @@ namespace Escape
                 var brassKey = new Item(
                     name: "Brass Key",
                     description: "Just your generic key that's in almost every game.",
-                    uses: (self) =>
+                    uses: (user, self) =>
                         {
                             var targetLocation = room3;
                             var newLocation = secretRoom;
-                            if (Player.Location == targetLocation)
+                            if (user.Location == targetLocation)
                             {
                                 Program.SetNotification("The " + self.Name + " opened the lock!");
                                 targetLocation.Exits.Add(newLocation);
@@ -96,11 +96,11 @@ namespace Escape
                 var shinyStone = new Item(
                     name: "Shiny Stone",
                     description: "It's a stone and it's shiny, what more could you ask for?",
-                    uses: (self) => // Can be (Item self), but that's not necessary due to type inference.
+                    uses: (user, self) => // Can be (Item self), but that's not necessary due to type inference.
                         {
-                            if (Player.Location == secretRoom)
+                            if (user.Location == secretRoom)
                             {
-                                Player.Health += Math.Min(Player.MaxHealth / 10, Player.MaxHealth - Player.Health);
+                                user.Health += Math.Min(user.MaxHealth / 10, user.MaxHealth - user.Health);
                                 Program.SetNotification("The magical stone restored your health by 10%!");
                             }
                             else
@@ -111,11 +111,11 @@ namespace Escape
                 var rock = new Item(
                     name: "Rock",
                     description: "It doesn't do anything, however, it is said that the mystical game designer used this for testing.",
-                    uses: (self) =>
+                    uses: (user, self) =>
                         {
                             Program.SetNotification("You threw the rock at a wall. Nothing happened.");
                         },
-                    battleUses: (self, victim) =>
+                    battleUses: (user, self, victim) =>
                         {
                             Program.SetNotification("The rock hit the enemy in the head! It seems confused...");
                         });
@@ -182,11 +182,11 @@ namespace Escape
         #region Public Location Methods
 
         //Prints the main HUD that is displayed for most of the game. Warning, this gets a little complex.
-        public static void LocationHUD()
+        public static void LocationHUD(Player player)
         {
             Text.WriteColor("`c`/-----------------------------------------------------------------------\\", false);
 
-            List<string> locationDesctiption = Text.Limit(Player.Location.Name + " - " + Player.Location.Description, Console.WindowWidth - 4);
+            List<string> locationDesctiption = Text.Limit(player.Location.Name + " - " + player.Location.Description, Console.WindowWidth - 4);
 
             foreach (string line in locationDesctiption)
             {
@@ -201,7 +201,7 @@ namespace Escape
             int i = 0;
             int longestList = 0;
 
-            foreach (Location exit in Player.Location.Exits)
+            foreach (Location exit in player.Location.Exits)
                 Text.WriteColor("  " + exit.Name);
 
             longestList = (i > longestList) ? i : longestList;
@@ -209,7 +209,7 @@ namespace Escape
 
             Console.SetCursorPosition(18, currentY);
 
-            foreach (Item item in Player.Location.Items)
+            foreach (Item item in player.Location.Items)
                 Text.WriteColor("  " + item.Name);
 
             longestList = (i > longestList) ? i : longestList;
@@ -217,7 +217,7 @@ namespace Escape
 
             Console.SetCursorPosition(36, currentY);
 
-            foreach (Enemy enemy in Player.Location.Enemies)
+            foreach (Enemy enemy in player.Location.Enemies)
                 Text.WriteColor("  " + enemy.Name);
 
             longestList = (i > longestList) ? i : longestList;
@@ -225,8 +225,8 @@ namespace Escape
 
             Console.SetCursorPosition(54, currentY);
 
-            Text.WriteColor("  HP [`r`" + Text.ToBar(Player.Health, Player.MaxHealth, 10) + "`w`]");
-            Text.WriteColor("  MP [`g`" + Text.ToBar(Player.Magic, Player.MaxMagic, 10) + "`w`]");
+            Text.WriteColor("  HP [`r`" + Text.ToBar(player.Health, player.MaxHealth, 10) + "`w`]");
+            Text.WriteColor("  MP [`g`" + Text.ToBar(player.Magic, player.MaxMagic, 10) + "`w`]");
 
             longestList = (2 > longestList) ? 2 : longestList;
 
@@ -247,13 +247,13 @@ namespace Escape
             Text.WriteColor("\\-----------------^-----------------+-----------------^-----------------/`w`", false);
             Text.WriteColor(" `c`\\`w` Lvl.", false);
 
-            if (Player.Level < 10)
+            if (player.Level < 10)
             {
                 Text.Write(" ");
             }
 
-            Text.WriteColor(Player.Level + " [`g`" + Text.ToBar(Player.Exp, Player.GetNextLevel(), 23) + "`w`] `c`|`w` "
-            + Player.Exp + "/" + Player.GetNextLevel() + "`c` /", false);
+            Text.WriteColor(player.Level + " [`g`" + Text.ToBar(player.Exp, player.GetNextLevel(), 23) + "`w`] `c`|`w` "
+            + player.Exp + "/" + player.GetNextLevel() + "`c` /", false);
 
             int expLength = Console.CursorLeft;
 

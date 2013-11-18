@@ -7,8 +7,9 @@ namespace Escape
     class Item : INamed
     {
         #region Definitions
-        public delegate void OnUse(Item item);
-        public delegate void OnUseInBattle(Item item, Enemy victim);
+        // Maybe should be changed to an interface instead of Player as user
+        public delegate void OnUse(Player user, Item item);
+        public delegate void OnUseInBattle(Player user, Item item, Enemy victim);
         #endregion
 
         #region Declarations
@@ -47,22 +48,22 @@ namespace Escape
         #endregion
 
         #region Public Methods
-        public void Use()
+        public void Use(Player user)
         {
             // Usable now implies Uses != null.
             // I've added curly braces as not having them is usually discouraged.
             // This version makes it clear that commenting out the line can have side-effects.
             if (Usable)
-            { Uses(this); }
+            { Uses(user, this); }
             else
             { NoUse(); }
         }
 
-        public void UseInBattle(Enemy victim)
+        public void UseInBattle(Player user, Enemy victim)
         {
             // See above.
             if (UsableInBattle)
-            { BattleUses(this, victim); }
+            { BattleUses(user, this, victim); }
             else
             { NoUse(); }
         }

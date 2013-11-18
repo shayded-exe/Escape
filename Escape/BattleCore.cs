@@ -5,117 +5,118 @@ using System.IO;
 
 namespace Escape
 {
-    static class BattleCore
+    class BattleCore
     {
         #region Declarations
-        public static Enemy CurrentEnemy;
-        public static string CurrentTurn = "player";
+        private Player player;
+        public Enemy CurrentEnemy;
+        public string CurrentTurn = "player";
 
         public static double BaseLuckyRate = 7.5;
         #endregion
 
         #region Properties
-        public static double AttackerHealth
+        public double AttackerHealth
         {
             get
             {
                 if (CurrentTurn == "player")
-                    return Player.Health;
+                    return player.Health;
                 else
                     return CurrentEnemy.Health;
             }
             set
             {
                 if (CurrentTurn == "player")
-                    Player.Health = (int)value;
+                    player.Health = (int)value;
                 else
                     CurrentEnemy.Health = (int)value;
             }
         }
 
-        public static double AttackerMaxHealth
+        public double AttackerMaxHealth
         {
             get
             {
                 if (CurrentTurn == "player")
-                    return Player.MaxHealth;
+                    return player.MaxHealth;
                 else
                     return CurrentEnemy.MaxHealth;
             }
         }
 
-        public static double DefenderHealth
+        public double DefenderHealth
         {
             get
             {
                 if (CurrentTurn == "player")
                     return CurrentEnemy.Health;
                 else
-                    return Player.Health;
+                    return player.Health;
             }
             set
             {
                 if (CurrentTurn == "player")
                     CurrentEnemy.Health = (int)value;
                 else
-                    Player.Health = (int)value;
+                    player.Health = (int)value;
             }
         }
 
-        public static double DefenderMaxHealth
+        public double DefenderMaxHealth
         {
             get
             {
                 if (CurrentTurn == "player")
                     return CurrentEnemy.MaxHealth;
                 else
-                    return Player.MaxHealth;
+                    return player.MaxHealth;
             }
         }
 
-        public static double AttackerMagic
+        public double AttackerMagic
         {
             get
             {
                 if (CurrentTurn == "player")
-                    return Player.Magic;
+                    return player.Magic;
                 else
                     return CurrentEnemy.Magic;
             }
             set
             {
                 if (CurrentTurn == "player")
-                    Player.Magic = (int)value;
+                    player.Magic = (int)value;
                 else
                     CurrentEnemy.Magic = (int)value;
             }
         }
 
-        public static double AttackerPower
+        public double AttackerPower
         {
             get
             {
                 if (CurrentTurn == "player")
-                    return Player.Power;
+                    return player.Power;
                 else
                     return CurrentEnemy.Power;
             }
         }
 
-        public static double DefenderDefense
+        public double DefenderDefense
         {
             get
             {
                 if (CurrentTurn == "player")
                     return CurrentEnemy.Defense;
                 else
-                    return Player.Defense;
+                    return player.Defense;
             }
         }
         #endregion
 
         #region Battle Methods
-        public static void StartBattle(Enemy enemy, string startingTurn = "player")
+        public void StartBattle(Enemy enemy, string startingTurn = "player")
         {
             Program.GameState = Program.GameStates.Battle;
 
@@ -123,20 +124,20 @@ namespace Escape
             CurrentEnemy = CloneEnemy(enemy);
         }
 
-        public static void NextTurn()
+        public void NextTurn()
         {
             if (CurrentTurn == "player")
             {
-                string temp = Text.SetPrompt("[" + Player.Location.Name + "] > ");
+                string temp = Text.SetPrompt("[" + player.Location.Name + "] > ");
                 Text.Clear();
-                Player.Do(temp);
+                player.Do(temp, this);
             }
             else if (CurrentTurn == "enemy")
             {
                 Text.SetKeyPrompt("[Press any key to continue!]");
                 Text.Clear();
 
-                CurrentEnemy.Attack();
+                CurrentEnemy.Attack(this);
             }
             else if (CurrentTurn == "end")
             {
@@ -152,20 +153,20 @@ namespace Escape
             CurrentTurn = (CurrentTurn == "player") ? "enemy" : "player";
         }
 
-        public static void CheckResults()
+        public void CheckResults()
         {
             if (CurrentEnemy.Health <= 0 && Program.GameState != Program.GameStates.Playing)
             {
                 Program.SetNotification("You defeated the " + CurrentEnemy.Name + " and gained " + CurrentEnemy.ExpValue + " EXP!");
-                Player.GiveExp(CurrentEnemy.ExpValue);
-                Player.Location.Enemies.Remove(CurrentEnemy);
+                player.GiveExp(CurrentEnemy.ExpValue);
+                player.Location.Enemies.Remove(CurrentEnemy);
                 CurrentTurn = "end";
             }
         }
         #endregion
 
         #region Public Methods
-        public static void BattleHUD()
+        public void BattleHUD()
         {
             Text.WriteColor("`c`/-----------------------------------------------------------------------\\", false);
 
@@ -184,15 +185,15 @@ namespace Escape
             int i;
             int longestList = 0;
 
-            Text.WriteColor("  HP [`r`" + Text.ToBar(Player.Health, Player.MaxHealth, 10) + "`w`]");
-            Text.WriteColor("  MP [`g`" + Text.ToBar(Player.Magic, Player.MaxMagic, 10) + "`w`]");
+            Text.WriteColor("  HP [`r`" + Text.ToBar(player.Health, player.MaxHealth, 10) + "`w`]");
+            Text.WriteColor("  MP [`g`" + Text.ToBar(player.Magic, player.MaxMagic, 10) + "`w`]");
 
             longestList = (2 > longestList) ? 2 : longestList;
             i = 0;
 
             Console.SetCursorPosition(18, currentY);
 
-            foreach (Attack attack in Player.Attacks)
+            foreach (Attack attack in player.Attacks)
                 Text.WriteColor("  " + attack.Name);
 
             longestList = (i > longestList) ? i : longestList;
@@ -200,7 +201,7 @@ namespace Escape
 
             Console.SetCursorPosition(36, currentY);
 
-            foreach (Item item in Player.Inventory.FindAll(j => j.UsableInBattle)) // Use 'j' instead of 'i' because 'i' is already used
+            foreach (Item item in player.Inventory.FindAll(j => j.UsableInBattle)) // Use 'j' instead of 'i' because 'i' is already used
                 Text.WriteColor("  " + item.Name);
 
             longestList = (i > longestList) ? i : longestList;
@@ -228,13 +229,13 @@ namespace Escape
             Text.WriteColor("\\-----------------^-----------------+-----------------^-----------------/`w`", false);
             Text.WriteColor(" `c`\\`w` Lvl.", false);
 
-            if (Player.Level < 10)
+            if (player.Level < 10)
             {
                 Text.Write(" ");
             }
 
-            Text.WriteColor(Player.Level + " [`g`" + Text.ToBar(Player.Exp, Player.GetNextLevel(), 23) + "`w`] `c`|`w` "
-            + Player.Exp + "/" + Player.GetNextLevel() + "`c` /", false);
+            Text.WriteColor(player.Level + " [`g`" + Text.ToBar(player.Exp, player.GetNextLevel(), 23) + "`w`] `c`|`w` "
+            + player.Exp + "/" + player.GetNextLevel() + "`c` /", false);
 
             int expLength = Console.CursorLeft;
 

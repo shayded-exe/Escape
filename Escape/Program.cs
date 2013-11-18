@@ -16,6 +16,10 @@ namespace Escape
         // but that wasn't possible before either.
         public static Random Random = new Random();
 
+        // Temporary?
+        private static Player player;
+        private static BattleCore battleCore = new BattleCore();
+
 		//The width and height of the console
 		private const int width = 73;
 		private const int height = 30;
@@ -47,8 +51,9 @@ namespace Escape
 			Console.BufferHeight = height;
 
 			// Create a new world and set the player's location
-            Player.World = new World(initialize: true);
-            Player.Location = Player.World.StartLocation;
+            player = new Player();
+            player.World = new World(initialize: true);
+            player.Location = player.World.StartLocation;
 
 			//The game executes different code depending on the GameState
 			while(run)
@@ -92,7 +97,7 @@ namespace Escape
 		{
 			//Get the player's name and set the game to the playing state
 			Text.WriteLine("Hello adventurer! What is your name?");
-			Player.Name = Text.SetPrompt("> ");
+			player.Name = Text.SetPrompt("> ");
 			Text.Clear();
 			GameState = GameStates.Playing;
 		}
@@ -106,12 +111,12 @@ namespace Escape
 			}
 			
 			//Render the main hUD
-			World.LocationHUD();
+			World.LocationHUD(player);
 			
 			//Get input from the player
-			string temp = Text.SetPrompt("[" + Player.Location.Name + "] > ");
+			string temp = Text.SetPrompt("[" + player.Location.Name + "] > ");
 			Text.Clear();
-			Player.Do(temp);
+			player.Do(temp, battleCore);
 		}
 		
 		private static void BattleState()
@@ -123,9 +128,9 @@ namespace Escape
 			}
 			
 			//Render the battle HUD, start the next turn, and check if the battle ended
-			BattleCore.BattleHUD();
-			BattleCore.NextTurn();
-			BattleCore.CheckResults();
+			battleCore.BattleHUD();
+			battleCore.NextTurn();
+			battleCore.CheckResults();
 		}
 		
 		private static void QuitState()
@@ -257,7 +262,7 @@ namespace Escape
 		public static void Save()
 		{
 			//Creates a new SaveGame object that captures all the current variables that need to be saved. See SaveGame.cs for more.
-			SaveGame saveGame = new SaveGame();
+			SaveGame saveGame = new SaveGame(player);
 			
 			try
 			{
@@ -290,7 +295,7 @@ namespace Escape
 				{
 					BinaryFormatter bin = new BinaryFormatter();
 					SaveGame saveGame = (SaveGame)bin.Deserialize(stream);
-					saveGame.Load();
+					player = saveGame.Load();
 				}
 				
 				Program.SetNotification("Load Successful!");

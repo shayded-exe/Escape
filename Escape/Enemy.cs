@@ -57,9 +57,9 @@ namespace Escape
         #region Public Methods
         // Removed attack accessors
 
-        public void Attack()
+        public void Attack(BattleCore battleCore)
         {
-            Attacks[Program.Random.Next(this.Attacks.Count)].Use();
+            Attacks[Program.Random.Next(this.Attacks.Count)].Use(battleCore);
         }
         #endregion
     }

@@ -3,10 +3,11 @@ using System.Collections.Generic;
 
 namespace Escape
 {
-    static class Player
+    class Player
     {
         #region Declarations
-        public static World World;
+        // Possibly temporary
+        public World World;
 
         private const int baseHealth = 100;
         private const int baseMagic = 100;
@@ -14,24 +15,25 @@ namespace Escape
         private const int power = 15;
         private const int defense = 10;
 
-        private static string name;
+        private string name;
 
         // Removed check whether location is in World,
         // it doesn't matter to the program and the code is simpler this way
-        public static Location Location { get; set; }
+        public Location Location { get; set; }
 
-        private static int level = 1;
-        private static int exp = 0;
+        private int level = 1;
+        private int exp = 0;
 
-        private static int health = MaxHealth;
-        private static int magic = MaxMagic;
+        //QUESTION: Is this strange naming or a mistake?
+        private int health = BattleCore.CalculateHealthStat(baseHealth, level: 1);
+        private int magic = BattleCore.CalculateHealthStat(baseMagic, level: 1);
 
-        public static List<Item> Inventory = new List<Item>();
-        public static List<Attack> Attacks = new List<Attack>();
+        public List<Item> Inventory = new List<Item>();
+        public List<Attack> Attacks = new List<Attack>();
         #endregion
 
         #region Properties
-        public static string Name
+        public string Name
         {
             get
             {
@@ -51,7 +53,7 @@ namespace Escape
             }
         }
 
-        public static int Health
+        public int Health
         {
             get
             {
@@ -68,7 +70,7 @@ namespace Escape
             }
         }
 
-        public static int MaxHealth
+        public int MaxHealth
         {
             get
             {
@@ -76,7 +78,7 @@ namespace Escape
             }
         }
 
-        public static int Magic
+        public int Magic
         {
             get
             {
@@ -88,7 +90,7 @@ namespace Escape
             }
         }
 
-        public static int MaxMagic
+        public int MaxMagic
         {
             get
             {
@@ -96,7 +98,7 @@ namespace Escape
             }
         }
 
-        public static int Level
+        public int Level
         {
             get
             {
@@ -108,7 +110,7 @@ namespace Escape
             }
         }
 
-        public static int Exp
+        public int Exp
         {
             get
             {
@@ -125,7 +127,7 @@ namespace Escape
             }
         }
 
-        public static int Power
+        public int Power
         {
             get
             {
@@ -133,7 +135,7 @@ namespace Escape
             }
         }
 
-        public static int Defense
+        public int Defense
         {
             get
             {
@@ -143,7 +145,7 @@ namespace Escape
         #endregion
 
         #region Public Methods
-        public static void Do(string aString)
+        public void Do(string aString, BattleCore battleCore)
         {
             string verb = "";
             string noun = "";
@@ -174,7 +176,7 @@ namespace Escape
                             break;
                         case "move":
                         case "go":
-                            MoveTo(noun);
+                            MoveTo(noun, battleCore);
                             break;
                         case "examine":
                             Examine(noun);
@@ -197,10 +199,10 @@ namespace Escape
                             DisplayInventory();
                             break;
                         case "attack":
-                            Attack(noun);
+                            Attack(noun, battleCore);
                             break;
                         case "hurt":
-                            Player.Health -= Convert.ToInt32(noun);
+                            Health -= Convert.ToInt32(noun);
                             break;
                         case "exp":
                             GiveExp(Convert.ToInt32(noun));
@@ -225,7 +227,7 @@ namespace Escape
                             WriteBattleCommands();
                             break;
                         case "attack":
-                            AttackInBattle(noun);
+                            AttackInBattle(noun, battleCore);
                             break;
                         case "flee":
                         case "escape":
@@ -234,13 +236,13 @@ namespace Escape
                             break;
                         case "use":
                         case "item":
-                            UseInBattle(noun);
+                            UseInBattle(noun, battleCore);
                             break;
                         case "items":
                         case "inventory":
                         case "inv":
                             DisplayBattleInventory();
-                            BattleCore.CurrentTurn = "enemy";
+                            battleCore.CurrentTurn = "enemy";
                             break;
                         case "exit":
                         case "quit":
@@ -249,9 +251,9 @@ namespace Escape
                         default:
                             {
                                 // Moved attack check to player
-                                AttackInBattle(verb);
+                                AttackInBattle(verb, battleCore);
 
-                                BattleCore.CurrentTurn = "enemy";
+                                battleCore.CurrentTurn = "enemy";
                                 break;
                             }
                     }
@@ -260,7 +262,7 @@ namespace Escape
         }
 
         // Only look up item once
-        public static void GiveAttack(string attackName)
+        public void GiveAttack(string attackName)
         {
             Attack attack;
             if (World.Attacks.TryGetValue(attackName, out attack))
@@ -275,7 +277,7 @@ namespace Escape
             }
         }
 
-        public static void GiveItem(string itemName)
+        public void GiveItem(string itemName)
         {
             Item item;
             if (World.Items.TryGetValue(itemName, out item))
@@ -290,12 +292,12 @@ namespace Escape
             }
         }
 
-        public static void GiveExp(int amount)
+        public void GiveExp(int amount)
         {
             Exp += amount;
         }
 
-        public static int GetNextLevel()
+        public int GetNextLevel()
         {
             int result = (int)Math.Pow(Level, 3) + 10;
 
@@ -325,16 +327,16 @@ namespace Escape
             Text.BlankLines();
         }
 
-        private static void MoveTo(string locationName)
+        private void MoveTo(string locationName, BattleCore battleCore)
         {
             Location exit;
-            if (TryGetFromName(locationName, out exit, Player.Location.Exits))
+            if (TryGetFromName(locationName, out exit, Location.Exits))
             {
-                Player.Location = exit;
+                Location = exit;
 
-                Location.CalculateRandomBattle();
+                Location.CalculateRandomBattle(battleCore);
             }
-            else if (Player.Location.Name == locationName)
+            else if (Location.Name == locationName)
             {
                 Program.SetError("You are already there!");
             }
@@ -347,7 +349,7 @@ namespace Escape
             }
         }
 
-        private static void Examine(string itemName)
+        private void Examine(string itemName)
         {
             Item item;
             if (TryGetFromName(itemName, out item, Location.Items, Inventory))
@@ -364,7 +366,7 @@ namespace Escape
             }
         }
 
-        private static void Pickup(string itemName)
+        private void Pickup(string itemName)
         {
             Item item;
             if (TryGetFromName(itemName, out item, Location.Items))
@@ -382,7 +384,7 @@ namespace Escape
             }
         }
 
-        private static void Place(string itemName)
+        private void Place(string itemName)
         {
             Item item;
             if (TryGetFromName(itemName, out item, Inventory))
@@ -400,12 +402,12 @@ namespace Escape
             }
         }
 
-        private static void Use(string itemName)
+        private void Use(string itemName)
         {
             Item item;
             if (TryGetFromName(itemName, out item, Inventory))
             {
-                item.Use();
+                item.Use(user: this);
             }
             else
             {
@@ -416,12 +418,12 @@ namespace Escape
             }
         }
 
-        private static void Attack(string enemyName)
+        private void Attack(string enemyName, BattleCore battleCore)
         {
             Enemy enemy;
             if (TryGetFromName(enemyName, out enemy, Location.Enemies))
             {
-                BattleCore.StartBattle(enemy);
+                battleCore.StartBattle(enemy);
                 Program.SetNotification("You attacked the " + enemy.Name + ". Prepare for battle!");
             }
             else
@@ -433,7 +435,7 @@ namespace Escape
             }
         }
 
-        private static void DisplayInventory()
+        private void DisplayInventory()
         {
             if (Inventory.Count <= 0)
             {
@@ -461,12 +463,12 @@ namespace Escape
             Text.BlankLines();
         }
 
-        private static void AttackInBattle(string attackName)
+        private void AttackInBattle(string attackName, BattleCore battleCore)
         {
             Attack attack;
             if (TryGetFromName(attackName, out attack, Attacks))
             {
-                attack.Use();
+                attack.Use(battleCore);
             }
             else
             {
@@ -477,14 +479,14 @@ namespace Escape
             }
         }
 
-        private static void UseInBattle(string itemName)
+        private void UseInBattle(string itemName, BattleCore battleCore)
         {
             Item item;
             if (TryGetFromName(itemName, out item, Inventory))
             {
                 if (item.UsableInBattle)
                 {
-                    item.UseInBattle(BattleCore.CurrentEnemy);
+                    item.UseInBattle(this, battleCore.CurrentEnemy);
                     return;
                 }
                 else
@@ -500,10 +502,10 @@ namespace Escape
                 Program.SetError("You aren't holding that item or that isn't a valid item!");
             }
 
-            BattleCore.CurrentTurn = "enemy";
+            battleCore.CurrentTurn = "enemy";
         }
 
-        private static void DisplayBattleInventory()
+        private void DisplayBattleInventory()
         {
             if (Inventory.Count <= 0)
             {
@@ -550,7 +552,7 @@ namespace Escape
             Program.SetError("That isn't a valid command!");
         }
 
-        private static void LevelUp()
+        private void LevelUp()
         {
             exp -= GetNextLevel();
             Level++;
