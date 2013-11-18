@@ -5,21 +5,21 @@ using System.Linq;
 namespace Escape
 {
     [Serializable]
-    class Enemy : INamed
+    class Enemy : INamed, ICombatant
     {
         #region Declarations
         public string Name { get; set; }
         public string Description;
 
-        public int Health;
-        public int MaxHealth;
+        public int Health { get; set; }
+        public int MaxHealth { get; private set; }
 
-        public int Magic;
-        public int MaxMagic;
+        public int Magic { get; set; }
+        public int MaxMagic { get; private set; }
 
-        public int Power;
-        public int Defense;
-        public int ExpValue;
+        public int Power { get; private set; }
+        public int Defense { get; private set; }
+        public int ExpValue { get; private set; }
 
         public List<Attack> Attacks { get; set; }
         #endregion

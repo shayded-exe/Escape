@@ -9,7 +9,7 @@ namespace Escape
         #region Definitions
         // Maybe should be changed to an interface instead of Player as user
         public delegate void OnUse(Player user, Item item);
-        public delegate void OnUseInBattle(Player user, Item item, Enemy victim);
+        public delegate void OnUseInBattle(ICombatant user, Item item, ICombatant victim);
         #endregion
 
         #region Declarations
@@ -59,7 +59,7 @@ namespace Escape
             { NoUse(); }
         }
 
-        public void UseInBattle(Player user, Enemy victim)
+        public void UseInBattle(ICombatant user, ICombatant victim)
         {
             // See above.
             if (UsableInBattle)

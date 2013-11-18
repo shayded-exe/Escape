@@ -51,6 +51,7 @@
     <Compile Include="AutomaticDictionary.cs" />
     <Compile Include="BattleCore.cs" />
     <Compile Include="Enemy.cs" />
+    <Compile Include="ICombatant.cs" />
     <Compile Include="INamed.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="Location.cs" />

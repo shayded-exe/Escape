@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Escape
 {
-    class Player
+    class Player : ICombatant
     {
         #region Declarations
         // Possibly temporary
@@ -242,7 +242,6 @@ namespace Escape
                         case "inventory":
                         case "inv":
                             DisplayBattleInventory();
-                            battleCore.CurrentTurn = "enemy";
                             break;
                         case "exit":
                         case "quit":
@@ -252,8 +251,6 @@ namespace Escape
                             {
                                 // Moved attack check to player
                                 AttackInBattle(verb, battleCore);
-
-                                battleCore.CurrentTurn = "enemy";
                                 break;
                             }
                     }
@@ -334,7 +331,7 @@ namespace Escape
             {
                 Location = exit;
 
-                Location.CalculateRandomBattle(battleCore);
+                Location.CalculateRandomBattle(this, battleCore);
             }
             else if (Location.Name == locationName)
             {
@@ -423,7 +420,7 @@ namespace Escape
             Enemy enemy;
             if (TryGetFromName(enemyName, out enemy, Location.Enemies))
             {
-                battleCore.StartBattle(enemy);
+                battleCore.StartBattle(this, enemy);
                 Program.SetNotification("You attacked the " + enemy.Name + ". Prepare for battle!");
             }
             else
@@ -486,7 +483,7 @@ namespace Escape
             {
                 if (item.UsableInBattle)
                 {
-                    item.UseInBattle(this, battleCore.CurrentEnemy);
+                    item.UseInBattle(this, battleCore.Defender);
                     return;
                 }
                 else
@@ -501,8 +498,6 @@ namespace Escape
                 //Program.SetError("That isn't a valid item!");
                 Program.SetError("You aren't holding that item or that isn't a valid item!");
             }
-
-            battleCore.CurrentTurn = "enemy";
         }
 
         private void DisplayBattleInventory()

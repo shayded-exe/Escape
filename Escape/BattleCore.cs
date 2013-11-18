@@ -8,159 +8,79 @@ namespace Escape
     class BattleCore
     {
         #region Declarations
-        private Player player;
-        public Enemy CurrentEnemy;
-        public string CurrentTurn = "player";
+        public ICombatant Attacker { get; set; }
+        public ICombatant Defender { get; set; }
+
+        bool isEnd = false;
 
         public static double BaseLuckyRate = 7.5;
         #endregion
 
-        #region Properties
-        public double AttackerHealth
-        {
-            get
-            {
-                if (CurrentTurn == "player")
-                    return player.Health;
-                else
-                    return CurrentEnemy.Health;
-            }
-            set
-            {
-                if (CurrentTurn == "player")
-                    player.Health = (int)value;
-                else
-                    CurrentEnemy.Health = (int)value;
-            }
-        }
-
-        public double AttackerMaxHealth
-        {
-            get
-            {
-                if (CurrentTurn == "player")
-                    return player.MaxHealth;
-                else
-                    return CurrentEnemy.MaxHealth;
-            }
-        }
-
-        public double DefenderHealth
-        {
-            get
-            {
-                if (CurrentTurn == "player")
-                    return CurrentEnemy.Health;
-                else
-                    return player.Health;
-            }
-            set
-            {
-                if (CurrentTurn == "player")
-                    CurrentEnemy.Health = (int)value;
-                else
-                    player.Health = (int)value;
-            }
-        }
-
-        public double DefenderMaxHealth
-        {
-            get
-            {
-                if (CurrentTurn == "player")
-                    return CurrentEnemy.MaxHealth;
-                else
-                    return player.MaxHealth;
-            }
-        }
-
-        public double AttackerMagic
-        {
-            get
-            {
-                if (CurrentTurn == "player")
-                    return player.Magic;
-                else
-                    return CurrentEnemy.Magic;
-            }
-            set
-            {
-                if (CurrentTurn == "player")
-                    player.Magic = (int)value;
-                else
-                    CurrentEnemy.Magic = (int)value;
-            }
-        }
-
-        public double AttackerPower
-        {
-            get
-            {
-                if (CurrentTurn == "player")
-                    return player.Power;
-                else
-                    return CurrentEnemy.Power;
-            }
-        }
-
-        public double DefenderDefense
-        {
-            get
-            {
-                if (CurrentTurn == "player")
-                    return CurrentEnemy.Defense;
-                else
-                    return player.Defense;
-            }
-        }
-        #endregion
-
         #region Battle Methods
-        public void StartBattle(Enemy enemy, string startingTurn = "player")
+        public void StartBattle(ICombatant attacker, ICombatant defender)
         {
             Program.GameState = Program.GameStates.Battle;
 
-            CurrentTurn = startingTurn;
-            CurrentEnemy = CloneEnemy(enemy);
+            // Maybe cloning should be moved to a higher scope
+            if (attacker is Enemy)
+            {
+                attacker = CloneEnemy((Enemy)attacker);
+            }
+            if (defender is Enemy)
+            {
+                defender = CloneEnemy((Enemy)defender);
+            }
+            this.Attacker = attacker;
+            this.Defender = defender;
+
+            isEnd = false;
         }
 
         public void NextTurn()
         {
-            if (CurrentTurn == "player")
-            {
-                string temp = Text.SetPrompt("[" + player.Location.Name + "] > ");
-                Text.Clear();
-                player.Do(temp, this);
-            }
-            else if (CurrentTurn == "enemy")
-            {
-                Text.SetKeyPrompt("[Press any key to continue!]");
-                Text.Clear();
-
-                CurrentEnemy.Attack(this);
-            }
-            else if (CurrentTurn == "end")
+            if (isEnd)
             {
                 Text.SetKeyPrompt("[Press any key to continue!]");
                 Text.Clear();
                 Program.GameState = Program.GameStates.Playing;
+            }
+            //TODO: Unify
+            else if (Attacker is Player)
+            {
+                var player = (Player)Attacker;
+                string temp = Text.SetPrompt("[" + player.Location.Name + "] > ");
+                Text.Clear();
+                player.Do(temp, this);
+            }
+            else if (Attacker is Enemy)
+            {
+                Text.SetKeyPrompt("[Press any key to continue!]");
+                Text.Clear();
+
+                ((Enemy)Attacker).Attack(this);
             }
             else
             {
                 Program.SetError("Errrr.... wanna fuk?");
             }
 
-            CurrentTurn = (CurrentTurn == "player") ? "enemy" : "player";
+            // Swap sides
+            var tempCombatant = Attacker;
+            Attacker = Defender;
+            Defender = tempCombatant;
         }
 
         public void CheckResults()
         {
-            if (CurrentEnemy.Health <= 0 && Program.GameState != Program.GameStates.Playing)
+            // The status messages should be moved into event handlers.
+            var currentEnemy = Attacker as Enemy ?? (Enemy)Defender;
+            var player = Attacker as Player ?? (Player)Defender;
+            if (currentEnemy.Health <= 0 && Program.GameState != Program.GameStates.Playing)
             {
-                Program.SetNotification("You defeated the " + CurrentEnemy.Name + " and gained " + CurrentEnemy.ExpValue + " EXP!");
-                player.GiveExp(CurrentEnemy.ExpValue);
-                player.Location.Enemies.Remove(CurrentEnemy);
-                CurrentTurn = "end";
+                Program.SetNotification("You defeated the " + currentEnemy.Name + " and gained " + currentEnemy.ExpValue + " EXP!");
+                player.GiveExp(currentEnemy.ExpValue);
+                player.Location.Enemies.Remove(currentEnemy);
+                isEnd = true;
             }
         }
         #endregion
@@ -168,9 +88,12 @@ namespace Escape
         #region Public Methods
         public void BattleHUD()
         {
+            var currentEnemy = Attacker as Enemy ?? (Enemy)Defender;
+            var player = Attacker as Player ?? (Player)Defender;
+
             Text.WriteColor("`c`/-----------------------------------------------------------------------\\", false);
 
-            List<string> enemyDescription = Text.Limit(CurrentEnemy.Name + " - " + CurrentEnemy.Description, Console.WindowWidth - 4);
+            List<string> enemyDescription = Text.Limit(currentEnemy.Name + " - " + currentEnemy.Description, Console.WindowWidth - 4);
 
             foreach (string line in enemyDescription)
             {
@@ -209,8 +132,8 @@ namespace Escape
 
             Console.SetCursorPosition(54, currentY);
 
-            Text.WriteColor("  HP [`r`" + Text.ToBar(CurrentEnemy.Health, CurrentEnemy.MaxHealth, 10) + "`w`]");
-            Text.WriteColor("  MP [`g`" + Text.ToBar(CurrentEnemy.Magic, CurrentEnemy.MaxMagic, 10) + "`w`]");
+            Text.WriteColor("  HP [`r`" + Text.ToBar(currentEnemy.Health, currentEnemy.MaxHealth, 10) + "`w`]");
+            Text.WriteColor("  MP [`g`" + Text.ToBar(currentEnemy.Magic, currentEnemy.MaxMagic, 10) + "`w`]");
 
             Console.SetCursorPosition(0, currentY);
 
@@ -270,18 +193,17 @@ namespace Escape
         #region Helper Methods
         private static Enemy CloneEnemy(Enemy enemy)
         {
-            Enemy ret = new Enemy(enemy.Name);
-            ret.Description = enemy.Description;
-            ret.Health = enemy.Health; ret.MaxHealth = enemy.MaxHealth;
-            ret.Magic = enemy.Magic; ret.MaxMagic = enemy.MaxMagic;
-            ret.Power = enemy.Power;
-            ret.Defense = enemy.Defense;
-            ret.ExpValue = enemy.ExpValue;
-
-            foreach (Attack attack in enemy.Attacks)
-                ret.Attacks.Add(attack);
-
-            return ret;
+            return new Enemy(
+                enemy.Name,
+                enemy.Description,
+                enemy.Health,
+                enemy.MaxHealth,
+                enemy.Magic,
+                enemy.MaxMagic,
+                enemy.Power,
+                enemy.Defense,
+                enemy.ExpValue,
+                new List<Attack>(enemy.Attacks));
         }
         #endregion
     }

@@ -62,7 +62,7 @@ namespace Escape
         // The BattleCore should handle the messages if it can't be normalized.
         public void Use(BattleCore battleCore)
         {
-            if (battleCore.CurrentTurn == "player")
+            if (battleCore.Attacker is Player)
             {
                 Program.SetNotification("You used " + this.Name + "!");
             }
@@ -77,7 +77,7 @@ namespace Escape
                 return;
             }
 
-            battleCore.AttackerMagic -= this.Cost;
+            battleCore.Attacker.Magic -= this.Cost;
 
             int lucky = CheckLucky(battleCore);
 
@@ -86,7 +86,7 @@ namespace Escape
 
             int damage = CheckDamage(lucky, battleCore);
 
-            battleCore.DefenderHealth -= damage;
+            battleCore.Defender.Health -= damage;
         }
         #endregion
 
@@ -96,7 +96,7 @@ namespace Escape
             Random rand = Program.Random;
             int random = rand.Next(0, 100);
 
-            double modifiedLuckyRate = BattleCore.BaseLuckyRate * (2 - (battleCore.AttackerHealth / battleCore.AttackerMaxHealth));
+            double modifiedLuckyRate = BattleCore.BaseLuckyRate * (2 - (battleCore.Attacker.Health / (double)battleCore.Attacker.MaxHealth));
 
             if (random < modifiedLuckyRate)
             {
@@ -119,9 +119,9 @@ namespace Escape
 
             double modifiedAccuracy = this.Accuracy;
 
-            if ((battleCore.AttackerHealth / battleCore.AttackerMaxHealth) < 0.5)
+            if ((battleCore.Attacker.Health / (double)battleCore.Attacker.MaxHealth) < 0.5)
             {
-                modifiedAccuracy = this.Accuracy * ConvertRange(0, 100, 80, 100, ((battleCore.AttackerHealth / battleCore.AttackerMaxHealth) * 200)) * 0.01;
+                modifiedAccuracy = this.Accuracy * ConvertRange(0, 100, 80, 100, ((battleCore.Attacker.Health / (double)battleCore.Attacker.MaxHealth) * 200)) * 0.01;
             }
 
             if (random < modifiedAccuracy)
@@ -136,11 +136,11 @@ namespace Escape
 
         private bool CheckMagic(BattleCore battleCore)
         {
-            if (battleCore.AttackerMagic >= this.Cost)
+            if (battleCore.Attacker.Magic >= this.Cost)
                 return true;
             else
             {
-                if (battleCore.CurrentTurn == "player")
+                if (battleCore.Attacker is Player)
                 {
                     Program.SetError("Not enough magic! You flailed your arms.");
                 }
@@ -158,9 +158,9 @@ namespace Escape
             double modifier = lucky * 0.6;
             double variation = (random.Next(85, 115) / 100d);
 
-            double damage = ((battleCore.AttackerPower * this.Power) / Math.Max(battleCore.DefenderDefense, 1)) * modifier * variation;
+            double damage = ((battleCore.Attacker.Power * this.Power) / (double)Math.Max(battleCore.Defender.Defense, 1)) * modifier * variation;
 
-            if (battleCore.CurrentTurn == "player")
+            if (battleCore.Attacker is Player)
             {
                 Program.SetNotification("You did " + (int)damage + " damage!");
             }
