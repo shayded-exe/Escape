@@ -22,40 +22,15 @@ namespace Escape
 			string Name,
 			string Description,
 			List<string> Exits,
-			List<string> Items,
-			List<string> Enemies,
-			int BattleChance)
-		:base(Name, Description)
+			List<string> Items = null,
+			List<string> Enemies = null,
+			int BattleChance = 0)
+			: base(Name, Description)
 		{
 			this.TempExits = Exits;
-			this.TempItems = Items;
-			this.TempEnemies = Enemies;
+			this.TempItems = Items ?? new List<string>();
+			this.TempEnemies = Enemies ?? new List<string>();
 			this.BattleChance = BattleChance;
-		}
-		
-		public Location(
-			string Name,
-			string Description,
-			List<string> Exits,
-			List<string> Items)
-		:base(Name, Description)
-		{
-			this.TempExits = Exits;
-			this.TempItems = Items;
-			this.TempEnemies = new List<string>();
-			this.BattleChance = 0;
-		}
-		
-		public Location(
-			string Name,
-			string Description,
-			List<string> Exits)
-		:base(Name, Description)
-		{
-			this.TempExits = Exits;
-			this.TempItems = new List<string>();
-			this.TempEnemies = new List<string>();
-			this.BattleChance = 0;
 		}
 		#endregion
 		

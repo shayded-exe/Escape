@@ -31,41 +31,40 @@ namespace Escape
 		 * 
 		 * Format:
 		 *     Map.Add(new Location(
-		 *         "Name",
-		 *         "Description",
-		 *         new List<string>() { List of exits by name },
-		 *         new List<string>() { List of items by name },
-		 *         new List<string>() { List of enemies by name },
-		 *         What the chance of a random battle in that room is ( x / 100 )));
+		 *         Name: "Name",
+		 *         Description: "Description",
+		 *         Exits: new List<string>() { List of exits by name },
+		 *         Items: new List<string>() { List of items by name },
+		 *         Enemies: new List<string>() { List of enemies by name },
+		 *         BattleChance: What the chance of a random battle in that room is ( x / 100 )));
 		 */
 		private static void GenerateWorld()
 		{
 			Map.Add(new Location(
-				"Room 1",
-				"This is a room.",
-				new List<string>() { "room 2" },
-				new List<string>() { "brass key", "rock" }));
+				Name: "Room 1",
+				Description: "This is a room.",
+				Exits: new List<string>() { "room 2" },
+				Items: new List<string>() { "brass key", "rock" }));
 				
 			Map.Add(new Location(
-				"Room 2",
-				"This is another room.",
-				new List<string>() { "room 1", "room 3" },
-				new List<string>() { "shiny stone" },
-				new List<string>() { "rat" },
-				50));
+				Name: "Room 2",
+				Description:"This is another room.",
+				Exits: new List<string>() { "room 1", "room 3" },
+				Items: new List<string>() { "shiny stone" },
+				Enemies: new List<string>() { "rat" },
+				BattleChance: 50));
 				
 			Map.Add(new Location(
-				"Room 3",
-				"This is yet another room.",
-				new List<string>() { "room 2" },
-				new List<string>(),
-				new List<string>() { "rat", "hawk" },
-				75));
+				Name: "Room 3",
+				Description: "This is yet another room.",
+				Exits: new List<string>() { "room 2" },
+				Enemies: new List<string>() { "rat", "hawk" },
+				BattleChance: 75));
 			
 			Map.Add(new Location(
-				"Secret Room",
-				"This is a very awesome secret room.",
-				new List<string>() { "room 3" }));
+				Name: "Secret Room",
+				Description: "This is a very awesome secret room.",
+				Exits: new List<string>() { "room 3" }));
 		}
 
 		/*
@@ -122,7 +121,6 @@ namespace Escape
 				new List<string>() { "scratch" }));
 		}
 
-		//Format: (Name, Description, Stats: (Power, Accuracy, Cost), Type)
 		/*
 		 * This defines all the enemies that exist in the game
 		 * 
@@ -136,16 +134,14 @@ namespace Escape
 		private static void GenerateAttacks()
 		{
 			Attacks.Add(new Attack(
-				"Flail",
-				"Flail your arms like a fish out of water and hope something happens",
-				new List<int>() { 5, 70, 0 },
-				Attack.AttackTypes.Physical));
+				Name: "Flail",
+				Description:"Flail your arms like a fish out of water and hope something happens",
+				Stats: new List<int>() { 5, 70, 0 }));
 
 			Attacks.Add(new Attack(
-				"Scratch",
-				"The Attacker digs it's claws into the skin of it's prey. Not really as painful as it sounds.",
-				new List<int>() { 10, 70, 1 },
-				Attack.AttackTypes.Physical));
+				Name: "Scratch",
+				Description: "The Attacker digs it's claws into the skin of it's prey. Not really as painful as it sounds.",
+				Stats: new List<int>() { 10, 70, 1 }));
 		}
 		#endregion
 

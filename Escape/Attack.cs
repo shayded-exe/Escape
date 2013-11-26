@@ -21,7 +21,7 @@ namespace Escape
 			string Name,
 			string Description,
 			List<int> Stats,
-			AttackTypes Type)
+			AttackTypes Type = AttackTypes.Physical)
 		:base(Name, Description)
 		{
 			this.Power = Stats[0];
