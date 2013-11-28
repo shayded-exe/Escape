@@ -59,6 +59,9 @@ namespace Escape
 
         public void Attack(BattleCore battleCore)
         {
+            // Moved here from BattleCore
+            Text.SetKeyPrompt("[Press any key to continue!]");
+            Text.Clear();
             Attacks[Program.Random.Next(this.Attacks.Count)].Use(battleCore);
         }
         #endregion

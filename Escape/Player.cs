@@ -146,7 +146,7 @@ namespace Escape
         public Action LoadHandler { get; set; }
 
         #region Public Methods
-        public void DoPlaying(string input, BattleCore battleCore)
+        public void DoPlaying(string input)
         {
             string verb;
             string noun;
@@ -164,7 +164,7 @@ namespace Escape
                     break;
                 case "move":
                 case "go":
-                    MoveTo(noun, battleCore);
+                    MoveTo(noun);
                     break;
                 case "examine":
                     Examine(noun);
@@ -187,7 +187,7 @@ namespace Escape
                     DisplayInventory();
                     break;
                 case "attack":
-                    Attack(noun, battleCore);
+                    Attack(noun);
                     break;
                 case "hurt":
                     Health -= Convert.ToInt32(noun);
@@ -205,6 +205,14 @@ namespace Escape
                     InputNotValid();
                     break;
             }
+        }
+
+        // Battle input handler
+        void ICombatant.Attack(BattleCore battleCore)
+        {
+            var input = Text.SetPrompt("[" + Location.Name + "] > ");
+            Text.Clear();
+            DoBattle(input, battleCore);
         }
 
         public void DoBattle(string input, BattleCore battleCore)
@@ -301,14 +309,14 @@ namespace Escape
             Text.BlankLines();
         }
 
-        private void MoveTo(string locationName, BattleCore battleCore)
+        private void MoveTo(string locationName)
         {
             Location exit;
             if (TryGetFromName(locationName, out exit, Location.Exits))
             {
                 Location = exit;
 
-                Location.CalculateRandomBattle(this, battleCore);
+                Location.CalculateRandomBattle(this);
             }
             else if (Location.Name == locationName)
             {
@@ -392,12 +400,12 @@ namespace Escape
             }
         }
 
-        private void Attack(string enemyName, BattleCore battleCore)
+        private void Attack(string enemyName)
         {
             Enemy enemy;
             if (TryGetFromName(enemyName, out enemy, Location.Enemies))
             {
-                battleCore.StartBattle(this, enemy);
+                BattleCore.StartBattle(this, enemy);
                 Program.SetNotification("You attacked the " + enemy.Name + ". Prepare for battle!");
             }
             else
@@ -405,7 +413,7 @@ namespace Escape
                 //REWRITE
                 //Program.SetError("That isn't a valid enemy!");
                 //Program.SetError("That enemy isn't able to take your call at the moment, please leave a message!..... **BEEP**");
-                Program.SetError("That isn't a valid enemy or hat enemy isn't able to take your call at the moment, please leave a message!..... **BEEP**");
+                Program.SetError("That isn't a valid enemy or that enemy isn't able to take your call at the moment, please leave a message!..... **BEEP**");
             }
         }
 

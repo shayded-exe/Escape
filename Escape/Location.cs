@@ -60,14 +60,14 @@ namespace Escape
         #region Public Methods
         // I removed the collection wrappers, just operating on the collections shouldn't do any harm.
 
-        public void CalculateRandomBattle(Player player, BattleCore battleCore)
+        public void CalculateRandomBattle(Player player)
         {
             // Creating new randoms on the fly yields repeat numbers. It's also slow.
             if (Program.Random.Next(100) < BattleChance && Enemies.Count > 0)
             {
                 Enemy enemy = Enemies[Program.Random.Next(Enemies.Count)];
                 Program.SetNotification("You were attacked by " + Text.AorAn(enemy.Name));
-                battleCore.StartBattle(enemy, player);
+                BattleCore.StartBattle(enemy, player);
             }
         }
         #endregion

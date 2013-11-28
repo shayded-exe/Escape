@@ -85,11 +85,6 @@ namespace Escape
 
         private static void PlayingState(Player player)
         {
-            BattleCore battleCore = new BattleCore()
-            {
-                BattleHandler = BattleState
-            };
-
             while (true)
             {
                 if (isError)
@@ -108,12 +103,11 @@ namespace Escape
                 //Get input from the player
                 string temp = Text.SetPrompt("[" + player.Location.Name + "] > ");
                 Text.Clear();
-                player.DoPlaying(temp, battleCore);
+                player.DoPlaying(temp);
             }
         }
 
-        /// <returns>True if the battle is still ongoing, otherwise false.</returns>
-        private static void BattleState(BattleCore battleCore)
+        public static void BattleState(BattleCore battleCore)
         {
             bool isEnd = false;
             while (isEnd == false)

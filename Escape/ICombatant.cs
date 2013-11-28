@@ -7,5 +7,6 @@
         int Magic { get; set; }
         int Power { get; }
         int Defense { get; }
+        void Attack(BattleCore battleCore);
     }
 }

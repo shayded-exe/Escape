@@ -8,18 +8,22 @@ namespace Escape
     class BattleCore
     {
         #region Declarations
-        public ICombatant Attacker { get; set; }
-        public ICombatant Defender { get; set; }
+        public ICombatant Attacker { get; private set; }
+        public ICombatant Defender { get; private set; }
 
         public static double BaseLuckyRate = 7.5;
         #endregion
 
-        public Action<BattleCore> BattleHandler { get; set; }
+        private BattleCore(ICombatant attacker, ICombatant defender)
+        {
+            Attacker = attacker;
+            Defender = defender;
+        }
 
         #region Battle Methods
-        public void StartBattle(ICombatant attacker, ICombatant defender)
+        public static void StartBattle(ICombatant attacker, ICombatant defender)
         {
-            // Maybe cloning should be a property of the combatant class
+            // Maybe cloning should be a method of the combatant class
             if (attacker is Enemy)
             {
                 attacker = CloneEnemy((Enemy)attacker);
@@ -28,35 +32,13 @@ namespace Escape
             {
                 defender = CloneEnemy((Enemy)defender);
             }
-            this.Attacker = attacker;
-            this.Defender = defender;
 
-            BattleHandler(this);
+            Program.BattleState(new BattleCore(attacker, defender));
         }
 
         public void NextTurn()
         {
-            // -snip- should have been unreachable
-
-            //TODO: Unify
-            if (Attacker is Player)
-            {
-                var player = (Player)Attacker;
-                string temp = Text.SetPrompt("[" + player.Location.Name + "] > ");
-                Text.Clear();
-                player.DoBattle(temp, this);
-            }
-            else if (Attacker is Enemy)
-            {
-                Text.SetKeyPrompt("[Press any key to continue!]");
-                Text.Clear();
-
-                ((Enemy)Attacker).Attack(this);
-            }
-            else
-            {
-                Program.SetError("Errrr.... wanna fuk?");
-            }
+            Attacker.Attack(this);
 
             // Swap sides
             var tempCombatant = Attacker;
