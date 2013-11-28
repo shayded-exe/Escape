@@ -266,37 +266,6 @@ namespace Escape
             }
         }
 
-        // Only look up item once
-        public void GiveAttack(string attackName, Dictionary<string, Attack> attacks)
-        {
-            Attack attack;
-            if (attacks.TryGetValue(attackName, out attack))
-            {
-                Attacks.Add(attack);
-                Program.SetNotification("You learned the attack " + attack.Name + "!");
-            }
-            else
-            {
-                //Error: PL149
-                Program.SetError("Go tell the developer he dun goofed. Error: PL149");
-            }
-        }
-
-        public void GiveItem(string itemName, Dictionary<string, Item> items)
-        {
-            Item item;
-            if (items.TryGetValue(itemName, out item))
-            {
-                Inventory.Add(item);
-                Program.SetNotification("You were given " + Text.AorAn(item.Name));
-            }
-            else
-            {
-                //Error: PL177
-                Program.SetError("Go tell the developer he dun goofed. Error: PL177");
-            }
-        }
-
         public void GiveExp(int amount)
         {
             Exp += amount;

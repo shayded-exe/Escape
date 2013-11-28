@@ -10,21 +10,15 @@ namespace Escape
     class World
     {
         #region Definitions
-        public Location StartLocation { get; set; }
-        public AutomaticDictionary<string, Attack> Attacks { get; set; }
-        public AutomaticDictionary<string, Item> Items { get; set; }
-        public AutomaticDictionary<string, Enemy> Enemies { get; set; }
-        public AutomaticDictionary<string, Location> Locations { get; set; }
+        public Location StartLocation { get; private set; }
+
+        // This should be an IReadOnlyList<Attack>, but that is only available in .NET 4.5 or later.
+        public Attack[] PlayerAttacks { get; private set; }
         #endregion
 
         #region Initialization
         public World()
         {
-            Attacks = new AutomaticDictionary<string, Attack>(x => x.Name);
-            Items = new AutomaticDictionary<string, Item>(x => x.Name);
-            Enemies = new AutomaticDictionary<string, Enemy>(x => x.Name);
-            Locations = new AutomaticDictionary<string, Location>(x => x.Name);
-
             // Location declarations
             // These appear here because the variables are caught in lambdas.
             Location
@@ -41,7 +35,6 @@ namespace Escape
                 accuracy: 70,
                 cost: 0,
                 type: Attack.AttackType.Physical);
-            Attacks.Add(flail);
 
             var scratch = new Attack(
                 name: "Scratch",
@@ -51,7 +44,9 @@ namespace Escape
                 cost: 1,
                 type: Attack.AttackType.Physical,
                 fallback: flail);
-            Attacks.Add(scratch);
+
+            //CHANGE: I'm giving the player a few attacks to start with so I can test better.
+            PlayerAttacks = new[] { flail, scratch };
 
             // Enemies
             var rat = new Enemy(
@@ -63,7 +58,6 @@ namespace Escape
                 defense: 5,
                 expValue: 5,
                 attacks: new[] { scratch });
-            Enemies.Add(rat);
 
             var hawk = new Enemy(
                 name: "Hawk",
@@ -74,7 +68,6 @@ namespace Escape
                 defense: 0,
                 expValue: 8,
                 attacks: new[] { scratch });
-            Enemies.Add(hawk);
 
             // Items
             var brassKey = new Item(
@@ -92,7 +85,6 @@ namespace Escape
                         else
                             self.NoUse();
                     });
-            Items.Add(brassKey);
 
             var shinyStone = new Item(
                 name: "Shiny Stone",
@@ -107,7 +99,6 @@ namespace Escape
                         else
                             Program.SetNotification("The shiny stone glowed shiny colors!");
                     });
-            Items.Add(shinyStone);
 
             var rock = new Item(
                 name: "Rock",
@@ -120,7 +111,6 @@ namespace Escape
                     {
                         Program.SetNotification("The rock hit the enemy in the head! It seems confused...");
                     });
-            Items.Add(rock);
 
             // Location initialization
             room1 = new Location(
@@ -133,7 +123,6 @@ namespace Escape
                             rock
                         });
             StartLocation = room1;
-            Locations.Add(room1);
 
             room2 = new Location(
                 name: "Room 2",
@@ -146,7 +135,6 @@ namespace Escape
                 items: new[] { shinyStone },
                 enemies: new[] { rat },
                 battleChance: 50);
-            Locations.Add(room2);
 
             room3 = new Location(
                 name: "Room 3",
@@ -158,13 +146,11 @@ namespace Escape
                             hawk
                         },
                 battleChance: 75);
-            Locations.Add(room3);
 
             secretRoom = new Location(
                 name: "Secret Room",
                 description: "This is a very awesome secret room.",
                 unboundExits: new Func<Location>[] { () => room3 });
-            Locations.Add(secretRoom);
         }
 
         #endregion

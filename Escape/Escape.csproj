@@ -48,7 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attack.cs" />
-    <Compile Include="AutomaticDictionary.cs" />
     <Compile Include="BattleCore.cs" />
     <Compile Include="Enemy.cs" />
     <Compile Include="ICombatant.cs" />

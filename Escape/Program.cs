@@ -63,8 +63,13 @@ namespace Escape
                     }
                 };
             player.Died += ply => GameOverState();
+
+            // I'm not sure about how the player is initialized, it's a bit ugly.
             var world = new World();
             player.Location = world.StartLocation;
+            player.Attacks.AddRange(world.PlayerAttacks);
+            // World is not referenced after this point.
+            // Not having global item lists could make debugging (cheat commands) difficult, so I need to think about that some more.
 
             if (isError)
             {
