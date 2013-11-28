@@ -405,8 +405,8 @@ namespace Escape
             Enemy enemy;
             if (TryGetFromName(enemyName, out enemy, Location.Enemies))
             {
-                BattleCore.StartBattle(this, enemy);
                 Program.SetNotification("You attacked the " + enemy.Name + ". Prepare for battle!");
+                BattleCore.RunBattle(this, enemy);
             }
             else
             {

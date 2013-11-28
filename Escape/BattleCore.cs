@@ -21,7 +21,7 @@ namespace Escape
         }
 
         #region Battle Methods
-        public static void StartBattle(ICombatant attacker, ICombatant defender)
+        public static void RunBattle(ICombatant attacker, ICombatant defender)
         {
             // Maybe cloning should be a method of the combatant class
             if (attacker is Enemy)

@@ -67,7 +67,7 @@ namespace Escape
             {
                 Enemy enemy = Enemies[Program.Random.Next(Enemies.Count)];
                 Program.SetNotification("You were attacked by " + Text.AorAn(enemy.Name));
-                BattleCore.StartBattle(enemy, player);
+                BattleCore.RunBattle(enemy, player);
             }
         }
         #endregion
