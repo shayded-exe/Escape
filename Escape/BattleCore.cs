@@ -7,6 +7,9 @@ namespace Escape
 {
     class BattleCore
     {
+        public delegate void BattleAction(ICombatant attacker, ICombatant defender);
+        public static readonly BattleAction Yield = (attacker, defender) => { };
+
         #region Declarations
         public ICombatant Attacker { get; private set; }
         public ICombatant Defender { get; private set; }
@@ -38,7 +41,8 @@ namespace Escape
 
         public void NextTurn()
         {
-            Attacker.Attack(this);
+            // Returns a delegate that is then executed
+            Attacker.SelectBattleAction()(Attacker, Defender);
 
             // Swap sides
             var tempCombatant = Attacker;

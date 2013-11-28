@@ -208,14 +208,14 @@ namespace Escape
         }
 
         // Battle input handler
-        void ICombatant.Attack(BattleCore battleCore)
+        BattleCore.BattleAction ICombatant.SelectBattleAction()
         {
             var input = Text.SetPrompt("[" + Location.Name + "] > ");
             Text.Clear();
-            DoBattle(input, battleCore);
+            return DoGetBattleAction(input);
         }
 
-        public void DoBattle(string input, BattleCore battleCore)
+        public BattleCore.BattleAction DoGetBattleAction(string input)
         {
             string verb;
             string noun;
@@ -226,33 +226,32 @@ namespace Escape
                 case "help":
                 case "?":
                     WriteBattleCommands();
-                    break;
+                    //QUESTION: This is a fast in-universe command, should it really take a full turn?
+                    return BattleCore.Yield;
                 case "attack":
-                    AttackInBattle(noun, battleCore);
-                    break;
+                    return AttackInBattle(noun);
                 case "flee":
                 case "escape":
                 case "run":
                     //flee command
-                    break;
+                    return BattleCore.Yield;
                 case "use":
                 case "item":
-                    UseInBattle(noun, battleCore);
-                    break;
+                    return UseInBattle(noun);
                 case "items":
                 case "inventory":
                 case "inv":
                     DisplayBattleInventory();
-                    break;
+                    return BattleCore.Yield;
                 case "exit":
                 case "quit":
                     Program.QuitState();
-                    break;
+                    //QUESTION: This is an out-of-universe command, should it really take a full turn?
+                    return BattleCore.Yield;
                 default:
                     {
                         // Moved attack check to player
-                        AttackInBattle(verb, battleCore);
-                        break;
+                        return AttackInBattle(verb);
                     }
             }
         }
@@ -445,12 +444,12 @@ namespace Escape
             Text.BlankLines();
         }
 
-        private void AttackInBattle(string attackName, BattleCore battleCore)
+        private BattleCore.BattleAction AttackInBattle(string attackName)
         {
             Attack attack;
             if (TryGetFromName(attackName, out attack, Attacks))
             {
-                attack.Use(battleCore);
+                return attack.Use;
             }
             else
             {
@@ -458,22 +457,23 @@ namespace Escape
                 //Program.SetError("That isn't a valid attack!");
                 //Program.SetError("You don't know that attack!");
                 Program.SetError("You don't know that attack or that isn't a valid attack!");
+                return BattleCore.Yield;
             }
         }
 
-        private void UseInBattle(string itemName, BattleCore battleCore)
+        private BattleCore.BattleAction UseInBattle(string itemName)
         {
             Item item;
             if (TryGetFromName(itemName, out item, Inventory))
             {
                 if (item.UsableInBattle)
                 {
-                    item.UseInBattle(this, battleCore.Defender);
-                    return;
+                    return item.UseInBattle;
                 }
                 else
                 {
                     Program.SetError("You can't use that item in battle!");
+                    return BattleCore.Yield;
                 }
             }
             else
@@ -482,6 +482,7 @@ namespace Escape
                 //Program.SetError("You aren't holding that item!");
                 //Program.SetError("That isn't a valid item!");
                 Program.SetError("You aren't holding that item or that isn't a valid item!");
+                return BattleCore.Yield;
             }
         }
 

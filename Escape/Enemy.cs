@@ -57,12 +57,12 @@ namespace Escape
         #region Public Methods
         // Removed attack accessors
 
-        public void Attack(BattleCore battleCore)
+        public BattleCore.BattleAction SelectBattleAction()
         {
             // Moved here from BattleCore
             Text.SetKeyPrompt("[Press any key to continue!]");
             Text.Clear();
-            Attacks[Program.Random.Next(this.Attacks.Count)].Use(battleCore);
+            return Attacks[Program.Random.Next(this.Attacks.Count)].Use;
         }
         #endregion
     }

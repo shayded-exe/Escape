@@ -58,11 +58,11 @@ namespace Escape
         #endregion
 
         #region Public Methods
-        // The flow of references here is really off.
-        // The BattleCore should handle the messages if it can't be normalized.
-        public void Use(BattleCore battleCore)
+        // The messages here aren't perfect imo (not sure if it's an enemy).
+        // Maybe there could be a method returning the proper name/noun phrase for the ICombatant.
+        public void Use(ICombatant attacker, ICombatant defender)
         {
-            if (battleCore.Attacker is Player)
+            if (attacker is Player)
             {
                 Program.SetNotification("You used " + this.Name + "!");
             }
@@ -71,32 +71,31 @@ namespace Escape
                 Program.SetNotification("The enemy used " + this.Name + "!");
             }
 
-            if (!CheckMagic(battleCore))
+            if (!CheckMagic(attacker))
             {
-                Fallback.Use(battleCore);
-                return;
+                Fallback.Use(attacker, defender);
             }
 
-            battleCore.Attacker.Magic -= this.Cost;
+            attacker.Magic -= this.Cost;
 
-            int lucky = CheckLucky(battleCore);
+            int lucky = CheckLucky(attacker);
 
-            if (!CheckAccuracy(lucky, battleCore))
+            if (!CheckAccuracy(lucky, attacker))
                 return;
 
-            int damage = CheckDamage(lucky, battleCore);
+            int damage = CheckDamage(lucky, attacker, defender);
 
-            battleCore.Defender.Health -= damage;
+            defender.Health -= damage;
         }
         #endregion
 
         #region Helper Methods
-        private int CheckLucky(BattleCore battleCore)
+        private int CheckLucky(ICombatant attacker)
         {
             Random rand = Program.Random;
             int random = rand.Next(0, 100);
 
-            double modifiedLuckyRate = BattleCore.BaseLuckyRate * (2 - (battleCore.Attacker.Health / (double)battleCore.Attacker.MaxHealth));
+            double modifiedLuckyRate = BattleCore.BaseLuckyRate * (2 - (attacker.Health / (double)attacker.MaxHealth));
 
             if (random < modifiedLuckyRate)
             {
@@ -107,7 +106,7 @@ namespace Escape
                 return 1;
         }
 
-        private bool CheckAccuracy(int lucky, BattleCore battleCore)
+        private bool CheckAccuracy(int lucky, ICombatant attacker)
         {
             if (lucky == 2)
             {
@@ -119,9 +118,9 @@ namespace Escape
 
             double modifiedAccuracy = this.Accuracy;
 
-            if ((battleCore.Attacker.Health / (double)battleCore.Attacker.MaxHealth) < 0.5)
+            if ((attacker.Health / (double)attacker.MaxHealth) < 0.5)
             {
-                modifiedAccuracy = this.Accuracy * ConvertRange(0, 100, 80, 100, ((battleCore.Attacker.Health / (double)battleCore.Attacker.MaxHealth) * 200)) * 0.01;
+                modifiedAccuracy = this.Accuracy * ConvertRange(0, 100, 80, 100, ((attacker.Health / (double)attacker.MaxHealth) * 200)) * 0.01;
             }
 
             if (random < modifiedAccuracy)
@@ -134,13 +133,13 @@ namespace Escape
 
         }
 
-        private bool CheckMagic(BattleCore battleCore)
+        private bool CheckMagic(ICombatant attacker)
         {
-            if (battleCore.Attacker.Magic >= this.Cost)
+            if (attacker.Magic >= this.Cost)
                 return true;
             else
             {
-                if (battleCore.Attacker is Player)
+                if (attacker is Player)
                 {
                     Program.SetError("Not enough magic! You flailed your arms.");
                 }
@@ -152,15 +151,15 @@ namespace Escape
             }
         }
 
-        private int CheckDamage(int lucky, BattleCore battleCore)
+        private int CheckDamage(int lucky, ICombatant attacker, ICombatant defender)
         {
             Random random = Program.Random;
             double modifier = lucky * 0.6;
             double variation = (random.Next(85, 115) / 100d);
 
-            double damage = ((battleCore.Attacker.Power * this.Power) / (double)Math.Max(battleCore.Defender.Defense, 1)) * modifier * variation;
+            double damage = ((attacker.Power * this.Power) / (double)Math.Max(defender.Defense, 1)) * modifier * variation;
 
-            if (battleCore.Attacker is Player)
+            if (attacker is Player)
             {
                 Program.SetNotification("You did " + (int)damage + " damage!");
             }

@@ -107,6 +107,7 @@ namespace Escape
             }
         }
 
+        // Maybe this should be moved into the BattleCore class...
         public static void BattleState(BattleCore battleCore)
         {
             bool isEnd = false;
