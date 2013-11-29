@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Diagnostics;
 using System.Reflection;
+using Escape.Exceptions;
 
 namespace Escape
 {
@@ -41,9 +42,23 @@ namespace Escape
             Console.BufferWidth = width;
             Console.BufferHeight = height;
 
-            // The control flow with inner loops represents how the game works a bit better.
-            // It's also much easier to follow.
-            StartState();
+        // You could use a loop here to avoid the goto but I think it's fine in this case.
+        // C# does validation and prevents common errors if you follow rules like not initializing variables unnecessarily.
+        gameStart:
+            try
+            {
+                // The control flow with inner loops represents how the game works a bit better.
+                // It's also much easier to follow.
+                StartState();
+            }
+            catch (StartNewGameException)
+            {
+                goto gameStart;
+            }
+            catch (QuitGameException)
+            {
+                return;
+            }
         }
         #endregion
 
@@ -147,9 +162,7 @@ namespace Escape
 
             if (quitKey == 'y')
             {
-                // Temporary
-                // This is entirely fine as long as you don't have threaded IO.
-                Environment.Exit(0);
+                throw new QuitGameException("Quit from QuitState().");
             }
             else
             {
@@ -176,10 +189,9 @@ namespace Escape
 
             if (quitKey.KeyChar == 'y')
             {
-                Process.Start(Assembly.GetExecutingAssembly().Location);
+                throw new StartNewGameException("Restart from GameOverState()");
             }
-            //TODO?: Quit differently?
-            Environment.Exit(0);
+            throw new QuitGameException("Quit from GameOverState().");
         }
         #endregion
 

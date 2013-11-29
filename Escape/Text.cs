@@ -258,6 +258,9 @@ namespace Escape
 		#region Helper Methods
 		private static bool isVowel(char letter)
 		{
+            // There is a good amount of words where this doesn't hold,
+            // u can be a combined consonant-vovel sound and y can start with a vovel.
+            // It's probably a good idea to just have fixed variants for names (or a name class that stores relevant information on a case-by-case basis).
 			return "aeiouAEIOU".IndexOf(letter) >= 0;
 		}
 		#endregion
