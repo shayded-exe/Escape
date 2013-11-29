@@ -48,6 +48,16 @@ namespace Escape
             IEnumerable<Enemy> enemies = null,
             int battleChance = 0)
         {
+            if (items != null && items.Any(x => x == null))
+            {
+                throw new ArgumentNullException("items", "An item is null.");
+            }
+
+            if (enemies != null && enemies.Any(x => x == null))
+            {
+                throw new ArgumentNullException("enemies", "An enemy is null.");
+            }
+
             this.Name = name;
             this.Description = description;
             this.unboundExits = unboundExits;

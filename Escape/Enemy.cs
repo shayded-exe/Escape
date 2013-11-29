@@ -39,6 +39,11 @@ namespace Escape
             int expValue = 0,
             IEnumerable<Attack> attacks = null)
         {
+            if (attacks != null && attacks.Any(x => x == null))
+            {
+                throw new ArgumentNullException("attacks", "An attack is null.");
+            }
+
             this.Name = name;
 
             // TODO: Handling health and mana max. without need for double lines outside.
