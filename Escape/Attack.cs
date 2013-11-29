@@ -45,7 +45,10 @@ namespace Escape
         {
             // The assertion here isn't 100% foolproof,
             // weird things (errors) happen when someone's magic pool is negative.
-            Debug.Assert(fallback != null || cost <= 1);
+            if (fallback == null && cost > 0)
+            {
+                throw new ArgumentNullException("fallback", "A fallback must be specified if the cost is higher than 0.");
+            }
 
             this.Name = name;
             this.Description = description;
