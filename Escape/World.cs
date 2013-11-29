@@ -9,7 +9,28 @@ namespace Escape
     // This also helps with loading, as the previous state can simply be discarded and won't interfere with the new one.
     class World
     {
-        #region Definitions
+        #region World Declarations
+        public readonly Location
+            Room1,
+            Room2,
+            Room3,
+            SecretRoom;
+
+        public readonly Attack
+            Flail,
+            Scratch;
+
+        public readonly Enemy
+            Rat,
+            Hawk;
+
+        public readonly Item
+            BrassKey,
+            ShinyStone,
+            Rock;
+        #endregion
+
+        #region Player Settings
         public Location StartLocation { get; private set; }
 
         // This should be an IReadOnlyList<Attack>, but that is only available in .NET 4.5 or later.
@@ -19,16 +40,10 @@ namespace Escape
         #region Initialization
         public World()
         {
-            // Location declarations
-            // These appear here because the variables are caught in lambdas.
-            Location
-                room1 = null,
-                room2 = null,
-                room3 = null,
-                secretRoom = null;
+            // The order here is now important and not verified by the compiler.
 
             // Attacks
-            var flail = new Attack(
+            Flail = new Attack(
                 name: "Flail",
                 description: "Flail your arms like a fish out of water and hope something happens",
                 power: 5,
@@ -36,20 +51,20 @@ namespace Escape
                 cost: 0,
                 type: Attack.AttackType.Physical);
 
-            var scratch = new Attack(
+            Scratch = new Attack(
                 name: "Scratch",
                 description: "The Attacker digs its claws into the skin of its prey. Not really as painful as it sounds.",
                 power: 10,
                 accuracy: 70,
                 cost: 1,
                 type: Attack.AttackType.Physical,
-                fallback: flail);
+                fallback: Flail);
 
             //CHANGE: I'm giving the player a few attacks to start with so I can test better.
-            PlayerAttacks = new[] { flail, scratch };
+            PlayerAttacks = new[] { Flail, Scratch };
 
             // Enemies
-            var rat = new Enemy(
+            Rat = new Enemy(
                 name: "Rat",
                 description: "It's just a pwesious wittle wat that will KILL YOU!",
                 health: 10, maxHealth: 10,
@@ -57,9 +72,9 @@ namespace Escape
                 power: 10,
                 defense: 5,
                 expValue: 5,
-                attacks: new[] { scratch });
+                attacks: new[] { Scratch });
 
-            var hawk = new Enemy(
+            Hawk = new Enemy(
                 name: "Hawk",
                 description: "It flies around looking for prey to feed on.",
                 health: 15, maxHealth: 15,
@@ -67,16 +82,16 @@ namespace Escape
                 power: 15,
                 defense: 0,
                 expValue: 8,
-                attacks: new[] { scratch });
+                attacks: new[] { Scratch });
 
             // Items
-            var brassKey = new Item(
+            BrassKey = new Item(
                 name: "Brass Key",
                 description: "Just your generic key that's in almost every game.",
                 uses: (user, self) =>
                     {
-                        var targetLocation = room3;
-                        var newLocation = secretRoom;
+                        var targetLocation = Room3;
+                        var newLocation = SecretRoom;
                         if (user.Location == targetLocation)
                         {
                             Program.SetNotification("The " + self.Name + " opened the lock!");
@@ -86,12 +101,12 @@ namespace Escape
                             self.NoUse();
                     });
 
-            var shinyStone = new Item(
+            ShinyStone = new Item(
                 name: "Shiny Stone",
                 description: "It's a stone and it's shiny, what more could you ask for?",
                 uses: (user, self) => // Can be (Item self), but that's not necessary due to type inference.
                     {
-                        if (user.Location == secretRoom)
+                        if (user.Location == SecretRoom)
                         {
                             user.Health += Math.Min(user.MaxHealth / 10, user.MaxHealth - user.Health);
                             Program.SetNotification("The magical stone restored your health by 10%!");
@@ -100,7 +115,7 @@ namespace Escape
                             Program.SetNotification("The shiny stone glowed shiny colors!");
                     });
 
-            var rock = new Item(
+            Rock = new Item(
                 name: "Rock",
                 description: "It doesn't do anything, however, it is said that the mystical game designer used this for testing.",
                 uses: (user, self) =>
@@ -113,44 +128,44 @@ namespace Escape
                     });
 
             // Location initialization
-            room1 = new Location(
+            Room1 = new Location(
                 name: "Room 1",
                 description: "This is a room.",
-                unboundExits: new Func<Location>[] { () => room2 },
+                unboundExits: new Func<Location>[] { () => Room2 },
                 items: new[]
                         {
-                            brassKey,
-                            rock
+                            BrassKey,
+                            Rock
                         });
-            StartLocation = room1;
+            StartLocation = Room1;
 
-            room2 = new Location(
+            Room2 = new Location(
                 name: "Room 2",
                 description: "This is another room.",
                 unboundExits: new Func<Location>[]
                         {
-                            () => room1,
-                            () => room3
+                            () => Room1,
+                            () => Room3
                         },
-                items: new[] { shinyStone },
-                enemies: new[] { rat },
+                items: new[] { ShinyStone },
+                enemies: new[] { Rat },
                 battleChance: 50);
 
-            room3 = new Location(
+            Room3 = new Location(
                 name: "Room 3",
                 description: "This is yet another room.",
-                unboundExits: new Func<Location>[] { () => room2 },
+                unboundExits: new Func<Location>[] { () => Room2 },
                 enemies: new[]
                         {
-                            rat,
-                            hawk
+                            Rat,
+                            Hawk
                         },
                 battleChance: 75);
 
-            secretRoom = new Location(
+            SecretRoom = new Location(
                 name: "Secret Room",
                 description: "This is a very awesome secret room.",
-                unboundExits: new Func<Location>[] { () => room3 });
+                unboundExits: new Func<Location>[] { () => Room3 });
         }
 
         #endregion
