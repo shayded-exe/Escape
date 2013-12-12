@@ -1,210 +1,269 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace Escape
 {
-	static class World
-	{
-		#region Declarations
-		public static List<Location> Map = new List<Location>();
-		public static List<Item> Items = new List<Item>();
-		public static List<Enemy> Enemies = new List<Enemy>();
-		#endregion
-		
-		#region Initialization
-		public static void Initialize()
-		{
-			GenerateWorld();
-			GenerateItems();
-			GenerateEnemies();
-		}
-		#endregion
-		
-		#region World Generation Methods
-		private static void GenerateWorld()
-		{
-			Map.Add(new Location(
-				"Room 1",
-				"This is a room.",
-				new List<int>() {1},
-				new List<int>() {0, 2}));
-				
-			Map.Add(new Location(
-				"Room 2",
-				"This is another room.",
-				new List<int>() {0, 2},
-				new List<int>() {1},
-				new List<int>() {0},
-				50));
-				
-			Map.Add(new Location(
-				"Room 3",
-				"This is yet another room.",
-				new List<int>() {1},
-				new List<int>(),
-				new List<int>() {0, 1},
-				75));
-			
-			Map.Add(new Location(
-				"Secret Room",
-				"This is a very awesome secret room.",
-				new List<int>() {2}));
-		}
-		
-		private static void GenerateItems()
-		{
-			Items.Add(new Key(
-				"Brass Key",
-				"Just your generic key that's in almost every game.",
-				2, 3,
-				true));
-				
-			Items.Add(new ShinyStone(
-				"Shiny Stone",
-				"Its a stone, and its shiny, what more could you ask for?"));
-				
-			Items.Add(new Rock(
-				"Rock",
-				"It doesn't do anything, however, it is said that the mystical game designer used this for testing."));
-		}
-		
-		private static void GenerateEnemies()
-		{
-			Enemies.Add(new Rat(
-				"Rat",
-				"Its just a pwesious wittle wat that will KILL YOU!",
-				new List<int>() {10, 3, 5}));
-				
-			Enemies.Add(new Hawk(
-				"Hawk",
-				"It flies around looking for prey to feed on.",
-				new List<int>() {15, 5, 0}));
-		}
-		#endregion
-		
-		#region Public Location Methods
-		public static bool IsLocation(string locationName)
-		{
-			for (int i = 0; i < Map.Count; i++)
-			{
-				if (Map[i].Name.ToLower() == locationName.ToLower())
-					return true;
-			}
-			
-			return false;
-		}
-		
-		public static int GetLocationIdByName(string locationName)
-		{
-			for (int i = 0; i < Map.Count; i++)
-			{
-				if (Map[i].Name.ToLower() == locationName.ToLower())
-					return i;
-			}
-			
-			return -1;
-		}
+    // There probably won't be a good reason to keep it static in the long run, so I changed it.
+    // This also helps with loading, as the previous state can simply be discarded and won't interfere with the new one.
+    class World
+    {
+        #region World Declarations
+        public readonly Location
+            Room1,
+            Room2,
+            Room3,
+            SecretRoom;
 
-		public static void LocationHUD()
-		{
-			Text.WriteColor("`c`/-----------------------------------------------------------------------\\", false);
-			
-			List<string> locationDesctiption = Text.Limit(Map[Player.Location].Description, Console.WindowWidth - 4);
-			
-			foreach (string line in locationDesctiption)
-			{
-				Text.WriteColor("| `w`" + line + Text.BlankSpaces((Console.WindowWidth - line.Length - 4), true) + "`c` |", false);
-			}
-			
-			Text.WriteColor(">-----------------v-----------------v-----------------v-----------------<", false);
-			Text.WriteColor("|      `w`Exits`c`      |      `w`Items`c`      |     `w`People`c`      |      `w`Stats`c`      |", false);
-			Text.WriteColor(">-----------------#-----------------#-----------------#-----------------<`w`", false);
-			
-			int currentY = Console.CursorTop;
-			int i;
-			int longestList = 0;
-			
-			for (i = 0; i < Map[Player.Location].Exits.Count; i++)
-			{
-				string name = Map[Map[Player.Location].Exits[i]].Name;
-				Text.WriteColor("  " + name);
-			}
-			
-			longestList = (i > longestList) ? i : longestList;
-			
-			Console.SetCursorPosition(18, currentY);
-			
-			for (i = 0; i < Map[Player.Location].Items.Count; i++)
-			{
-				string name = Items[Map[Player.Location].Items[i]].Name;
-				Text.WriteColor("  " + name);
-			}
-			
-			longestList = (i > longestList) ? i : longestList;
-			
-			Console.SetCursorPosition(36, currentY);
-			
-			for (i = 0; i < Map[Player.Location].Enemies.Count; i++)
-			{
-				string name = Enemies[Map[Player.Location].Enemies[i]].Name;
-				Text.WriteColor("  " + name);
-			}
-			
-			longestList = (i > longestList) ? i : longestList;
-			
-			Console.SetCursorPosition(54, currentY);
-			
-			Text.WriteColor("  HP [`r`" + Text.ToBar(Player.Health, Player.MaxHealth, 10) + "`w`]");
-			Text.WriteColor("  MP [`g`" + Text.ToBar(Player.Magic, Player.MaxMagic, 10) + "`w`]");
-			
-			longestList = (2 > longestList) ? 2 : longestList;
-						
-			Console.SetCursorPosition(0, currentY);
-			
-			for (i = 0; i < longestList; i++)
-			{
-				for (int j = 0; j < 4; j++)
-				{
-					Text.WriteColor("`c`|", false);
-					Console.CursorLeft += 17;
-				}
-				
-				Text.Write("|");
-				Console.CursorLeft = 0;
-			}
-			
-			Text.WriteColor("\\-----------------^-----------------^-----------------^-----------------/`w`");
-		}
-		#endregion
-		
-		#region Public Item Methods
-		public static bool IsItem(string itemName)
-		{
-			for (int i = 0; i < Items.Count; i++)
-			{
-				if (Items[i].Name.ToLower() == itemName.ToLower())
-					return true;
-			}
-			
-			return false;
-		}
-		
-		public static int GetItemIdByName(string itemName)
-		{
-			for (int i = 0; i < Items.Count; i++)
-			{
-				if (Items[i].Name.ToLower() == itemName.ToLower())
-					return i;
-			}
-			
-			return -1;
-		}
-		
-		public static void ItemDescription(int itemId)
-		{
-			Text.WriteLine(Items[itemId].Description);
-			Text.BlankLines();
-		}
-		#endregion
-	}
+        public readonly Attack
+            Flail,
+            Scratch;
+
+        public readonly Enemy
+            Rat,
+            Hawk;
+
+        public readonly Item
+            BrassKey,
+            ShinyStone,
+            Rock;
+        #endregion
+
+        #region Player Settings
+        public Location StartLocation { get; private set; }
+
+        // This should be an IReadOnlyList<Attack>, but that is only available in .NET 4.5 or later.
+        public Attack[] PlayerAttacks { get; private set; }
+        #endregion
+
+        #region Initialization
+        public World()
+        {
+            // The order here is now important and not verified by the compiler.
+
+            // Attacks
+            Flail = new Attack(
+                name: "Flail",
+                description: "Flail your arms like a fish out of water and hope something happens",
+                power: 5,
+                accuracy: 70,
+                cost: 0,
+                type: Attack.AttackType.Physical);
+
+            Scratch = new Attack(
+                name: "Scratch",
+                description: "The Attacker digs its claws into the skin of its prey. Not really as painful as it sounds.",
+                power: 10,
+                accuracy: 70,
+                cost: 1,
+                type: Attack.AttackType.Physical,
+                fallback: Flail);
+
+            //CHANGE: I'm giving the player a few attacks to start with so I can test better.
+            PlayerAttacks = new[] { Flail, Scratch };
+
+            // Enemies
+            Rat = new Enemy(
+                name: "Rat",
+                description: "It's just a pwesious wittle wat that will KILL YOU!",
+                health: 10, maxHealth: 10,
+                magic: 5, maxMagic: 5,
+                power: 10,
+                defense: 5,
+                expValue: 5,
+                attacks: new[] { Scratch });
+
+            Hawk = new Enemy(
+                name: "Hawk",
+                description: "It flies around looking for prey to feed on.",
+                health: 15, maxHealth: 15,
+                magic: 0, maxMagic: 0,
+                power: 15,
+                defense: 0,
+                expValue: 8,
+                attacks: new[] { Scratch });
+
+            // Items
+            BrassKey = new Item(
+                name: "Brass Key",
+                description: "Just your generic key that's in almost every game.",
+                uses: (user, self) =>
+                    {
+                        var targetLocation = Room3;
+                        var newLocation = SecretRoom;
+                        if (user.Location == targetLocation)
+                        {
+                            Program.SetNotification("The " + self.Name + " opened the lock!");
+                            targetLocation.Exits.Add(newLocation);
+                        }
+                        else
+                            self.NoUse();
+                    });
+
+            ShinyStone = new Item(
+                name: "Shiny Stone",
+                description: "It's a stone and it's shiny, what more could you ask for?",
+                uses: (user, self) => // Can be (Item self), but that's not necessary due to type inference.
+                    {
+                        if (user.Location == SecretRoom)
+                        {
+                            user.Health += Math.Min(user.MaxHealth / 10, user.MaxHealth - user.Health);
+                            Program.SetNotification("The magical stone restored your health by 10%!");
+                        }
+                        else
+                            Program.SetNotification("The shiny stone glowed shiny colors!");
+                    });
+
+            Rock = new Item(
+                name: "Rock",
+                description: "It doesn't do anything, however, it is said that the mystical game designer used this for testing.",
+                uses: (user, self) =>
+                    {
+                        Program.SetNotification("You threw the rock at a wall. Nothing happened.");
+                    },
+                battleUses: (user, self, victim) =>
+                    {
+                        Program.SetNotification("The rock hit the enemy in the head! It seems confused...");
+                    });
+
+            // Location initialization
+            Room1 = new Location(
+                name: "Room 1",
+                description: "This is a room.",
+                unboundExits: new Func<Location>[] { () => Room2 },
+                items: new[]
+                        {
+                            BrassKey,
+                            Rock
+                        });
+            StartLocation = Room1;
+
+            Room2 = new Location(
+                name: "Room 2",
+                description: "This is another room.",
+                unboundExits: new Func<Location>[]
+                        {
+                            () => Room1,
+                            () => Room3
+                        },
+                items: new[] { ShinyStone },
+                enemies: new[] { Rat },
+                battleChance: 50);
+
+            Room3 = new Location(
+                name: "Room 3",
+                description: "This is yet another room.",
+                unboundExits: new Func<Location>[] { () => Room2 },
+                enemies: new[]
+                        {
+                            Rat,
+                            Hawk
+                        },
+                battleChance: 75);
+
+            SecretRoom = new Location(
+                name: "Secret Room",
+                description: "This is a very awesome secret room.",
+                unboundExits: new Func<Location>[] { () => Room3 });
+        }
+
+        #endregion
+
+        #region Public Location Methods
+
+        //Prints the main HUD that is displayed for most of the game. Warning, this gets a little complex.
+        public static void LocationHUD(Player player)
+        {
+            Text.WriteColor("`c`/-----------------------------------------------------------------------\\", false);
+
+            List<string> locationDesctiption = Text.Limit(player.Location.Name + " - " + player.Location.Description, Console.WindowWidth - 4);
+
+            foreach (string line in locationDesctiption)
+            {
+                Text.WriteColor("| `w`" + line + Text.BlankSpaces((Console.WindowWidth - line.Length - 4), true) + "`c` |", false);
+            }
+
+            Text.WriteColor(">-----------------v-----------------v-----------------v-----------------<", false);
+            Text.WriteColor("|      `w`Exits`c`      |      `w`Items`c`      |     `w`People`c`      |      `w`Stats`c`      |", false);
+            Text.WriteColor(">-----------------#-----------------#-----------------#-----------------<`w`", false);
+
+            int currentY = Console.CursorTop;
+            int i = 0;
+            int longestList = 0;
+
+            foreach (Location exit in player.Location.Exits)
+                Text.WriteColor("  " + exit.Name);
+
+            longestList = (i > longestList) ? i : longestList;
+            i = 0;
+
+            Console.SetCursorPosition(18, currentY);
+
+            foreach (Item item in player.Location.Items)
+                Text.WriteColor("  " + item.Name);
+
+            longestList = (i > longestList) ? i : longestList;
+            i = 0;
+
+            Console.SetCursorPosition(36, currentY);
+
+            foreach (Enemy enemy in player.Location.Enemies)
+                Text.WriteColor("  " + enemy.Name);
+
+            longestList = (i > longestList) ? i : longestList;
+            i = 0;
+
+            Console.SetCursorPosition(54, currentY);
+
+            Text.WriteColor("  HP [`r`" + Text.ToBar(player.Health, player.MaxHealth, 10) + "`w`]");
+            Text.WriteColor("  MP [`g`" + Text.ToBar(player.Magic, player.MaxMagic, 10) + "`w`]");
+
+            longestList = (2 > longestList) ? 2 : longestList;
+
+            Console.SetCursorPosition(0, currentY);
+
+            for (i = 0; i < longestList; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    Text.WriteColor("`c`|", false);
+                    Console.CursorLeft += 17;
+                }
+
+                Text.Write("|");
+                Console.CursorLeft = 0;
+            }
+
+            Text.WriteColor("\\-----------------^-----------------+-----------------^-----------------/`w`", false);
+            Text.WriteColor(" `c`\\`w` Lvl.", false);
+
+            if (player.Level < 10)
+            {
+                Text.Write(" ");
+            }
+
+            Text.WriteColor(player.Level + " [`g`" + Text.ToBar(player.Exp, player.GetNextLevel(), 23) + "`w`] `c`|`w` "
+            + player.Exp + "/" + player.GetNextLevel() + "`c` /", false);
+
+            int expLength = Console.CursorLeft;
+
+            Text.WriteLine("", false);
+
+            Text.WriteColor("  \\---------------------------------^", false);
+
+            while (Console.CursorLeft < expLength - 2)
+            {
+                Text.WriteColor("-", false);
+            }
+
+            Text.WriteColor("/`w`", false);
+
+            Text.WriteAt("`c`v`w`", expLength, Console.CursorTop - 2, true, true);
+
+            Text.WriteLine("", false);
+            Text.WriteLine("", false);
+        }
+        #endregion
+    }
 }

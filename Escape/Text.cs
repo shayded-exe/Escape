@@ -18,6 +18,13 @@ namespace Escape
 			
 			return Console.ReadLine();
 		}
+
+		public static char SetKeyPrompt(string aString = "")
+		{
+			Text.Write(string.Format(aString));
+
+			return Console.ReadKey().KeyChar;
+		}
 		
 		public static void Write(string aString)
 		{			
@@ -229,10 +236,32 @@ namespace Escape
 			
 			return barString;
 		}
+
+		public static string AorAn(string word)
+		{
+			if (Text.isVowel(word[0]))
+			{
+				return "an " + word;
+			}
+			else
+			{
+				return "a " + word;
+			}
+		}
 		
 		public static void Clear()
 		{
 			Console.Clear();
+		}
+		#endregion
+
+		#region Helper Methods
+		private static bool isVowel(char letter)
+		{
+            // There is a good amount of words where this doesn't hold,
+            // u can be a combined consonant-vovel sound and y can start with a vovel.
+            // It's probably a good idea to just have fixed variants for names (or a name class that stores relevant information on a case-by-case basis).
+			return "aeiouAEIOU".IndexOf(letter) >= 0;
 		}
 		#endregion
 	}

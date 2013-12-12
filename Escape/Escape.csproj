@@ -47,9 +47,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attack.cs" />
     <Compile Include="BattleCore.cs" />
     <Compile Include="Enemy.cs" />
-    <Compile Include="Entity.cs" />
+    <Compile Include="Exceptions\EscapeException.cs" />
+    <Compile Include="Exceptions\FlowControlException.cs" />
+    <Compile Include="Exceptions\StartNewGameException.cs" />
+    <Compile Include="Exceptions\QuitGameException.cs" />
+    <Compile Include="ICombatant.cs" />
+    <Compile Include="INamed.cs" />
     <Compile Include="Item.cs" />
     <Compile Include="Location.cs" />
     <Compile Include="Player.cs" />

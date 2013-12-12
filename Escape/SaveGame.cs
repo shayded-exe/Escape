@@ -1,42 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Escape
 {
-	[Serializable]
-	class SaveGame
-	{
-		#region Declarations
-		public string Player_Name = Player.Name;
-		public int Player_Location = Player.Location;
-		
-		public int Player_MaxHealth = Player.MaxHealth;
-		public int Player_Health = Player.Health;
-		
-		public int Player_MaxMagic = Player.MaxMagic;
-		public int Player_Magic = Player.Magic;
-		
-		public List<int> Player_Inventory = Player.Inventory;
-		
-		public List<Location> World_Map = World.Map;
-		#endregion
-		
-		#region Loading Method
-		public void Load()
-		{
-			Player.Name = this.Player_Name;
-			Player.Location = this.Player_Location;
-			
-			Player.MaxHealth = this.Player_MaxHealth;
-			Player.Health = this.Player_Health;
-			
-			Player.MaxMagic = this.Player_MaxMagic;
-			Player.Magic = this.Player_Magic;
-			
-			Player.Inventory = this.Player_Inventory;
-			
-			World.Map = this.World_Map;
-		}
-		#endregion
-	}
+    [Serializable]
+    class SaveGame
+    {
+        #region Declarations
+        public string Player_Name;
+        public Location Player_Location;
+        public int Player_Health;
+        public int Player_Magic;
+        public int Player_Level;
+        public int Player_Exp;
+
+        public List<Item> Player_Inventory;
+        #endregion
+
+        public SaveGame(Player player)
+        {
+            Player_Name = player.Name;
+            Player_Location = player.Location;
+            Player_Health = player.Health;
+            Player_Magic = player.Magic;
+            Player_Level = player.Level;
+            Player_Exp = player.Exp;
+
+            Player_Inventory = new List<Item>(player.Inventory);
+        }
+
+        #region Loading Method
+        public Player Load()
+        {
+            Player player = new Player();
+            player.Name = this.Player_Name;
+            player.Location = this.Player_Location;
+            player.Health = this.Player_Health;
+            player.Magic = this.Player_Magic;
+            player.Level = this.Player_Level;
+            player.Exp = this.Player_Exp;
+
+            player.Inventory = this.Player_Inventory;
+
+            return player;
+        }
+        #endregion
+    }
 }

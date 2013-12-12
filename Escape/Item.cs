@@ -1,109 +1,77 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Escape
 {
-	abstract class Item : Entity
-	{
-		#region Declarations
-		private bool uses;
-		#endregion
-		
-		#region Constructor
-		public Item(
-			string Name,
-			string Description,
-			bool uses = false)
-		:base(Name, Description)
-		{
-			this.uses = uses;
-		}
-		#endregion
-		
-		#region Public Methods
-		public virtual void Use() { }
+    [Serializable]
+    class Item : INamed
+    {
+        #region Definitions
+        // Maybe should be changed to an interface instead of Player as user
+        public delegate void OnUse(Player user, Item item);
+        public delegate void OnUseInBattle(ICombatant user, Item item, ICombatant victim);
+        #endregion
 
-		public void NoUse()
-		{
-			Program.SetError("There is a time and place for everything, but this is not the place to use that!");
-		}
-		#endregion
-	}
+        #region Declarations
+        public string Name { get; set; }
+        public string Description;
 
-	#region Key
-	class Key : Item
-	{
-		private int targetLocation;
-		private int newLocation;
+        // This should behave the same way as before, except that it can't be switched dynamically.
+        // You can add that with the code from the Alternative branch, and probably should add an optional parameter into the constructor.
+#if !Alternative
+        public bool Usable { get { return Uses != null; } }
+#else
+        private bool usable = true;
+        public bool Usable { get { return usable && Uses != null; } set { usable = value; } }
+#endif
+        public event OnUse Uses;
 
-		public Key(
-			string Name,
-			string Description,
-			int targetLocation,
-			int newLocation,
-			bool uses = false)
-		:base(Name, Description, uses)
-		{
-			this.targetLocation = targetLocation;
-			this.newLocation = newLocation;
-		}
+        // Same here.
+        public bool UsableInBattle { get { return BattleUses != null; } }
+        public event OnUseInBattle BattleUses;
 
-		public override void Use()
-		{
-			if (Player.Location == targetLocation)
-			{
-				Program.SetNotification("The " + this.Name + " opened the lock!");
-				World.Map[targetLocation].Exits.Add(newLocation);
-			}
-			else
-			{
-				NoUse();
-				return;
-			}
-		}
-	}
-	#endregion
+        // I removed the extended attributes, if necessary they can be put directly into the uses parameter.
+        #endregion
 
-	#region ShinyStone
-	class ShinyStone : Item
-	{
-		public ShinyStone(
-			string Name,
-			string Description,
-			bool uses = false)
-		: base(Name, Description, uses)
-		{
-		}
+        #region Constructor
+        public Item(
+            string name,
+            string description = "",
+            OnUse uses = null,
+            OnUseInBattle battleUses = null)
+        {
+            this.Name = name;
+            this.Description = description;
+            this.Uses = uses;
+            this.BattleUses = battleUses;
+        }
+        #endregion
 
-		public override void Use()
-		{
-			if (Player.Location == 3)
-			{
-				Player.Health += Math.Min(Player.MaxHealth / 10, Player.MaxHealth - Player.Health);
-				Program.SetNotification("The magical stone restored your health by 10%!");
-			}
-			else
-			{
-				Program.SetNotification("The shiny stone glowed shiny colors!");
-			}
-		}
-	}
-	#endregion
+        #region Public Methods
+        public void Use(Player user)
+        {
+            // Usable now implies Uses != null.
+            // I've added curly braces as not having them is usually discouraged.
+            // This version makes it clear that commenting out the line can have side-effects.
+            if (Usable)
+            { Uses(user, this); }
+            else
+            { NoUse(); }
+        }
 
-	#region Rock
-	class Rock : Item
-	{
-		public Rock(
-			string Name,
-			string Description,
-			bool uses = false)
-		:base(Name, Description, uses)
-		{
-		}
+        public void UseInBattle(ICombatant user, ICombatant victim)
+        {
+            // See above.
+            if (UsableInBattle)
+            { BattleUses(user, this, victim); }
+            else
+            { NoUse(); }
+        }
 
-		public override void Use()
-		{
-			Program.SetNotification("You threw the rock at a wall. Nothing happened.");
-		}
-	}
-	#endregion
+        public void NoUse()
+        {
+            Program.SetError("There is a time and place for everything, but this is not the place to use that!");
+        }
+        #endregion
+    }
 }
