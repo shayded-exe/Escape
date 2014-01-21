@@ -29,13 +29,13 @@ namespace Escape
             string name,
             // Some of these default values may not be sensible,
             // normally you'd always set some of them.
-            string description = "",
-            int health = 0,
-            int maxHealth = 0,
-            int magic = 0,
-            int maxMagic = 0,
-            int power = 0,
-            int defense = 0,
+            string description,
+            int health,
+            int maxHealth,
+            int magic,
+            int maxMagic,
+            int power,
+            int defense,
             int expValue = 0,
             IEnumerable<Attack> attacks = null)
         {

@@ -42,7 +42,7 @@ namespace Escape
         #region Constructor(s)
         public Location(
             string name,
-            string description = "",
+            string description,
             IEnumerable<Func<Location>> unboundExits = null,
             IEnumerable<Item> items = null,
             IEnumerable<Enemy> enemies = null,

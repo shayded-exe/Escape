@@ -36,7 +36,7 @@ namespace Escape
         #region Constructor
         public Item(
             string name,
-            string description = "",
+            string description,
             OnUse uses = null,
             OnUseInBattle battleUses = null)
         {

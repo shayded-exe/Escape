@@ -36,10 +36,10 @@ namespace Escape
             // A lot of these defaults probably aren't reasonable.
             // Make them required if you think they should be set in almost all cases,
             // that way you'll err slightly towards the side of safety.
-            string description = "",
-            int power = 0,
-            int accuracy = 0,
-            int cost = 0,
+            string description,
+            int power,
+            int accuracy,
+            int cost,
             AttackType type = AttackType.None,
             Attack fallback = null)
         {

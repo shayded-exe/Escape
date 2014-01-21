@@ -13,7 +13,7 @@ namespace Escape
     class Program
     {
         #region Declarations
-        // The gloabal Random instance, possibly should be moved into an instance for repeatable plays,
+        // The global Random instance, possibly should be moved into an instance for repeatable plays,
         // but that wasn't possible before either.
         public static Random Random = new Random();
 

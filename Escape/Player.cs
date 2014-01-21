@@ -311,23 +311,23 @@ namespace Escape
         private void MoveTo(string locationName)
         {
             Location exit;
-            if (TryGetFromName(locationName, out exit, Location.Exits))
-            {
-                Location = exit;
+			if (TryGetFromName(locationName, out exit, Location.Exits))
+			{
+				Location = exit;
 
-                Location.CalculateRandomBattle(this);
-            }
-            else if (Location.Name == locationName)
-            {
-                Program.SetError("You are already there!");
-            }
-            else
-            {
-                //REWRITE
-                //Program.SetError("This isn't a valid location!");
-                //Program.SetError("You can't get there from here!");
-                Program.SetError("This isn't a valid location or you can't get there from here!");
-            }
+				Location.CalculateRandomBattle(this);
+			}
+			else if (Location.Name.ToLower() == locationName)
+			{
+				Program.SetError("You are already there!");
+			}
+			else
+			{
+				//REWRITE
+				//Program.SetError("This isn't a valid location!");
+				//Program.SetError("You can't get there from here!");
+				Program.SetError("This isn't a valid location or you can't get there from here!");
+			}
         }
 
         private void Examine(string itemName)
