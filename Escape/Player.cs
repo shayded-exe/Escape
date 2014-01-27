@@ -291,6 +291,7 @@ namespace Escape
 								else
 								{
 									InputNotValid();
+									BattleCore.CurrentTurn = "enemy";
 								}
 								break;
 							}
