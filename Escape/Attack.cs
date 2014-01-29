@@ -34,36 +34,41 @@ namespace Escape
 		#region Public Methods
 		public virtual void Use() 
 		{
+			string outputMessage = "";
+
 			if (BattleCore.CurrentTurn == "player")
 			{
-				Program.SetNotification("You used " + this.Name + "!");
+				outputMessage += "You used " + this.Name;
 			}
 			else
 			{
-				Program.SetNotification("The enemy used " + this.Name + "!");
+				outputMessage += "The enemy used " + this.Name;
 			}
 
-			if (!CheckMagic())
+			if (!CheckMagic(ref outputMessage))
 			{
 				World.Attacks[World.GetAttackIDByName("flail")].Use();
-				return;
+			}
+			else
+			{
+				BattleCore.AttackerMagic -= this.Cost;
+
+				int lucky = CheckLucky(ref outputMessage);
+
+				if (CheckAccuracy(lucky, ref outputMessage))
+				{
+					int damage = CheckDamage(lucky, ref outputMessage);
+
+					BattleCore.DefenderHealth -= damage;
+				}
 			}
 
-			BattleCore.AttackerMagic -= this.Cost;
-
-			int lucky = CheckLucky();
-			
-			if (!CheckAccuracy(lucky))
-				return;
-
-			int damage = CheckDamage(lucky);
-
-			BattleCore.DefenderHealth -= damage;
+			Program.SetNotification(outputMessage);
 		}
 		#endregion
 
 		#region Helper Methods
-		private int CheckLucky()
+		private int CheckLucky(ref string outputMessage)
 		{
 			Random rand = new Random();
 			int random = rand.Next(0, 100);
@@ -72,14 +77,14 @@ namespace Escape
 
 			if (random < modifiedLuckyRate)
 			{
-				Program.SetNotification("Lucky Hit!");
+				outputMessage = "Lucky Hit! " + outputMessage;
 				return 2;
 			}
 			else
 				return 1;
 		}
 
-		private bool CheckAccuracy(int lucky)
+		private bool CheckAccuracy(int lucky, ref string outputMessage)
 		{
 			if (lucky == 2)
 			{
@@ -100,13 +105,13 @@ namespace Escape
 				return true;
 			else
 			{
-				Program.SetError("The attack missed!");
+				outputMessage += ", but it missed!";
 				return false;
 			}
 				
 		}
 
-		private bool CheckMagic()
+		private bool CheckMagic(ref string outputMessage)
 		{
 			if (BattleCore.AttackerMagic >= this.Cost)
 				return true;
@@ -114,17 +119,17 @@ namespace Escape
 			{
 				if (BattleCore.CurrentTurn == "player")
 				{
-					Program.SetError("Not enough magic! You flailed your arms.");
+					outputMessage = "Not enough magic! You flailed your arms.";
 				}
 				else
 				{
-					Program.SetError("The enemy is out of magic! It flailed its arms.");
+					outputMessage = "The enemy is out of magic! It flailed its arms.";
 				}
 				return false;
 			}
 		}
 
-		private int CheckDamage(int lucky)
+		private int CheckDamage(int lucky, ref string outputMessage)
 		{
 			Random random = new Random();
 			double modifier = lucky * 0.6;
@@ -134,11 +139,11 @@ namespace Escape
 
 			if (BattleCore.CurrentTurn == "player")
 			{
-				Program.SetNotification("You did " + (int)damage + " damage!");
+				outputMessage += " and did " + (int)damage + " damage!";
 			}
 			else
 			{
-				Program.SetNotification("The enemy did " + (int)damage + " damage");
+				outputMessage += " and did " + (int)damage + " damage";
 			}
 
 			return (int)damage;
